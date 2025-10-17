@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\MesureEnsembles\Pages;
 
 use App\Filament\Resources\MesureEnsembles\MesureEnsembleResource;
+use App\Models\Produit;
+use App\Models\ProduitCouture;
 use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
@@ -12,6 +14,13 @@ use Illuminate\Support\Facades\Auth;
 class EditMesureEnsemble extends EditRecord
 {
     protected static string $resource = MesureEnsembleResource::class;
+    protected $ancienCouture;
+    
+  protected function beforeSave(): void
+{
+    $this->ancienCouture = ProduitCouture::where('mesure_ensemble_id', $this->record->id)->get()->keyBy('produit_id');
+ 
+}
 
 
       
@@ -53,6 +62,41 @@ foreach ($etapes as $etapeId => $etapeData) {
         ]
     );
 }
+
+
+
+        $nouveauxIds = $this->record->produitCouture->pluck('produit_id')->toArray();
+
+            foreach ($this->ancienCouture as $produitId => $ancienneLigne) {
+                if (!in_array($produitId, $nouveauxIds)) {
+                    // Ce produit a été supprimé → on remet le stock
+                    $produit = Produit::find($produitId);
+                    if ($produit) {
+                        $produit->increment('stock', $ancienneLigne->quantite);
+                       
+                    }
+                }
+            }
+            
+        foreach ($this->record->produitCouture as $detail) {
+            $produitId = $detail->produit_id;
+            $nouvelleQuantite = $detail->quantite;
+            $ancienneQuantite = $this->ancienCouture[$produitId]->quantite ?? 0;
+            //dd($ancienneQuantite, $nouvelleQuantite );
+            $delta = $nouvelleQuantite - $ancienneQuantite;
+
+            if ($delta !== 0) {
+                $produit = Produit::find($produitId);
+                if ($delta > 0) {
+                    $produit->decrement('stock', $delta);
+                } else {
+                    $produit->increment('stock', abs($delta));
+                }
+
+               
+            }
+        }
+
 
 }
 

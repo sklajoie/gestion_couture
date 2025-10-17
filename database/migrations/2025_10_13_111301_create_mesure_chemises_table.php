@@ -30,6 +30,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('set null');
             $table->boolean('status')->default(false);
             $table->boolean('is_archived')->default(false);
+            $table->decimal('total_produit', 10, 2)->nullable();
             $table->timestamps();
         });
     }

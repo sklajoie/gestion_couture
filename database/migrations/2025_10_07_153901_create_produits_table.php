@@ -21,8 +21,9 @@ return new class extends Migration
             $table->integer('stock_minimum')->default(0);
             $table->integer('stock')->default(0);
             $table->string('unite');
-             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-             $table->foreignId('categorie_produit_id')->constrained('categories_produits')->onDelete('cascade');
+            $table->boolean('stockable')->default(false);
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('categorie_produit_id')->constrained('categories_produits')->onDelete('cascade');
             $table->timestamps();
         });
     }

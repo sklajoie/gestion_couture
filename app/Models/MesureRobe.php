@@ -21,11 +21,11 @@ class MesureRobe extends Model
         'Longueur_manche',
         'Type',
         'Description',
-        // 'image_model_id',
         'user_id',
         'Model_mesure',
          'status',
         'is_archived',
+        'total_produit',
     ];
 
         protected $casts = [
@@ -36,11 +36,16 @@ class MesureRobe extends Model
     {
         return $this->hasMany(EtapeMesure::class);
     }
+            public function produitCouture()
+    {
+        return $this->hasMany(ProduitCouture::class);
+    }
 
             protected static function booted()
     {
         static::deleting(function ($etapeMesures) {
             $etapeMesures->etapeMesures()->delete();
+            $etapeMesures->produitCouture()->delete();
         });
     }
 }

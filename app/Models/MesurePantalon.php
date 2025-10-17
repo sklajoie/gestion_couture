@@ -19,11 +19,11 @@ class MesurePantalon extends Model
         'Longueur_pantalon',
         'Type',
         'Description',
-        // 'image_model_id',
         'user_id',
         'Model_mesure',
          'status',
         'is_archived',
+        'total_produit',
     ];
 
         protected $casts = [
@@ -33,6 +33,11 @@ class MesurePantalon extends Model
      public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+        public function produitCouture()
+    {
+        return $this->hasMany(ProduitCouture::class);
     }
 
     public function imageModel()
@@ -48,6 +53,7 @@ class MesurePantalon extends Model
     {
         static::deleting(function ($etapeMesures) {
             $etapeMesures->etapeMesures()->delete();
+            $etapeMesures->produitCouture()->delete();
         });
     }
 }

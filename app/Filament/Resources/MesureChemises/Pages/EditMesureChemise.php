@@ -3,18 +3,28 @@
 namespace App\Filament\Resources\MesureChemises\Pages;
 
 use App\Filament\Resources\MesureChemises\MesureChemiseResource;
+use App\Models\Produit;
+use App\Models\ProduitCouture;
 use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class EditMesureChemise extends EditRecord
 {
     protected static string $resource = MesureChemiseResource::class;
+    protected $ancienCouture;
 
     
+  protected function beforeSave(): void
+{
+    $this->ancienCouture = ProduitCouture::where('mesure_chemise_id', $this->record->id)->get()->keyBy('produit_id');
+ 
+}
+
     
 protected function afterSave(): void
 {
@@ -52,10 +62,49 @@ foreach ($etapes as $etapeId => $etapeData) {
             'user_id' => $etapeData['user_id'] ?? Auth::id(),
             'temp_mis' => $temp_mis,
         ]
-    );
-}
+    );     
 
 }
+
+
+$nouveauxIds = $this->record->produitCouture->pluck('produit_id')->toArray();
+
+    foreach ($this->ancienCouture as $produitId => $ancienneLigne) {
+        if (!in_array($produitId, $nouveauxIds)) {
+            // Ce produit a été supprimé → on remet le stock
+            $produit = Produit::find($produitId);
+            if ($produit) {
+                $produit->increment('stock', $ancienneLigne->quantite);
+                Log::info("Produit supprimé du repeater : stock réajusté de +{$ancienneLigne->quantite} pour produit {$produitId} dans mesure {$this->record->id}");
+            }
+        }
+    }
+    
+foreach ($this->record->produitCouture as $detail) {
+    $produitId = $detail->produit_id;
+    $nouvelleQuantite = $detail->quantite;
+    $ancienneQuantite = $this->ancienCouture[$produitId]->quantite ?? 0;
+    //dd($ancienneQuantite, $nouvelleQuantite );
+    $delta = $nouvelleQuantite - $ancienneQuantite;
+
+    if ($delta !== 0) {
+        $produit = Produit::find($produitId);
+        if ($delta > 0) {
+            $produit->decrement('stock', $delta);
+        } else {
+            $produit->increment('stock', abs($delta));
+        }
+
+        Log::info("Stock ajusté de {$delta} pour produit {$produitId} dans mesure {$this->record->id}");
+    }
+}
+
+
+
+
+        }
+
+
 
 
 protected function mutateFormDataBeforeFill(array $data): array

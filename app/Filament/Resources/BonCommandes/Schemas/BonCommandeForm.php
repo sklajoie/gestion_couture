@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BonCommandes\Schemas;
 
 use App\Models\Fournisseur;
+use App\Models\Produit;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -21,6 +22,7 @@ class BonCommandeForm
                     ->label('fournisseur')
                     ->searchable()
                     ->required()
+                      ->preload()
                     ->getSearchResultsUsing(function (string $search) {
                         return \App\Models\Fournisseur::query()
                             ->where('nom', 'like', "%{$search}%")
@@ -50,7 +52,10 @@ class BonCommandeForm
                             Select::make('produit_id')
                                 ->label('Produit')
                                 ->relationship('produit', 'nom')
-                                ->required(),
+                                ->required()
+                                ->searchable()
+                                ->preload()
+                                ->getOptionLabelFromRecordUsing(fn (Produit $record) => "{$record->nom} ({$record->code_barre})"),
                             TextInput::make('quantite')
                                 ->label('Quantité')
                                 ->numeric()

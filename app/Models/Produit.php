@@ -15,6 +15,7 @@ class Produit extends Model
         'stock_minimum',
         'stock',
         'unite',
+        'stockable',
         'user_id',
         'categorie_produit_id',
     ];

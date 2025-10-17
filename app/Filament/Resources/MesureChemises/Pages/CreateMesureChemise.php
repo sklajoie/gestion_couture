@@ -6,12 +6,15 @@ use App\Filament\Resources\MesureChemises\MesureChemiseResource;
 use App\Models\EtapeMesure;
 use App\Models\EtapeProduction;
 use App\Models\MesureChemise;
+use App\Models\Produit;
+use App\Models\ProduitCouture;
 use Carbon\Carbon;
 // use Filament\Actions\Concerns\HasWizard;
 use Filament\Resources\Pages\CreateRecord\Concerns\HasWizard;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CreateMesureChemise extends CreateRecord
 {
@@ -62,6 +65,20 @@ protected function afterCreate(): void
                 'user_id' => $etapeData['user_id'] ?? Auth::id(),
             ]);
         }
+
+$grouped = $this->record->produitCouture->groupBy('produit_id');
+
+foreach ($grouped as $produitId => $details) {
+    // Si tu veux décrémenter une seule fois, prends la première quantité
+    $quantiteTotale = $details->first()->quantite;
+
+    if ($produit = Produit::find($produitId)) {
+        $produit->decrement('stock', $quantiteTotale);
+    }
+}
+
+
+
 
 }
 

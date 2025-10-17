@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MesureChemises\Schemas;
 
 use App\Models\EtapeProduction;
+use App\Models\Produit;
 use App\Models\User;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
@@ -70,7 +71,76 @@ return $schema
                                 ->image()
                                 ->imagePreviewHeight('150')
                                 ->enableDownload()
-                                ->enableOpen(),
+                                ->enableOpen()
+                                ->openable()
+                                 ->previewable()
+                                 ->reorderable()
+                                 ->appendFiles()
+                                ->panelLayout('grid'),
+                                            ////////////choix produit
+                            Repeater::make('produitCouture')
+                                ->label('Produits commandés')
+                                ->relationship('produitCouture') // Assure-toi que la relation existe dans le modèle BonCommande
+                                ->schema([
+                                    Select::make('produit_id')
+                                        ->label('Produit')
+                                        ->relationship('produit', 'nom')
+                                        ->required()
+                                        ->searchable()
+                                        ->preload()
+                                        ->getOptionLabelFromRecordUsing(fn (Produit $record) => "{$record->nom} ({$record->code_barre})")
+                                        ->reactive()
+                                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                            $produit = \App\Models\Produit::find($state);
+                                            $prix = $produit?->prix_vente ?? 0;
+                                            $set('prix_unitaire', $prix);
+
+                                            // Optionnel : recalcul du total si quantité déjà définie
+                                            $qte = floatval($produit?->quantite ?? 1);
+                                            $set('total', $qte * $prix);
+                                            self::calcTotals($state, $set, $get);
+                                        }),
+                                    TextInput::make('prix_unitaire')
+                                        ->label('Prix unitaire')
+                                        ->numeric()
+                                        ->readOnly()
+                                        ->reactive()
+                                        ->readOnly(),
+
+                                    TextInput::make('quantite')
+                                        ->label('Quantité')
+                                        ->numeric()
+                                        ->default(1)
+                                        ->required()
+                                        ->reactive()
+                                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                            $qte = floatval($state ?? 0);
+                                            $prix = floatval($get('prix_unitaire') ?? 0);
+                                            $set('total', $qte * $prix);
+                                            self::calcTotals($state, $set, $get);
+                                        }),
+
+                                    TextInput::make('total')
+                                        ->label('Total')
+                                        ->numeric()
+                                        ->default(0.0)
+                                        ->readOnly()
+                                        ->reactive(),
+                                        
+                                ])
+                                ->columns(4) // Affiche les 4 champs sur une seule ligne
+                                ->createItemButtonLabel('Ajouter un produit')
+                                ->columnSpanFull()
+                                ->reactive()
+                                ->afterStateUpdated(function ($state, callable $set, callable $get) {
+
+                                 self::calcTotals($state, $set, $get);
+                                }),
+                                TextInput::make('total_produit')
+                                        ->label('TOTAL PRODUIT')
+                                        ->numeric()
+                                        ->readOnly(),
+                                
                         ]),
                 ]),
         ],
@@ -135,5 +205,18 @@ return $schema
     'startIndex' => $startIndex,
 ];
 }
+
+    public static function calcTotals( $state,callable $set, callable $get)
+    {
+        $details = $get('produitCouture') ;
+
+        $totalProduit = collect($details)
+            ->pluck('total')
+            ->filter(fn($v) => is_numeric($v))
+            ->map(fn($v) => floatval($v))
+            ->sum();
+        $set('total_produit', round( $totalProduit, 2));
+    }
+
 
 }

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Produits\Schemas;
 
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
@@ -15,10 +17,10 @@ class ProduitForm
             ->components([
 
                 Select::make('categorie_produit_id')
-                ->relationship('categorie','type')
-                ->relationship('categorie','nom')
-                ->label('Catégorie')
-                ->searchable(),
+                    ->relationship('categorie','nom')
+                    ->label('Catégorie')
+                    ->searchable(['type', 'nom'])
+                     ->preload(),
                 TextInput::make('nom')
                     ->label('Nom du produit')
                     ->required(),
@@ -37,6 +39,12 @@ class ProduitForm
                     ->required()
                     ->numeric()
                     ->default(0),
+                // Checkbox::make('stockable')
+                //     ->label('Stockable'),
+                Radio::make('stockable')
+                ->label('Produit Stockable?')
+                ->boolean()
+                ->inline(),
                 Select::make('unite')
                     ->required()
                     ->options([

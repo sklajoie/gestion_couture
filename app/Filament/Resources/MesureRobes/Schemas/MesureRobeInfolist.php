@@ -54,19 +54,42 @@ class MesureRobeInfolist
                     ->hidden(fn (MesureRobe $record) => empty($record->Model_mesure))
                     ->label('Modèle'),
 
-                RepeatableEntry::make('etapeMesures')
+                 RepeatableEntry::make('etapeMesures')
                         ->table([
                     TableColumn::make('ETAPE')
                         ->alignment(Alignment::Center),
                     TableColumn::make('RESPONSABLE'),
                     TableColumn::make('STATUT'),
-                ])
-                ->schema([
-                    TextEntry::make('etapeProduction.nom'),
-                    TextEntry::make('responsable.name'),
-                    IconEntry::make('is_completed')
-                ->boolean(),
-                    ]),
+                    TableColumn::make('DATE DEBUT'),
+                    TableColumn::make('DATE FIN'),
+                    TableColumn::make('TEMPS MIS'),
+                        ])
+                        ->schema([
+                            TextEntry::make('etapeProduction.nom'),
+                            TextEntry::make('responsable.name'),
+                            IconEntry::make('is_completed')
+                            ->boolean(),
+                            TextEntry::make('date_debut')
+                                ->dateTime('j M , Y H:i:s'),
+                            TextEntry::make('date_fin')
+                                ->dateTime('j M , Y H:i:s'),
+                            TextEntry::make('temp_mis')
+                               ->html(),
+                        
+                                ]),
+                RepeatableEntry::make('produitCouture')
+                        ->table([
+                            TableColumn::make('PRODUIT'),
+                            TableColumn::make('QTE'),
+                            TableColumn::make('PRIX'),
+                            TableColumn::make('TOTAL'),
+                        ])
+                        ->schema([
+                            TextEntry::make('produit.nom'),
+                            TextEntry::make('prix_unitaire'),
+                            TextEntry::make('quantite'),
+                            TextEntry::make('total'),
+                         ]),
             ]);
     }
 }
