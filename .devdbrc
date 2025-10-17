@@ -1,0 +1,6 @@
+[
+  {
+    "type": "sqlite",
+    "path": "d:\\application\\CoutureGestion\\database\\database.sqlite"
+  }
+]
