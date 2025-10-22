@@ -30,6 +30,11 @@ return new class extends Migration
             $table->boolean('status')->default(false);
             $table->boolean('is_archived')->default(false);
             $table->decimal('total_produit', 10, 2)->nullable();
+            $table->decimal('main_oeuvre', 10, 2)->nullable();
+            $table->float('prix_couture')->nullable();
+            $table->float('prix_vente')->nullable();
+            $table->foreignId('couleur_id')->nullable()->constrained('couleurs')->onDelete('set null');
+            $table->foreignId('taille_id')->nullable()->constrained('tailles')->onDelete('set null');
             $table->timestamps();
         });
     }

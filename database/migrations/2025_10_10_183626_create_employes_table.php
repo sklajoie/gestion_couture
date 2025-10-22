@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('poste')->nullable();
             $table->date('date_embauche');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('agence_id')->nullable()->constrained('agences')->onDelete('cascade');
+            $table->foreignId('atelier_id')->nullable()->constrained('ateliers')->onDelete('cascade');
             $table->timestamps();
         });
     }

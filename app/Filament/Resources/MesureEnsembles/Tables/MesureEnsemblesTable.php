@@ -96,6 +96,7 @@ class MesureEnsemblesTable
             ->bulkActions([
                 BulkAction::make('transmettreEtape')
                     ->label('Assigner Mesure')
+                    ->icon('heroicon-m-pencil-square')
                     ->modalHeading('Transmettre les mesures à une étape')
                    
                     ->form([

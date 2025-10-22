@@ -14,5 +14,16 @@ class Employe extends Model
         'poste',
         'date_embauche',
         'user_id',
+        'atelier_id',
+        'agence_id',
     ];
+
+    public function atelier()
+    {
+        return $this->belongsTo(Atelier::class);
+    }
+    public function agence()
+    {
+        return $this->belongsTo(Agence::class);
+    }
 }

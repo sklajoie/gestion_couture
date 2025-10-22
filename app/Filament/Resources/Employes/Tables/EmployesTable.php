@@ -40,6 +40,14 @@ class EmployesTable
                      ->date()
                       ->searchable()
                       ->sortable(),
+                TextColumn::make('atelier.nom')
+                    ->label('Atelier')
+                     ->searchable()
+                      ->sortable(),
+                TextColumn::make('agence.nom')  
+                    ->label('Agence')
+                     ->searchable()
+                      ->sortable(),
             ])
             ->filters([
                 //

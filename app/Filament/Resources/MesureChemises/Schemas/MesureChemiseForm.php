@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\MesureChemises\Schemas;
 
+use App\Models\Couleur;
 use App\Models\EtapeProduction;
 use App\Models\Produit;
+use App\Models\Taille;
 use App\Models\User;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
@@ -113,6 +115,7 @@ return $schema
                                         ->default(1)
                                         ->required()
                                         ->reactive()
+                                         ->live()
                                         ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                             $qte = floatval($state ?? 0);
                                             $prix = floatval($get('prix_unitaire') ?? 0);
@@ -125,6 +128,7 @@ return $schema
                                         ->numeric()
                                         ->default(0.0)
                                         ->readOnly()
+                                         ->live()
                                         ->reactive(),
                                         
                                 ])
@@ -139,7 +143,29 @@ return $schema
                                 TextInput::make('total_produit')
                                         ->label('TOTAL PRODUIT')
                                         ->numeric()
+                                         ->live()
                                         ->readOnly(),
+                                TextInput::make('main_oeuvre')
+                                        ->label('Main d\'œuvre')
+                                        ->numeric()
+                                        ->nullable(),
+                                TextInput::make('prix_couture')
+                                        ->label('Prix Couture')
+                                        ->numeric()
+                                        ->readOnly()
+                                        ->nullable(),
+                                TextInput::make('prix_vente')
+                                        ->label('Prix Vente')
+                                        ->numeric()
+                                        ->nullable(),
+                                Select::make('couleur_id')
+                                        ->options(Couleur::query()->pluck('nom', 'id'))
+                                        ->searchable()
+                                        ->label('Couleur'),
+                                Select::make('taille_id')
+                                        ->options(Taille::query()->pluck('nom', 'id'))
+                                        ->searchable()
+                                        ->label('Couleur'),
                                 
                         ]),
                 ]),
@@ -209,13 +235,16 @@ return $schema
     public static function calcTotals( $state,callable $set, callable $get)
     {
         $details = $get('produitCouture') ;
+        $mainOeuvre = $get('main_oeuvre') ;
 
         $totalProduit = collect($details)
             ->pluck('total')
             ->filter(fn($v) => is_numeric($v))
             ->map(fn($v) => floatval($v))
             ->sum();
+        $prixCouture = $totalProduit + $mainOeuvre;
         $set('total_produit', round( $totalProduit, 2));
+        $set('prix_couture', round( $prixCouture, 2));
     }
 
 

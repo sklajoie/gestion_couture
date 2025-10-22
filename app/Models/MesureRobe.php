@@ -26,6 +26,12 @@ class MesureRobe extends Model
          'status',
         'is_archived',
         'total_produit',
+        'main_oeuvre',
+        'couleur_id',
+        'taille_id',
+        'prix_couture',
+        'prix_vente',
+        
     ];
 
         protected $casts = [

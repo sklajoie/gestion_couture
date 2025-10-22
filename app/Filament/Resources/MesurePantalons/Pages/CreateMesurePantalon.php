@@ -21,7 +21,7 @@ class CreateMesurePantalon extends CreateRecord
     $prefix = $now->format('ym'); // Année sur 2 chiffres + mois → ex: 2510
 
     // Compteur du jour (ex: 001, 002…)
-    $countToday = MesurePantalon::whereDate('created_at', $now->toDateString())->count() + 1;
+    $countToday = MesurePantalon::count() + 1;
     $suffix = str_pad($countToday, 3, '0', STR_PAD_LEFT); // ex: 001
 
     $data['Reference'] = "PA{$prefix}{$suffix}"; // ex: 2510001

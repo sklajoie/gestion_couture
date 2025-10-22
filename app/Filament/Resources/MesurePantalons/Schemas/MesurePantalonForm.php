@@ -164,6 +164,10 @@ class MesurePantalonForm
                         ->label('TOTAL PRODUIT')
                         ->numeric()
                         ->readOnly(),
+                TextInput::make('main_oeuvre')
+                        ->label('Main d\'œuvre')
+                        ->numeric()
+                        ->nullable(),
         ]),
            ],
         $data['steps'],))->startOnStep($data['startIndex'])->columnSpanFull(),

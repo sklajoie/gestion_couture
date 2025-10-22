@@ -207,6 +207,10 @@ class MesureEnsembleForm
                                         ->label('TOTAL PRODUIT')
                                         ->numeric()
                                         ->readOnly(),
+                                TextInput::make('main_oeuvre')
+                                        ->label('Main d\'œuvre')
+                                        ->numeric()
+                                        ->nullable(),
               ]),
                 ]),
         ],

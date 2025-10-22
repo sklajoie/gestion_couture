@@ -87,10 +87,12 @@ foreach ($etapes as $etapeId => $etapeData) {
 
             if ($delta !== 0) {
                 $produit = Produit::find($produitId);
+                if ($produit && $produit->stockable) {
                 if ($delta > 0) {
                     $produit->decrement('stock', $delta);
                 } else {
                     $produit->increment('stock', abs($delta));
+                }
                 }
 
                

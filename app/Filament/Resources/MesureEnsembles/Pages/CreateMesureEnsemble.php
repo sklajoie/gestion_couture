@@ -21,7 +21,7 @@ class CreateMesureEnsemble extends CreateRecord
     $prefix = $now->format('ym'); // Année sur 2 chiffres + mois → ex: 2510
 
     // Compteur du jour (ex: 001, 002…)
-    $countToday = MesureEnsemble::whereDate('created_at', $now->toDateString())->count() + 1;
+    $countToday = MesureEnsemble::count() + 1;
     $suffix = str_pad($countToday, 3, '0', STR_PAD_LEFT); // ex: 001
 
     $data['Reference'] = "EN{$prefix}{$suffix}"; // ex: 2510001
@@ -63,9 +63,12 @@ foreach ($grouped as $produitId => $details) {
     // Si tu veux décrémenter une seule fois, prends la première quantité
     $quantiteTotale = $details->first()->quantite;
 
-    if ($produit = Produit::find($produitId)) {
-        $produit->decrement('stock', $quantiteTotale);
-    }
+        $produit = Produit::find($produitId);
+
+        if ($produit && $produit->stockable) {
+            $produit->decrement('stock', $quantiteTotale);
+        }
+
 }
 
 }

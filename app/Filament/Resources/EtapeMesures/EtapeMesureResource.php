@@ -15,11 +15,14 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class EtapeMesureResource extends Resource
 {
     protected static ?string $model = EtapeMesure::class;
 
+    protected static string | UnitEnum | null $navigationGroup = 'RESSOURCES HUMAINES';
+    protected static ?int $navigationSort = 7;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'nom';
