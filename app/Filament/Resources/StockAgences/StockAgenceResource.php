@@ -43,7 +43,7 @@ class StockAgenceResource extends Resource
                 ->readOnly(),
                 Select::make('stock_entreprise_id')
                     ->relationship('stockEntreprise', 'reference')
-                     ->label('ENTREPÔT')
+                     ->label('PRODUIT')
                     ->searchable()
                      ->preload()
                      ->disabled()
@@ -81,14 +81,15 @@ class StockAgenceResource extends Resource
         return $table
             ->recordTitleAttribute('Stock Agence')
             ->columns([
-                TextColumn::make('stock_alerte')->label('Stock Alerte')->searchable(),
-                TextColumn::make('stock')->label('Stock')->searchable(),
+          
                 TextColumn::make('stockEntreprise.designation')->label('Designation')->searchable(),
                 TextColumn::make('stockEntreprise.code_barre')->label('Code Barre')->searchable(),
                 TextColumn::make('stockEntreprise.reference')->label('Reference')->searchable(),
                 TextColumn::make('stockEntreprise.couleur.nom')->label('Couleur')->searchable(),
                 TextColumn::make('stockEntreprise.taille.nom')->label('Taille')->searchable(),
                 TextColumn::make('agence.nom')->label('Agence')->searchable(),
+                TextColumn::make('stock_alerte')->label('Stock Alerte')->searchable(),
+                TextColumn::make('stock')->label('Stock')->searchable(),
             ])
             ->filters([
                 //

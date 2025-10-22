@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'role',
         'employe_id',
+        'agence_id',
         'active',
     ];
 
