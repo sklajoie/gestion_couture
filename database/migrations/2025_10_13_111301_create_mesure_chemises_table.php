@@ -28,6 +28,7 @@ return new class extends Migration
             // $table->longText('Model_mesure')->nullable();
             $table->json('Model_mesure')->nullable();
             $table->foreignId('user_id')->constrained('users')->onDelete('set null');
+            $table->foreignId('etape_id')->nullable()->constrained('etape_productions')->onDelete('set null');
             $table->boolean('status')->default(false);
             $table->boolean('is_archived')->default(false);
             $table->decimal('total_produit', 10, 2)->nullable();

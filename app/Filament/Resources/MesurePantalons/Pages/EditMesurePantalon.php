@@ -24,7 +24,8 @@ class EditMesurePantalon extends EditRecord
 protected function afterSave(): void
 {
     $etapes = $this->form->getState()['etapes'] ?? [];
-
+      $maxId = \App\Models\EtapeProduction::max('id');
+      //dd($maxId);
 foreach ($etapes as $etapeId => $etapeData) {
     $dateDebut = Carbon::parse($etapeData['date_debut']);
     $dateFin = Carbon::parse($etapeData['date_fin']);
@@ -43,6 +44,20 @@ foreach ($etapes as $etapeId => $etapeData) {
     // Mise à jour de la date_fin si l'étape est en cours et vient d'être complétée
     if ($etapeMesure && !$etapeMesure->is_completed && $etapeData['is_completed'] === true) {
         $etapeData['date_fin'] = Carbon::now();
+         
+               // Mise à jour de la mesure
+        if ($etapeData['etape_production_id'] == $maxId) {
+            // dd($etapeData['etape_production_id'], $maxId);
+            $this->record->update([
+                'etape_id' =>   $etapeData['etape_production_id'],
+                'status' => 1,
+            ]);
+        } else {
+            $this->record->update([
+                'etape_id' =>   $etapeData['etape_production_id'],
+                'status' => 0,
+            ]);
+        }
     }
 
     // Mise à jour ou création de l'étape

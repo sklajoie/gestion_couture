@@ -12,9 +12,14 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class MesurePantalonsTable
@@ -51,9 +56,39 @@ class MesurePantalonsTable
                 ImageColumn::make('Model_mesure') 
                 ->disk('public')
                 ->label('Modèle'),
+                IconColumn::make('status')
+                  ->icon(fn (string $state): Heroicon => match ($state) {
+                    '0' => Heroicon::OutlinedPencil,
+                    '1' => Heroicon::OutlinedCheckCircle,
+                })
+                ->boolean(),
+
+              TextColumn::make('dernierEtape.nom')
+                ->label('Étape en cours')
+                 ->icon(Heroicon::Check)
+                  ->badge()
+                ->colors([
+                    'success' => fn ($state) => $state !== null,
+                    'danger' => fn ($state) => $state === null,
+                ])
+                ->formatStateUsing(fn ($state) => $state ?? 'Terminée'),
+
             ])
             ->filters([
-                //
+                Filter::make('status')
+                    ->query(fn (Builder $query): Builder => $query->where('status', true))
+                    ->toggle()
+                    ->label('FINI'),
+
+                SelectFilter::make('etape_id')
+                   ->options(fn (): array => \App\Models\EtapeProduction::query()->pluck('nom', 'id')->all())
+                   ->multiple()
+                   ->label('ETAPE COUTURE'),
+
+                SelectFilter::make('Type')
+                   ->options(fn (): array => \App\Models\MesurePantalon::query()->distinct()->pluck('Type', 'Type')->all())
+                   ->multiple()
+                   ->label('TYPE COUTURE'),
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -62,8 +97,8 @@ class MesurePantalonsTable
             ->toolbarActions([
                 BulkActionGroup::make([
                    BulkAction::make('transmettreEtape'),
-        BulkAction::make('validerEtape'),
-        DeleteBulkAction::make(),
+                    BulkAction::make('validerEtape'),
+                    DeleteBulkAction::make(),
                 ]),
             ])
 
@@ -94,31 +129,35 @@ class MesurePantalonsTable
                             ->rows(3)
                             ->nullable(),
                     ])
-                    ->action(function (\Illuminate\Support\Collection $records, array $data) {
-                    foreach ($records as $mesure) {
-    $etape = $mesure->etapeMesures()
-        ->where('etape_production_id', $data['etape_production_id'])
-        ->first();
+        ->action(function (\Illuminate\Support\Collection $records, array $data) {
+          
 
-                if ($etape) {
-                    $etape->update([
-                        'responsable_id' => $data['responsable_id'],
-                        'comments' => $data['commentaire'],
-                        'date_debut' => $data['date_debut'],
-                        'user_id' => Auth::id(),
-                        'is_completed' => false,
-                    ]);
-                } else {
-                    $mesure->etapeMesures()->create([
-                        'etape_production_id' => $data['etape_production_id'],
-                        'responsable_id' => $data['responsable_id'],
-                        'comments' => $data['commentaire'],
-                        'date_debut' => $data['date_debut'],
-                        'user_id' => Auth::id(),
-                        'is_completed' => false,
-                    ]);
-                }
-            }
+        foreach ($records as $mesure) {
+            $etape = $mesure->etapeMesures()
+                ->where('etape_production_id', $data['etape_production_id'])
+                ->first();
+
+                        if ($etape) {
+                            $etape->update([
+                                'responsable_id' => $data['responsable_id'],
+                                'comments' => $data['commentaire'],
+                                'date_debut' => $data['date_debut'],
+                                'user_id' => Auth::id(),
+                                'is_completed' => false,
+                            ]);
+                        } else {
+                            $mesure->etapeMesures()->create([
+                                'etape_production_id' => $data['etape_production_id'],
+                                'responsable_id' => $data['responsable_id'],
+                                'comments' => $data['commentaire'],
+                                'date_debut' => $data['date_debut'],
+                                'user_id' => Auth::id(),
+                                'is_completed' => false,
+                            ]);
+                        }
+
+                       
+                    }
 
 
                 Notification::make()
@@ -157,6 +196,8 @@ class MesurePantalonsTable
                             ->required(),
                     ])
                 ->action(function (\Illuminate\Support\Collection $records, array $data) {
+                    $maxId = \App\Models\EtapeProduction::max('id');
+                    
                     foreach ($records as $mesure) {
             $etape = $mesure->etapeMesures()
                 ->where('etape_production_id', $data['etape_production_id'])
@@ -189,6 +230,18 @@ class MesurePantalonsTable
                                 'user_id' => Auth::id(),
                                 'is_completed' => true,
                                 'temp_mis' => 0,
+                            ]);
+                        }
+                             // Mise à jour de la mesure
+                        if ($etape->etape_production_id == $maxId) {
+                            $mesure->update([
+                                'etape_id' =>   $data['etape_production_id'],
+                                'status' => 1,
+                            ]);
+                        } else {
+                            $mesure->update([
+                                'etape_id' =>   $data['etape_production_id'],
+                                'status' => 0,
                             ]);
                         }
                     }

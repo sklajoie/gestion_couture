@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\MesureEnsembles\Schemas;
 
+use App\Models\Couleur;
 use App\Models\EtapeProduction;
 use App\Models\Produit;
+use App\Models\Taille;
 use App\Models\User;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
@@ -177,9 +179,11 @@ class MesureEnsembleForm
                             TextInput::make('quantite')
                                 ->label('Quantité')
                                 ->numeric()
-                                ->default(1)
+                                ->default(0)
+                                ->minValue(1)
                                 ->required()
                                 ->reactive()
+                                ->live(onBlur: true)
                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                     $qte = floatval($state ?? 0);
                                     $prix = floatval($get('prix_unitaire') ?? 0);
@@ -199,18 +203,48 @@ class MesureEnsembleForm
                                 ->createItemButtonLabel('Ajouter un produit')
                                 ->columnSpanFull()
                                 ->reactive()
+                                ->default([]) // ← important pour éviter les erreurs si vide
+                                ->dehydrated(true)
                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
-
+                                    $details = $get('produitCouture') ?? [];
+                                    $totalProduit = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
+                                    // dump($get('prix_unitaire'));
+                                    $set('total_produit', round($totalProduit, 2));
                                  self::calcTotals($state, $set, $get);
                                 }),
                                 TextInput::make('total_produit')
                                         ->label('TOTAL PRODUIT')
                                         ->numeric()
-                                        ->readOnly(),
+                                        ->readOnly()
+                                        ->reactive(),
                                 TextInput::make('main_oeuvre')
                                         ->label('Main d\'œuvre')
                                         ->numeric()
+                                        ->nullable()
+                                        ->reactive()
+                                        ->live(onBlur: true)
+                                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                            self::calcTotals($state, $set, $get);
+                                        }),
+                                TextInput::make('prix_couture')
+                                        ->label('Prix Couture')
+                                        ->numeric()
+                                        ->readOnly()
+                                        ->nullable()
+                                         ->reactive()
+                                         ->live(),
+                                TextInput::make('prix_vente')
+                                        ->label('Prix Vente')
+                                        ->numeric()
                                         ->nullable(),
+                                Select::make('couleur_id')
+                                        ->options(Couleur::query()->pluck('nom', 'id'))
+                                        ->searchable()
+                                        ->label('Couleur'),
+                                Select::make('taille_id')
+                                        ->options(Taille::query()->pluck('nom', 'id'))
+                                        ->searchable()
+                                        ->label('Taille'),
               ]),
                 ]),
         ],
@@ -279,13 +313,17 @@ class MesureEnsembleForm
 
     public static function calcTotals( $state,callable $set, callable $get)
     {
-        $details = $get('produitCouture') ;
 
-        $totalProduit = collect($details)
-            ->pluck('total')
-            ->filter(fn($v) => is_numeric($v))
-            ->map(fn($v) => floatval($v))
-            ->sum();
-        $set('total_produit', round( $totalProduit, 2));
+    $details = $get('produitCouture') ?? [];
+    $totalProduit = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
+    // dump($get('prix_unitaire'));
+    $mainOeuvre = $get('main_oeuvre') ;
+   // dd( $details);
+
+    $prixCouture = $totalProduit + $mainOeuvre;
+    $set('total_produit', round( $totalProduit, 2));
+    $set('prix_couture', round( $prixCouture, 2));
     }
+
+
 }

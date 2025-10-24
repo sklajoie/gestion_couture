@@ -94,7 +94,7 @@ class VenteForm
                         ->relationship()
                         ->schema([
                             Select::make('stock_entreprise_id')
-                                ->label('Stock Entreprise')
+                                ->label('Produits')
                                 ->relationship('stockEntreprise', 'code_barre')
                                 ->required()
                                 ->searchable()
@@ -141,9 +141,9 @@ class VenteForm
 
                             TextInput::make('quantite')
                                     ->numeric()
-                                    ->default(1)
-                                    ->live()
-                                    ->reactive()
+                                    ->default(0)
+                                    ->live(onBlur: true)
+                                    // ->reactive()
                                     ->minValue(1)
                                     ->maxValue(fn (callable $get) => $get('stock')) 
                                     ->required()
@@ -170,10 +170,23 @@ class VenteForm
                             TextInput::make('montant')
                                 ->numeric()
                                 ->required()
-                                ->readOnly(),
+                                ->readOnly()
+                                ->reactive()
+                                 ->live(),
                         ])
                         ->columns(4)
-                        ->columnSpanFull(),
+                        ->columnSpanFull()
+                        ->live()
+                        ->reactive()
+                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                             $details = $get('detailVentes') ?? [];
+
+                            $totalBrut = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
+                            $set('montant_brut', round($totalBrut, 2));
+
+
+                            self::calculTotaux($state, $set, $get);
+                        }),
                  ]),
                 Step::make('INFORMATION VERSEMENT')
                     ->schema([
@@ -183,11 +196,15 @@ class VenteForm
                                 ->label('Montant Brut')
                                 ->numeric()
                                 ->readOnly()
+                                ->reactive()
+                                ->live()
                                 ->default(0),
                             TextInput::make('remise')
                                 ->label('Remise')
                                 ->numeric()
                                 ->default(0)
+                                 ->reactive()
+                                ->live(onBlur: true)
                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                     self::calculTotaux($state, $set, $get);
                                     }),
@@ -195,7 +212,9 @@ class VenteForm
                                 ->label('Montant Hors Taxe')
                                 ->numeric()
                                 ->readOnly()
-                                ->default(0),
+                                ->default(0)
+                                 ->reactive()
+                                ->live(),
                             Select::make('tva')
                                 ->options([
                                         '0' => '0%',
@@ -204,6 +223,7 @@ class VenteForm
                                 ->label('TVA')
                                 ->default(0)
                                 ->reactive()
+                                 ->live()
                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                     self::calculTotaux($state, $set, $get);
                                     }),
@@ -211,35 +231,37 @@ class VenteForm
                                 ->label('Montant TTC')
                                 ->numeric()
                                 ->readOnly()
+                                 ->reactive()
+                                ->live()
                                 ->default(0),
                             TextInput::make('avance')
                                 ->label('Avance')
                                 ->numeric()
                                 ->readOnly()
-                                ->reactive()
+                                 ->reactive()
+                                ->live()
                                 ->default(0)
                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                     self::calculTotaux($state, $set, $get);
                                     }),
-                            Select::make('statut')
-                                ->label('Statut')
-                                ->options([
-                                    'En cours' => 'En cours',
-                                    'Clôturée' => 'Clôturée',
-                                ])
-                                ->default('En cours')
-                                ->required(),
-
                             TextInput::make('solde')
                                 ->label('Solde')
                                 ->numeric()
                                 ->default(0)
-                                ->readOnly(),   
+                                ->readOnly()
+                                 ->reactive()
+                                ->live(),   
         
                         ]) ->columns(2)->columnSpanFull()
                         ->live()
                         ->reactive()
                         ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                             $details = $get('detailVentes') ?? [];
+
+                            $totalBrut = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
+                            $set('montant_brut', round($totalBrut, 2));
+
+
                             self::calculTotaux($state, $set, $get);
                         }),
                     
@@ -251,6 +273,8 @@ class VenteForm
                            TextInput::make('montant')
                                 ->label('Montant')
                                 ->numeric()
+                                 ->reactive()
+                                ->live(onBlur: true)
                                 ->columnSpan(1)
                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                     self::calculTotaux($state, $set, $get);
@@ -267,6 +291,8 @@ class VenteForm
                                     'Autre' => 'Autre',
                                 ])
                                 ->default('Especes')
+                                 ->reactive()
+                                ->live()
                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                     self::calculTotaux($state, $set, $get);
                                     }),
@@ -295,16 +321,10 @@ class VenteForm
 
 public static function calculTotaux($state, callable $set, callable $get)
 {
-    $details = $get('detailVentes');
-
     // Total brut = somme des montants des lignes de vente
-    $totalBrut = collect($details)
-        ->pluck('montant')
-        ->filter(fn($v) => is_numeric($v))
-        ->map(fn($v) => floatval($v))
-        ->sum();
+     $details = $get('detailVentes') ?? [];
+    $totalBrut = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
     $set('montant_brut', round($totalBrut, 2));
-
     // Remise
     $remise = floatval($get('remise') ?? 0);
     $totalHT = $totalBrut - $remise;

@@ -46,6 +46,20 @@ foreach ($etapes as $etapeId => $etapeData) {
     // Mise à jour de la date_fin si l'étape est en cours et vient d'être complétée
     if ($etapeMesure && !$etapeMesure->is_completed && $etapeData['is_completed'] === true) {
         $etapeData['date_fin'] = Carbon::now();
+
+           $maxId = \App\Models\EtapeProduction::max('id');
+               // Mise à jour de la mesure
+        if ($etapeData['etape_production_id'] == $maxId) {
+            $this->record->update([
+                'etape_id' =>   $etapeData['etape_production_id'],
+                'status' => 1,
+            ]);
+        } else {
+            $this->record->update([
+                'etape_id' =>   $etapeData['etape_production_id'],
+                'status' => 0,
+            ]);
+        }
     }
 
     // Mise à jour ou création de l'étape

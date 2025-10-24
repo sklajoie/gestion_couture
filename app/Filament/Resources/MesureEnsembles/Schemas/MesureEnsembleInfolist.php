@@ -81,14 +81,21 @@ class MesureEnsembleInfolist
                     ->label('Modèle'),
 
                RepeatableEntry::make('etapeMesures')
+                       ->columnSpanFull()
+                       ->getStateUsing(fn ($record) =>
+                        $record->etapeMesures()
+                            ->with(['etapeProduction', 'responsable'])
+                            ->orderBy('id', 'asc')
+                            ->get()
+                             )
                         ->table([
-                    TableColumn::make('ETAPE')
-                        ->alignment(Alignment::Center),
-                    TableColumn::make('RESPONSABLE'),
-                    TableColumn::make('STATUT'),
-                    TableColumn::make('DATE DEBUT'),
-                    TableColumn::make('DATE FIN'),
-                    TableColumn::make('TEMPS MIS'),
+                            TableColumn::make('ETAPE')
+                                ->alignment(Alignment::Center),
+                            TableColumn::make('RESPONSABLE'),
+                            TableColumn::make('STATUT'),
+                            TableColumn::make('DATE DEBUT'),
+                            TableColumn::make('DATE FIN'),
+                            TableColumn::make('TEMPS MIS'),
                         ])
                         ->schema([
                             TextEntry::make('etapeProduction.nom'),
@@ -104,6 +111,7 @@ class MesureEnsembleInfolist
                         
                                 ]),
                 RepeatableEntry::make('produitCouture')
+                        ->columnSpanFull()
                         ->table([
                             TableColumn::make('PRODUIT'),
                             TableColumn::make('QTE'),

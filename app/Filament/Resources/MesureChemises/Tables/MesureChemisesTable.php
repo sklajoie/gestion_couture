@@ -4,6 +4,9 @@ namespace App\Filament\Resources\MesureChemises\Tables;
 
 // use Filament\Actions\BulkAction;
 
+use App\Models\EtapeMesure;
+use App\Models\EtapeProduction;
+use App\Models\MesureChemise;
 use Carbon\Carbon;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -16,9 +19,13 @@ use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -30,10 +37,12 @@ class MesureChemisesTable
             ->columns([
 
                 TextColumn::make('created_at')
-                    ->dateTime('j M, Y H:i'),
+                    ->dateTime('j M, Y H:i')
+                       ->searchable(),
 
                 TextColumn::make('Type')
-                    ->label('Type'),
+                    ->label('Type')
+                       ->searchable(),
                    
                 TextColumn::make('Tour_cou')
                     ->label('Tour cou'),
@@ -61,30 +70,44 @@ class MesureChemisesTable
                 TextColumn::make('Longueur_chemise')
                     ->label('Longueur chemise'),
 
-              TextColumn::make('etape_en_cours')
+                IconColumn::make('status')
+                  ->icon(fn (string $state): Heroicon => match ($state) {
+                    '0' => Heroicon::OutlinedPencil,
+                    '1' => Heroicon::OutlinedCheckCircle,
+                })
+                ->boolean(),
+
+              TextColumn::make('dernierEtape.nom')
                 ->label('Étape en cours')
                  ->icon(Heroicon::Check)
                   ->badge()
-              
                 ->colors([
                     'success' => fn ($state) => $state !== null,
                     'danger' => fn ($state) => $state === null,
                 ])
                 ->formatStateUsing(fn ($state) => $state ?? 'Terminée'),
 
-            // TextColumn::make('etapeMesures')
-            //     ->label('Statut')
-            //     ->formatStateUsing(fn ($etapes) => collect($etapes)
-            //         ->sortByDesc('created_at')
-            //         ->first()?->is_completed ? '✅ Terminée' : '⏳ En cours'
-            //     )
-
+            
                 ImageColumn::make('Model_mesure') 
                 ->disk('public')
                 ->label('Modèle'),
             ])
             ->filters([
-                //
+                Filter::make('status')
+                ->query(fn (Builder $query): Builder => $query->where('status', true))
+                ->toggle()
+                ->label('FINI'),
+
+                SelectFilter::make('etape_id')
+                   ->options(fn (): array => EtapeProduction::query()->pluck('nom', 'id')->all())
+                   ->multiple()
+                   ->label('ETAPE COUTURE'),
+
+                SelectFilter::make('Type')
+                   ->options(fn (): array => MesureChemise::query()->distinct()->pluck('Type', 'Type')->all())
+                   ->multiple()
+                   ->label('TYPE COUTURE'),
+
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -187,6 +210,13 @@ class MesureChemisesTable
                             ->required(),
                     ])
                 ->action(function (\Illuminate\Support\Collection $records, array $data) {
+
+                       function isDerniereEtape($etape)
+                        {
+                            $maxId = \App\Models\EtapeProduction::max('id');
+                            return $etape->etape_production_id == $maxId;
+                        }
+
                     foreach ($records as $mesure) {
             $etape = $mesure->etapeMesures()
                 ->where('etape_production_id', $data['etape_production_id'])
@@ -221,6 +251,18 @@ class MesureChemisesTable
                                 'temp_mis' => 0,
                             ]);
                         }
+                         // Mise à jour de la mesure
+                        if (isDerniereEtape($etape)) {
+                            $mesure->update([
+                                'etape_id' =>   $data['etape_production_id'],
+                                'status' => 1,
+                            ]);
+                        } else {
+                            $mesure->update([
+                                'etape_id' =>   $data['etape_production_id'],
+                                'status' => 0,
+                            ]);
+                        }
                     }
 
 
@@ -236,7 +278,14 @@ class MesureChemisesTable
               DeleteBulkAction::make(),
 
             ]);
-    }
+     
+            
+        }
+        protected function getTableQuery(): Builder
+        {
+        return MesureChemise::query()->with('dernierEtape');
+        }
 
-    
+
+
 }

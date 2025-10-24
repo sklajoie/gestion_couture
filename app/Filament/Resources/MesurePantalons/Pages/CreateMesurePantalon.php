@@ -32,6 +32,8 @@ protected function afterCreate(): void
 {
     $etapes = $this->form->getState()['etapes'] ?? [];
     //  dd($etapes);
+      $maxId = \App\Models\EtapeProduction::max('id');
+
         foreach ($etapes as $etapeData) {
             $isFirst = $etapeData['etape_production_id'] == EtapeProduction::orderBy('id')->first()?->id;
 
@@ -54,7 +56,16 @@ protected function afterCreate(): void
                 'responsable_id' => $isFirst ? Auth::id() : ($etapeData['responsable_id'] ?? null),
                 'user_id' => $etapeData['user_id'] ?? Auth::id(),
             ]);
+
+             
+               // Mise à jour de la mesure
+      
+            $this->record->update([
+                'etape_id' => 1,
+                'status' => 0,
+            ]);
         }
+        
 
         $grouped = $this->record->produitCouture->groupBy('produit_id');
 

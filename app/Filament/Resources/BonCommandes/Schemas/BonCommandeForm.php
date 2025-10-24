@@ -61,16 +61,13 @@ class BonCommandeForm
                                 ->numeric()
                                  ->default(1)
                                 ->required()
-                                ->reactive()
+                                ->live(onBlur: true)
                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                    $qte = floatval($state ?? 0);
+                                  
                                     $prix = floatval($get('prix_unitaire') ?? 0);
-                                    $total = $qte * $prix;
-                                    $set('total', null);
-                                    $set('total', $total);
+                                      $set('total', $state * $prix);
                                    
-                                    // Recalcul global
-                                   self::recalcTotals($state, $set, $get);
+                                    self::recalcTotals($state, $set, $get);
                             }),
                             // TextInput::make('quantite_approvisionnee')
                             //     ->label('Quantité approvisionnée')
@@ -84,15 +81,12 @@ class BonCommandeForm
                                 ->default(0.0)
                                 ->required()
                                 ->reactive()
+                                ->live(onBlur: true)
                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                     $qte = floatval($get('quantite') ?? 0);
-                                    $prix = floatval($state ?? 0);
-                                    $total = $qte * $prix;
-                                    $set('total', null);
-                                    $set('total', $total);
+                                    $set('total', $state * $qte);
                                     // Recalcul global
-                                    //\App\Filament\Resources\BonCommandes\Schemas\BonCommandeForm::recalcTotals($set, $get);
-                                     self::recalcTotals($state, $set, $get);
+                                self::recalcTotals($state, $set, $get);
                                 }),
                             TextInput::make('total')
                                 ->label('Total')
@@ -107,8 +101,13 @@ class BonCommandeForm
                         ->columnSpanFull()
                         ->reactive()
                         ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $details = $get('details') ?? [];
 
-                            self::recalcTotals($state, $set, $get);
+                            $totalBrut = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
+                            $set('total_brut', round($totalBrut, 2));
+
+                            // Recalcul complet
+                            self::recalcTotals($state,$set, $get);
                         }),
                     /////Choix produit
 
@@ -119,29 +118,28 @@ class BonCommandeForm
                     ->required()
                     ->numeric()
                     ->default(0.0)
-                    ->readOnly(),
+                    ->readOnly()
+                    ->reactive()
+                    ->live(),
                 TextInput::make('remise')
                     ->required()
                     ->numeric()
                     ->default(0.0)
                     ->reactive()
+                    ->live(onBlur: true)
                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                        // $totalBrut = $get('total_brut') ?? 0;
-                        // $remise = floatval($state ?? 0);
-                        // $total_hors_taxes = $totalBrut - $remise;
-                        // $set('total_hors_taxes', $total_hors_taxes);
+                        // $totalBrut = floatval($get('total_brut') ?? 0);
+                        // $set('total_hors_taxes', round(($totalBrut - $state), 2));
+                    self::recalcTotals($state, $set, $get);
 
-                        // $tva = floatval($get('tva') ?? 0);
-                        // $total_ttc = $total_hors_taxes + ($total_hors_taxes * $tva);
-                        // $set('total_ttc', $total_ttc);
-
-                        self::recalcTotals($state, $set, $get);
                     }),
                 TextInput::make('total_hors_taxes')
                     ->required()
                     ->numeric()
                     ->default(0.0)
-                    ->readOnly(),
+                    ->readOnly()
+                    ->reactive()
+                    ->live(),
                 Select::make('tva')
                     ->options([
                             '0.0' => '0',
@@ -150,14 +148,6 @@ class BonCommandeForm
                     ->default('0.0')
                     ->reactive()
                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                        // $totalBrut = floatval($get('total_brut')) ?? 0;
-                        // $remise = floatval($get('remise') ?? 0);
-                        // $total_hors_taxes = $totalBrut - $remise;
-                        // $set('total_hors_taxes', $total_hors_taxes);
-
-                        // $tva = floatval($state ?? 0);
-                        // $total_ttc = $total_hors_taxes + ($total_hors_taxes * $tva);
-                        // $set('total_ttc', $total_ttc);
 
                         self::recalcTotals($state, $set, $get);
                     }),
@@ -165,24 +155,25 @@ class BonCommandeForm
                     ->required()
                     ->numeric()
                     ->default(0.0)
-                    ->readOnly(),
+                    ->readOnly()
+                    ->reactive()
+                    ->live(),
                 TextInput::make('avance')
                     ->required()
                     ->numeric()
                     ->default(0.0)
                     ->reactive()
+                    ->live(onBlur: true)
                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                        // $totalTtc = floatval($get('total_ttc') ?? 0);
-                        // $avance = floatval($state ?? 0);
-                        // $solde = $totalTtc - $avance;
-                        // $set('solde', round($solde, 2));
                         self::recalcTotals($state, $set, $get);
                             }),
                 TextInput::make('solde')
                     ->required()
                     ->numeric()
                     ->default(0.0)
-                    ->readOnly(),
+                    ->readOnly()
+                    ->reactive()
+                    ->live(),
                 Textarea::make('remarques')
                     ->columnSpanFull(),
 
@@ -191,29 +182,44 @@ class BonCommandeForm
             ]);
     }
 
-    public static function recalcTotals( $state,callable $set, callable $get)
-    {
-        $details = $get('details') ;
+    // public static function recalcTotals( $state,callable $set, callable $get)
+    // {
+    //    $details = $get('../../details') ?? [];
+    //     $totalBrut = collect($details)->sum(fn ($item) => floatval($item['total'] ?? 0));
+    //     $set('../../total_brut', round($totalBrut, 2));
 
-        $totalBrut = collect($details)
-            ->pluck('total')
-            ->filter(fn($v) => is_numeric($v))
-            ->map(fn($v) => floatval($v))
-            ->sum();
-        $set('total_brut', round($totalBrut, 2));
+    //     $remise = floatval($get('remise') ?? 0);
+    //     $totalHT = $totalBrut - $remise;
+    //     $set('../../total_hors_taxes', round($totalHT, 2));
 
-        $remise = floatval($get('remise') ?? 0);
-        $totalHT = $totalBrut - $remise;
-        $set('total_hors_taxes', round($totalHT, 2));
+    //     $tva = floatval($get('tva') ?? 0);
+    //     $totalTTC = $totalHT + ($totalHT * $tva);
+    //     $set('../../total_ttc', round($totalTTC, 2));
 
-        $tva = floatval($get('tva') ?? 0);
-        $totalTTC = $totalHT + ($totalHT * $tva);
-        $set('total_ttc', round($totalTTC, 2));
+    //     $avance = floatval($get('avance') ?? 0);
+    //     $set('../../solde', round($totalTTC - $avance, 2));
+    // }
 
-        $avance = floatval($get('avance') ?? 0);
-        $set('solde', round($totalTTC - $avance, 2));
-    }
+    public static function recalcTotals($state, callable $set, callable $get): void
+{
+    $details = $get('details') ?? [];
+    $totalBrut = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
+    $set('total_brut', round($totalBrut, 2));
+
+    $remise = floatval($get('remise') ?? 0);
+    $totalHT = $totalBrut - $remise;
+    $set('total_hors_taxes', round($totalHT, 2));
+
+    $tva = floatval($get('tva') ?? 0);
+    $totalTTC = $totalHT + ($totalHT * $tva);
+    $set('total_ttc', round($totalTTC, 2));
+
+    $avance = floatval($get('avance') ?? 0);
+    $set('solde', round($totalTTC - $avance, 2));
+}
 
 
     
 }
+
+

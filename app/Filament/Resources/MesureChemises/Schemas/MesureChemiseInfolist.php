@@ -67,6 +67,13 @@ class MesureChemiseInfolist
                     ->label('Modèle'),
 
                RepeatableEntry::make('etapeMesures')
+                        ->columnSpanFull()
+                        ->getStateUsing(fn ($record) =>
+                          $record->etapeMesures()
+                            ->with(['etapeProduction', 'responsable'])
+                            ->orderBy('id', 'asc')
+                            ->get()
+                             )
                         ->table([
                     TableColumn::make('ETAPE')
                         ->alignment(Alignment::Center),
@@ -90,6 +97,7 @@ class MesureChemiseInfolist
                         
                                 ]),
                 RepeatableEntry::make('produitCouture')
+                        ->columnSpanFull()
                         ->table([
                             TableColumn::make('PRODUIT'),
                             TableColumn::make('QTE'),

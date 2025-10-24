@@ -33,6 +33,7 @@ return new class extends Migration
             $table->decimal('main_oeuvre', 10, 2)->nullable();
             $table->float('prix_couture')->nullable();
             $table->float('prix_vente')->nullable();
+            $table->foreignId('etape_id')->nullable()->constrained('etape_productions')->onDelete('set null');
             $table->foreignId('couleur_id')->nullable()->constrained('couleurs')->onDelete('set null');
             $table->foreignId('taille_id')->nullable()->constrained('tailles')->onDelete('set null');
             $table->timestamps();

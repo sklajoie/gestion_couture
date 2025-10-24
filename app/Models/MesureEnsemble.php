@@ -38,11 +38,16 @@ class MesureEnsemble extends Model
         'taille_id',
         'prix_couture',
         'prix_vente',
+        'etape_id',
     ];
         protected $casts = [
            'Model_mesure' => 'array',
       ];
 
+       public function dernierEtape()
+    {
+        return $this->belongsTo(EtapeProduction::class, 'etape_id');
+    }
         public function user()
     {
         return $this->belongsTo(User::class);

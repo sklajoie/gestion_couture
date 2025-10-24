@@ -29,12 +29,19 @@ class MesureChemise extends Model
         'taille_id',
         'prix_couture',
         'prix_vente',
+        'etape_id'
     ];
     protected $casts = [
     'Model_mesure' => 'array',
       ];
 
 
+
+
+    public function dernierEtape()
+    {
+        return $this->belongsTo(EtapeProduction::class, 'etape_id');
+    }
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -54,6 +61,17 @@ class MesureChemise extends Model
     {
         return $this->hasMany(EtapeMesure::class);
     }
+
+    
+
+//   public function getDernierEtapeAttribute()
+// {
+//     return $this->etapeMesures
+//         ->where('is_completed', true)
+//         ->sortByDesc('date_fin')
+//         ->first()?->etapeProduction?->nom ?? '—';
+// }
+
 
         protected static function booted()
     {

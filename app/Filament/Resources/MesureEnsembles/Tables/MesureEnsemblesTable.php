@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\MesureEnsembles\Tables;
 
+use App\Models\EtapeProduction;
+use App\Models\MesureEnsemble;
 use Carbon\Carbon;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -12,9 +14,14 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class MesureEnsemblesTable
@@ -80,9 +87,39 @@ class MesureEnsemblesTable
                 ImageColumn::make('Model_mesure') 
                     ->disk('public')
                     ->label('Modèle'),
+                IconColumn::make('status')
+                  ->icon(fn (string $state): Heroicon => match ($state) {
+                    '0' => Heroicon::OutlinedPencil,
+                    '1' => Heroicon::OutlinedCheckCircle,
+                })
+                ->boolean(),
+
+              TextColumn::make('dernierEtape.nom')
+                ->label('Étape en cours')
+                 ->icon(Heroicon::Check)
+                  ->badge()
+                ->colors([
+                    'success' => fn ($state) => $state !== null,
+                    'danger' => fn ($state) => $state === null,
+                ])
+                ->formatStateUsing(fn ($state) => $state ?? 'Terminée'),
+
             ])
             ->filters([
-                //
+                Filter::make('status')
+                ->query(fn (Builder $query): Builder => $query->where('status', true))
+                ->toggle()
+                ->label('FINI'),
+
+                SelectFilter::make('etape_id')
+                   ->options(fn (): array => EtapeProduction::query()->pluck('nom', 'id')->all())
+                   ->multiple()
+                   ->label('ETAPE COUTURE'),
+
+                SelectFilter::make('Type')
+                   ->options(fn (): array => MesureEnsemble::query()->distinct()->pluck('Type', 'Type')->all())
+                   ->multiple()
+                   ->label('TYPE COUTURE'),
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -179,6 +216,9 @@ class MesureEnsemblesTable
                             ->required(),
                     ])
                 ->action(function (\Illuminate\Support\Collection $records, array $data) {
+
+                     $maxId = \App\Models\EtapeProduction::max('id');
+
                     foreach ($records as $mesure) {
             $etape = $mesure->etapeMesures()
                 ->where('etape_production_id', $data['etape_production_id'])
@@ -211,6 +251,19 @@ class MesureEnsemblesTable
                                 'user_id' => Auth::id(),
                                 'is_completed' => true,
                                 'temp_mis' => 0,
+                            ]);
+                        }
+
+                           // Mise à jour de la mesure
+                        if ($etape->etape_production_id == $maxId) {
+                            $mesure->update([
+                                'etape_id' =>   $data['etape_production_id'],
+                                'status' => 1,
+                            ]);
+                        } else {
+                            $mesure->update([
+                                'etape_id' =>   $data['etape_production_id'],
+                                'status' => 0,
                             ]);
                         }
                     }

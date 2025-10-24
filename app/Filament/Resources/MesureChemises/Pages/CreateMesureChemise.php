@@ -64,7 +64,13 @@ protected function afterCreate(): void
                 'responsable_id' => $isFirst ? Auth::id() : ($etapeData['responsable_id'] ?? null),
                 'user_id' => $etapeData['user_id'] ?? Auth::id(),
             ]);
+
+
         }
+             $this->record->update([
+                'etape_id' => 1,
+                'status' => 0,
+            ]);
 
 $grouped = $this->record->produitCouture->groupBy('produit_id');
 

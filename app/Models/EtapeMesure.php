@@ -45,7 +45,7 @@ class EtapeMesure extends Model
     }
     public function etapeProduction()
     {
-        return $this->belongsTo(EtapeProduction::class);
+        return $this->belongsTo(EtapeProduction::class, 'etape_production_id');
     }
     public function responsable()
     {

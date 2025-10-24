@@ -92,13 +92,14 @@ return $schema
                                         ->preload()
                                         ->getOptionLabelFromRecordUsing(fn (Produit $record) => "{$record->nom} ({$record->code_barre})")
                                         ->reactive()
+                                        ->live()
                                         ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                             $produit = \App\Models\Produit::find($state);
                                             $prix = $produit?->prix_vente ?? 0;
                                             $set('prix_unitaire', $prix);
 
                                             // Optionnel : recalcul du total si quantité déjà définie
-                                            $qte = floatval($produit?->quantite ?? 1);
+                                            $qte = floatval($produit?->quantite ?? 0);
                                             $set('total', $qte * $prix);
                                             self::calcTotals($state, $set, $get);
                                         }),
@@ -107,19 +108,21 @@ return $schema
                                         ->numeric()
                                         ->readOnly()
                                         ->reactive()
+                                        ->live()
                                         ->readOnly(),
 
                                     TextInput::make('quantite')
                                         ->label('Quantité')
                                         ->numeric()
-                                        ->default(1)
+                                        ->default(0)
+                                        ->minValue(1)
                                         ->required()
                                         ->reactive()
-                                         ->live()
+                                         ->live(onBlur: true)
                                         ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                            $qte = floatval($state ?? 0);
+                                           
                                             $prix = floatval($get('prix_unitaire') ?? 0);
-                                            $set('total', $qte * $prix);
+                                            $set('total', $state * $prix);
                                             self::calcTotals($state, $set, $get);
                                         }),
 
@@ -128,7 +131,6 @@ return $schema
                                         ->numeric()
                                         ->default(0.0)
                                         ->readOnly()
-                                         ->live()
                                         ->reactive(),
                                         
                                 ])
@@ -136,7 +138,13 @@ return $schema
                                 ->createItemButtonLabel('Ajouter un produit')
                                 ->columnSpanFull()
                                 ->reactive()
+                                ->default([]) // ← important pour éviter les erreurs si vide
+                                ->dehydrated(true)
                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
+
+                                    $details = $get('produitCouture') ?? [];
+                                    $totalProduit = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
+                                    $set('total_produit', round($totalProduit, 2));
 
                                  self::calcTotals($state, $set, $get);
                                 }),
@@ -144,16 +152,24 @@ return $schema
                                         ->label('TOTAL PRODUIT')
                                         ->numeric()
                                          ->live()
+                                         ->reactive()
                                         ->readOnly(),
                                 TextInput::make('main_oeuvre')
                                         ->label('Main d\'œuvre')
                                         ->numeric()
-                                        ->nullable(),
+                                        ->nullable()
+                                         ->reactive()
+                                         ->live(onBlur: true)
+                                ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                 self::calcTotals($state, $set, $get);
+                                }),
                                 TextInput::make('prix_couture')
                                         ->label('Prix Couture')
                                         ->numeric()
                                         ->readOnly()
-                                        ->nullable(),
+                                        ->nullable()
+                                         ->reactive()
+                                         ->live(),
                                 TextInput::make('prix_vente')
                                         ->label('Prix Vente')
                                         ->numeric()
@@ -165,7 +181,7 @@ return $schema
                                 Select::make('taille_id')
                                         ->options(Taille::query()->pluck('nom', 'id'))
                                         ->searchable()
-                                        ->label('Couleur'),
+                                        ->label('Taille'),
                                 
                         ]),
                 ]),
@@ -234,17 +250,16 @@ return $schema
 
     public static function calcTotals( $state,callable $set, callable $get)
     {
-        $details = $get('produitCouture') ;
-        $mainOeuvre = $get('main_oeuvre') ;
 
-        $totalProduit = collect($details)
-            ->pluck('total')
-            ->filter(fn($v) => is_numeric($v))
-            ->map(fn($v) => floatval($v))
-            ->sum();
-        $prixCouture = $totalProduit + $mainOeuvre;
-        $set('total_produit', round( $totalProduit, 2));
-        $set('prix_couture', round( $prixCouture, 2));
+    $details = $get('produitCouture') ?? [];
+    $totalProduit = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
+    // dump($get('prix_unitaire'));
+    $mainOeuvre = $get('main_oeuvre') ;
+   // dd( $details);
+
+    $prixCouture = $totalProduit + $mainOeuvre;
+    $set('total_produit', round( $totalProduit, 2));
+    $set('prix_couture', round( $prixCouture, 2));
     }
 
 
