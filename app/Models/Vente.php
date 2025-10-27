@@ -50,18 +50,20 @@ class Vente extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-      protected static function booted()
-        {
-            static::creating(function ($model) {
-                $now = \Carbon\Carbon::now();
-                $prefix = $now->format('ym');
+            protected static function booted()
+            {
+                static::creating(function ($model) {
+                    $now = \Carbon\Carbon::now();
+                    $prefix = $now->format('ym');
 
-                    $countItem = Vente::count() + 1;
-                    $suffix = str_pad($countItem , 5, '0', STR_PAD_LEFT); // ex: 001
+                    do {
+                        $suffix = str_pad(random_int(1, 99999), 5, '0', STR_PAD_LEFT);
+                        $numero = "V{$prefix}{$suffix}";
+                    } while (self::where('reference', $numero)->exists());
 
-                    $numero = "V$prefix{$suffix}"; // ex: 2510001
-                    $model->reference =  $numero;
-            });
+                    $model->reference = $numero;
+                });
+      
 
             static::deleting(function ($vente) {
                     foreach ($vente->detailVentes as $detail) {

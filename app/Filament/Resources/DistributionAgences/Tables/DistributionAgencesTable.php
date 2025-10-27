@@ -48,11 +48,12 @@ class DistributionAgencesTable
                 BulkAction::make('valider_distribution')
                     ->label('Reception Distribution')
                     ->icon('heroicon-m-check')
-                    ->modalHeading("Vous etre sur le point de receptionner la/les distributions sélectionnées")
+                    ->modalHeading("Vous êtes sur le point de receptionner la/les distributions sélectionnées")
                     ->color('success')
                     ->modalWidth(Width::Medium)
                     ->action(function (\Illuminate\Support\Collection $records) {
                          $records->load('detailDistributionAgences');
+                         
                         foreach ($records as $record) {
                            // dd($record);
                             if ($record->is_valide) {

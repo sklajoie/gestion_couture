@@ -17,6 +17,7 @@ class VentesTable
             ->columns([
                 TextColumn::make('reference')->label('Référence')->searchable()->sortable(),
                 TextColumn::make('client.nom')->label('Client')->searchable()->sortable(),
+                TextColumn::make('agence.nom')->label('Agence')->searchable()->sortable(),
                 TextColumn::make('montant_ttc')->label('Montant TTC')->money('XAF', true)->sortable(),
                 TextColumn::make('avance')->label('Avance')->money('XAF', true)->sortable(),
                 TextColumn::make('solde')->label('Solde')->money('XAF', true)->sortable(),
@@ -32,7 +33,7 @@ class VentesTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                DeleteBulkAction::make(),
                 ]),
             ]);
     }
