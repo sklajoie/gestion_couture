@@ -78,6 +78,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- L'en-tête doit être le premier élément du body pour une bonne prise en charge -->
@@ -85,9 +86,9 @@
         <table class="table1" style="margin-bottom: 25px">
             <tr>
                 <td width="33%" style="text-align: left;">
-                    @if ($devis->agence->logo)
+                    @if ($agence->agence->logo)
                         @php
-                            $logoPath = public_path("storage/".$devis->agence->logo);
+                            $logoPath = public_path("storage/".$agence->agence->logo);
                             $logoType = pathinfo($logoPath, PATHINFO_EXTENSION);
                             $logoData = base64_encode(file_get_contents($logoPath));
                             $logoSrc = "data:image/{$logoType};base64,{$logoData}";
@@ -97,17 +98,17 @@
                         <img src="data:image/jpg;base64,{{ base64_encode(file_get_contents(public_path('logo/logo.jpg'))) }}" width="80" alt="Logo de l'entreprise">
                     @endif
                     <br><br>
-                      <strong>{{ $devis->agence->nom }}</strong><br>
-                    {{ $devis->agence->adresse }}<br>
+                      <strong>{{ $agence->agence->nom }}</strong><br>
+                    {{ $agence->agence->adresse }}<br>
                 </td>
                 <td width="33%" style="text-align: center;">
                   
                 </td>
                 <td width="33%" style="text-align: right;">
-                    {{ $devis->agence->telephone?? 'N/A' }}<br>
-                    {{ $devis->agence->contact?? 'N/A' }}<br>
-                    {{ $devis->agence->email?? 'N/A' }} <br><br>
-                    {{$devis->agence->ville}} Le: {{ date('d-m-Y') }}
+                    {{ $agence->agence->telephone?? 'N/A' }}<br>
+                    {{ $agence->agence->contact?? 'N/A' }}<br>
+                    {{ $agence->agence->email?? 'N/A' }} <br><br>
+                    {{$agence->agence->ville}} Le: {{ date('d-m-Y') }}
                 </td>
             </tr>
         </table>
@@ -116,100 +117,76 @@
     <div class="wrapper" style="margin-top: 40px">
         <section class="invoice">
             <!-- Info client et devis -->
-            <table style="margin-bottom: 10px;">
+            {{-- <table style="margin-bottom: 10px;">
                 <tr>
                     <td width="33%">
                         <strong>CLIENT</strong><br>
                         <address>
-                            {{ $devis->client->nom ?? 'N/A' }}<br>
-                            <b>TELEPHONE:</b> {{ $devis->client->telephone ?? 'N/A' }}<br>
-                            <b>ADRESSE:</b> {{ $devis->client->adresse ?? 'N/A' }}<br>
+                            {{ $vente->client->nom ?? 'N/A' }}<br>
+                            <b>TELEPHONE:</b> {{ $vente->client->telephone ?? 'N/A' }}<br>
+                            <b>ADRESSE:</b> {{ $vente->client->adresse ?? 'N/A' }}<br>
                         </address>
                     </td>
                     <td width="35%">
-                        <strong>DEVIS #{{ $devis->reference }}</strong><br>
+                        <strong>VENTE #{{ $vente->reference }}</strong><br>
                         <address>
-                        <b>ÉMIS LE: </b>{{ date('d F Y à H\hi', strtotime($devis->date_devis))}}
+                        <b>ÉMIS LE: </b>{{ date('d F Y à H\hi', strtotime($vente->date_vente))}}
                         </address>
                     </td>
                     <td width="30%">
-                        <b>UTILISATEUR:</b> {{ $devis->user->name ?? 'N/A' }}<br>
-                        <b>TELEPHONE:</b> {{ $devis->user->telephone ?? 'N/A' }}<br>
+                        <b>UTILISATEUR:</b> {{ $vente->user->name ?? 'N/A' }}<br>
+                        <b>TELEPHONE:</b> {{ $vente->user->telephone ?? 'N/A' }}<br>
                     </td>
                 </tr>
-            </table>
+            </table> --}}
 
             <!-- Table produits -->
             <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>PRODUIT</th>
-                            <th>QTE</th>
-                            <th>PRIX</th>
-                            <th>SOUS TOTAL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ( $devis->detailDevis as $devi )
-                            <tr>
-                                <td>
-                                    {{$devi->stockEntreprise->designation}}-
-                                    {{$devi->stockEntreprise->couleur->nom}}-
-                                    {{$devi->stockEntreprise->taille->nom}}-
-                                    {{$devi->stockEntreprise->code_barre}}
-                                </td>
-                                <td>{{$devi->quantite}}</td>
-                                <td>{{$devi->prix_unitaire}}</td>
-                                <td>{{$devi->montant}}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+ <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>FACTURE</th>
+            <th>RÉFÉRENCE VERSEMENT</th>
+            <th>MONTANT</th>
+            <th>MODE PAIEMENT</th>
+            <th>DATE</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($versementsParFacture as $venteId => $versements)
+            @php $vente = $ventes[$venteId] ?? null; @endphp
+            @if ($vente)
+                @foreach ($versements as $index => $versemt)
+                    <tr>
+                        @if ($index === 0)
+                            <td rowspan="{{ count($versements) }}">{{ $vente->reference }}</td>
+                        @endif
+                        <td>{{ $versemt->reference }}</td>
+                        <td>{{ number_format($versemt->montant, 0, ',', ' ') }} FCFA</td>
+                        <td>{{ $versemt->mode_paiement }}</td>
+                        <td>{{ date('d F Y à H\hi', strtotime($versemt->created_at)) }}</td>
+                    </tr>
+                @endforeach
+            @endif
+        @endforeach
+    </tbody>
+</table>
+
+
             </div>
 
             <!-- Totaux -->
             <div class="row">
-                <div class="col-6"></div>
-                <div class="col-6">
-                    <div class="table-responsive">
-                        <table class="table" style="width:47%;" align="right">
-                            <tr>
-                                <th>TOTAL BRUT:</th>
-                                <td>{{$devis->montant_brut}}</td>
-                            </tr>
-                            <tr>
-                                <th>REMISE</th>
-                                <td>{{$devis->remise }}</td>
-                            </tr>
-                            <tr>
-                                <th>MONTANT HORS TAXE</th>
-                                <td>{{$devis->montant_hors_taxe }}</td>
-                            </tr>
-                            <tr>
-                                <th>TVA</th>
-                                <td>{{$devis->tva }}</td>
-                            </tr>
-                            <tr>
-                                <th>MONTANT TOTAL DEVIS:</th>
-                                <td>{{$devis->montant_ttc}}</td>
-                            </tr>
-                        </table>
-                         <p>
-                       <i>Arrêté le présent devis à la somme de: </i> :
-                        <span style="font-weight:bold;"> {{ strtoupper(NumberHelper::inFrenchWords($devis->montant_ttc)) }}</span>
-                    </p>
-                     <div align="right" style="font-size:16px;margin-right:50px;font-weight:bold;">
-                        <p><u>Signature & Cachet</u></p>
-                    </div>
-                    </div>
-                </div>
+               
+             <div align="right" style="font-size:16px;margin-right:50px;font-weight:bold;">
+                <p><u>Signature & Cachet</u></p>
+            </div>
             </div>
         </section>
     </div>
 
     <footer>
-        <p style="color:#000000 ">{{ $devis->agence->pied_page}}</p>
+        <p style="color:#000000 "></p>
     </footer>
 {{-- <script type="text/php">
     if (isset($pdf)) {
@@ -234,4 +211,5 @@
 </script> --}}
 
 </body>
+
 </html>

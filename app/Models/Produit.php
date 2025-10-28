@@ -20,7 +20,7 @@ class Produit extends Model
         'categorie_produit_id',
     ];
 
-    public function categorie()
+    public function categorieProduit()
     {
         return $this->belongsTo(CategorieProduit::class);
     }

@@ -19,8 +19,10 @@ use Filament\Notifications\Notification;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Livewire\Component;
 
 class DevisTable
 {
@@ -49,7 +51,7 @@ class DevisTable
                     ->visible(fn ($record) => filled($record->vente_id)),
             
                 Action::make('Télécharger PDF')
-                    ->label('Télécharger le devis')
+                     ->label('Imprimer') // aucun texte affiché
                     ->icon('heroicon-o-printer')
                     ->url(fn ($record) => route('devis.pdf', ['devis' => $record->id]))
                     ->openUrlInNewTab()
@@ -60,6 +62,7 @@ class DevisTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     BulkAction::make('transformer_devis_facture'),
+                     BulkAction::make('Imprimer_devis_select'),
                 ]),
             ])
 
@@ -118,7 +121,24 @@ class DevisTable
                             ->title('Devis Transformé avec succès')
                             ->success()
                             ->send();
-                    })
+                    }),
+                //   BulkAction::make('Imprimer sélection')
+                //     ->icon('heroicon-o-printer')
+                //     ->action(function (Collection $records) {
+                //         $ids = $records->pluck('id')->toArray();
+                //         return redirect()->route('devis.imprimer', ['devis_ids' => $ids]);
+                //     })
+                //     ->openUrlInNewTab()
+                BulkAction::make('Imprimer sélection')
+                ->icon('heroicon-o-printer')
+                ->action(function (Collection $records, Component $livewire) {
+                    $ids = $records->pluck('id')->toArray();
+                    $url = route('devis.imprimer', ['devis_ids' => $ids]);
+                    
+                    $livewire->js('window.open(\'' . $url . '\', \'_blank\');');
+                })
+
+
                     ->deselectRecordsAfterCompletion(),
                         DeleteBulkAction::make(),
                 ]);

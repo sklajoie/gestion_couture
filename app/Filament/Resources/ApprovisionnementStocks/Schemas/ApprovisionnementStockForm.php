@@ -20,6 +20,7 @@ class ApprovisionnementStockForm
                 Hidden::make('user_id')
                     ->default(Auth::id()),
                 DateTimePicker::make('date_operation')
+                    ->default(now())
                     ->label('Date de l\'opération'),
                 TextInput::make('total_appro')
                     ->label('Montant Total')
@@ -37,6 +38,7 @@ class ApprovisionnementStockForm
                                 'robe' => 'Robe',
                                 'pantalon' => 'Pantalon',
                                 'ensemble' => 'Ensemble',
+                                'Autre Produit' => 'Autre Produit',
                             ])
                             ->required(),
 
@@ -52,6 +54,12 @@ class ApprovisionnementStockForm
                             'robe' => \App\Models\MesureRobe::pluck('reference', 'id'),
                             'pantalon' => \App\Models\MesurePantalon::pluck('reference', 'id'),
                             'ensemble' => \App\Models\MesureEnsemble::pluck('reference', 'id'),
+                            'Autre Produit' => \App\Models\Accessoire::all()->mapWithKeys(function ($item) {
+                                        return [
+                                            $item->id => "{$item->code_barre} - {$item->nom} - {$item->prix_vente} FCFA - {$item->taille?->nom} - {$item->couleur?->nom} -  {$item->marque?->nom}"
+                                        ];
+                                    }),
+
                             default => [],
                         };
                     })
@@ -67,13 +75,14 @@ class ApprovisionnementStockForm
                             'robe' => \App\Models\MesureRobe::class,
                             'pantalon' => \App\Models\MesurePantalon::class,
                             'ensemble' => \App\Models\MesureEnsemble::class,
+                            'Autre Produit' => \App\Models\Accessoire::class,
                             default => null,
                         };
 
                         $produit = $modelClass ? $modelClass::find($state) : null;
 
-                        $prix = $produit?->main_oeuvre ?? 0;
-                        $reference = $produit?->Reference ?? 0;
+                        $prix = ($produit?->main_oeuvre) ?? ($produit?->prix_vente) ?? 0;
+                        $reference = ($produit?->Reference) ?? ($produit?->code_barre )?? 0;
                         $set('prix_unitaire', $prix);
                         $set('reference', $reference);
 

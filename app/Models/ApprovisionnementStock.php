@@ -21,4 +21,21 @@ class ApprovisionnementStock extends Model
     {
         return $this->hasMany(DetailApproStock::class);
     }
+
+
+
+          protected static function booted()
+    {
+        static::creating(function ($model) {
+            $now = \Carbon\Carbon::now();
+            $prefix = $now->format('ym');
+
+            do {
+                $suffix = str_pad(random_int(1, 99999), 4, '0', STR_PAD_LEFT);
+                $numero = "AS{$prefix}{$suffix}";
+            } while (self::where('reference', $numero)->exists());
+
+            $model->reference = $numero;
+        });
+    }
 }

@@ -2,12 +2,15 @@
 
 namespace App\Filament\Resources\Versements\Tables;
 
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Collection;
+use Livewire\Component;
 
 class VersementsTable
 {
@@ -33,6 +36,24 @@ class VersementsTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
+            ])
+            ->bulkActions([
+                 BulkAction::make('Imprimer Versement')
+                ->icon('heroicon-o-printer')
+                ->action(function (Collection $records, Component $livewire) {
+                    $ids = $records->pluck('id')->toArray();
+                    $url = route('versement-facture.imprimer', ['versement_ids' => $ids]);
+                    
+                    $livewire->js('window.open(\'' . $url . '\', \'_blank\');');
+                }),
+                 BulkAction::make('Imprimer Ticket')
+                ->icon('heroicon-o-printer')
+                ->action(function (Collection $records, Component $livewire) {
+                    $ids = $records->pluck('id')->toArray();
+                    $url = route('versement-ticke.imprimer', ['versement_ids' => $ids]);
+                    
+                    $livewire->js('window.open(\'' . $url . '\', \'_blank\');');
+                }),
             ]);
     }
 }

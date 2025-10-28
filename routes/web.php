@@ -9,3 +9,11 @@ Route::get('/', function () {
 
 
 Route::get('/devis/{devis}/pdf', [DevisController::class, 'exportPdf'])->name('devis.pdf');
+Route::get('/devis/imprimer', [DevisController::class, 'imprimerPlusieursDevis'])->name('devis.imprimer');
+
+Route::get('/impression-vente/{vente}', [DevisController::class, 'impressionvente'])->name('impression-vente');
+Route::get('/vente/imprimer', [DevisController::class, 'imprimerPlusieursVente'])->name('vente.imprimer');
+Route::get('/vente-ticket/imprimer/{vente}', [DevisController::class, 'impressionticketvente'])->name('vente-ticket.imprimer');
+Route::get('/versement/imprimer', [DevisController::class, 'imprimerPlusieursVersement'])->name('versement.imprimer');
+Route::get('/versement-facture/imprimer', [DevisController::class, 'imprimerPlusieursVersementFacture'])->name('versement-facture.imprimer');
+Route::get('/versement-ticket/imprimer', [DevisController::class, 'versementticketvente'])->name('versement-ticke.imprimer');

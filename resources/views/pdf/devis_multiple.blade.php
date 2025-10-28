@@ -78,6 +78,7 @@
         }
     </style>
 </head>
+@foreach ($devisList as $devis)
 <body>
 
     <!-- L'en-tête doit être le premier élément du body pour une bonne prise en charge -->
@@ -234,4 +235,5 @@
 </script> --}}
 
 </body>
+@endforeach
 </html>

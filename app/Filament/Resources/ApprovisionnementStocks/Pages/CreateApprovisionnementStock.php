@@ -17,19 +17,11 @@ class CreateApprovisionnementStock extends CreateRecord
 
 
 
-            protected function mutateFormDataBeforeCreate(array $data): array
-        {
-            $now = Carbon::now();
-            $nowmonth = $now->format('m');
-            $prefix = $now->format('ym'); // Année sur 2 chiffres + mois → ex: 2510
-
-            // Compteur du jour (ex: 001, 002…)
-            $countToday = ApprovisionnementStock::count() + 1;
-            $suffix = str_pad($countToday, 3, '0', STR_PAD_LEFT); // ex: 001
-
-            $data['reference'] = "AS{$prefix}{$suffix}"; // ex: 2510001
-            return $data;
-        }
+        //     protected function mutateFormDataBeforeCreate(array $data): array
+        // {
+           
+        //     return $data;
+        // }
 
         protected function afterCreate(): void
         {
@@ -44,6 +36,7 @@ class CreateApprovisionnementStock extends CreateRecord
                     'robe' => \App\Models\MesureRobe::class,
                     'pantalon' => \App\Models\MesurePantalon::class,
                     'ensemble' => \App\Models\MesureEnsemble::class,
+                    'Autre Produit' => \App\Models\Accessoire::class,
                     default => null,
                 };
 
@@ -53,16 +46,18 @@ class CreateApprovisionnementStock extends CreateRecord
                     $couture->update(['status' => 1]);
 
                     $quantiteapp = $detail->quantite;
-
-                    $produit = StockEntreprise::where('reference', $couture->Reference)->first();
+                        $designation = !empty($couture->Reference) ? $couture->Reference : $couture->nom;
+                        $ref = !empty($couture->Reference) ? $couture->Reference : $couture->code_barre;
+                        $produit = StockEntreprise::where('reference', $ref)->first();
+                                            // $produit = StockEntreprise::where('reference', $couture->Reference?? $couture->code_barre)->first();
 
                     if ($produit) {
                         $produit->increment('stock', $quantiteapp);
                     } else {
                         StockEntreprise::create([
-                            'designation' => $couture->Reference,
+                            'designation' => $designation,
                             // 'code_barre' => $couture->Reference,
-                            'reference' => $couture->Reference,
+                            'reference' => $ref,
                             'stock' => $quantiteapp,
                             'prix' => $couture->prix_vente,
                             'stock_alerte' => 1,

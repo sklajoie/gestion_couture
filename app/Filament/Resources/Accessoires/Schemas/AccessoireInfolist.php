@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\Produits\Schemas;
+namespace App\Filament\Resources\Accessoires\Schemas;
 
+use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
-class ProduitInfolist
+class AccessoireInfolist
 {
     public static function configure(Schema $schema): Schema
     {
@@ -28,6 +29,12 @@ class ProduitInfolist
                     ->numeric(),
                 TextEntry::make('unite'),
                 TextEntry::make('categorieProduit.nom')
+                    ->placeholder('-'),
+                TextEntry::make('marque.nom')
+                    ->placeholder('-'),
+                TextEntry::make('taille.nom')
+                    ->placeholder('-'),
+                TextEntry::make('couleur.nom')
                     ->placeholder('-'),
                 TextEntry::make('user.name')
                     ->placeholder('-'),

@@ -85,9 +85,9 @@
         <table class="table1" style="margin-bottom: 25px">
             <tr>
                 <td width="33%" style="text-align: left;">
-                    @if ($devis->agence->logo)
+                    @if ($vente->agence->logo)
                         @php
-                            $logoPath = public_path("storage/".$devis->agence->logo);
+                            $logoPath = public_path("storage/".$vente->agence->logo);
                             $logoType = pathinfo($logoPath, PATHINFO_EXTENSION);
                             $logoData = base64_encode(file_get_contents($logoPath));
                             $logoSrc = "data:image/{$logoType};base64,{$logoData}";
@@ -97,17 +97,17 @@
                         <img src="data:image/jpg;base64,{{ base64_encode(file_get_contents(public_path('logo/logo.jpg'))) }}" width="80" alt="Logo de l'entreprise">
                     @endif
                     <br><br>
-                      <strong>{{ $devis->agence->nom }}</strong><br>
-                    {{ $devis->agence->adresse }}<br>
+                      <strong>{{ $vente->agence->nom }}</strong><br>
+                    {{ $vente->agence->adresse }}<br>
                 </td>
                 <td width="33%" style="text-align: center;">
                   
                 </td>
                 <td width="33%" style="text-align: right;">
-                    {{ $devis->agence->telephone?? 'N/A' }}<br>
-                    {{ $devis->agence->contact?? 'N/A' }}<br>
-                    {{ $devis->agence->email?? 'N/A' }} <br><br>
-                    {{$devis->agence->ville}} Le: {{ date('d-m-Y') }}
+                    {{ $vente->agence->telephone?? 'N/A' }}<br>
+                    {{ $vente->agence->contact?? 'N/A' }}<br>
+                    {{ $vente->agence->email?? 'N/A' }} <br><br>
+                    {{$vente->agence->ville}} Le: {{ date('d-m-Y') }}
                 </td>
             </tr>
         </table>
@@ -121,20 +121,20 @@
                     <td width="33%">
                         <strong>CLIENT</strong><br>
                         <address>
-                            {{ $devis->client->nom ?? 'N/A' }}<br>
-                            <b>TELEPHONE:</b> {{ $devis->client->telephone ?? 'N/A' }}<br>
-                            <b>ADRESSE:</b> {{ $devis->client->adresse ?? 'N/A' }}<br>
+                            {{ $vente->client->nom ?? 'N/A' }}<br>
+                            <b>TELEPHONE:</b> {{ $vente->client->telephone ?? 'N/A' }}<br>
+                            <b>ADRESSE:</b> {{ $vente->client->adresse ?? 'N/A' }}<br>
                         </address>
                     </td>
                     <td width="35%">
-                        <strong>DEVIS #{{ $devis->reference }}</strong><br>
+                        <strong>VENTE #{{ $vente->reference }}</strong><br>
                         <address>
-                        <b>ÉMIS LE: </b>{{ date('d F Y à H\hi', strtotime($devis->date_devis))}}
+                        <b>ÉMIS LE: </b>{{ date('d F Y à H\hi', strtotime($vente->date_vente))}}
                         </address>
                     </td>
                     <td width="30%">
-                        <b>UTILISATEUR:</b> {{ $devis->user->name ?? 'N/A' }}<br>
-                        <b>TELEPHONE:</b> {{ $devis->user->telephone ?? 'N/A' }}<br>
+                        <b>UTILISATEUR:</b> {{ $vente->user->name ?? 'N/A' }}<br>
+                        <b>TELEPHONE:</b> {{ $vente->user->telephone ?? 'N/A' }}<br>
                     </td>
                 </tr>
             </table>
@@ -151,17 +151,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ( $devis->detailDevis as $devi )
+                        @foreach ( $vente->detailVentes as $vent )
                             <tr>
                                 <td>
-                                    {{$devi->stockEntreprise->designation}}-
-                                    {{$devi->stockEntreprise->couleur->nom}}-
-                                    {{$devi->stockEntreprise->taille->nom}}-
-                                    {{$devi->stockEntreprise->code_barre}}
+                                    {{$vent->stockEntreprise->designation}}-
+                                    {{$vent->stockEntreprise->couleur->nom}}-
+                                    {{$vent->stockEntreprise->taille->nom}}-
+                                    {{$vent->stockEntreprise->code_barre}}
                                 </td>
-                                <td>{{$devi->quantite}}</td>
-                                <td>{{$devi->prix_unitaire}}</td>
-                                <td>{{$devi->montant}}</td>
+                                <td>{{$vent->quantite}}</td>
+                                <td>{{$vent->prix_unitaire}}</td>
+                                <td>{{$vent->montant}}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -176,28 +176,36 @@
                         <table class="table" style="width:47%;" align="right">
                             <tr>
                                 <th>TOTAL BRUT:</th>
-                                <td>{{$devis->montant_brut}}</td>
+                                <td>{{$vente->montant_brut}}</td>
                             </tr>
                             <tr>
                                 <th>REMISE</th>
-                                <td>{{$devis->remise }}</td>
+                                <td>{{$vente->remise }}</td>
                             </tr>
                             <tr>
                                 <th>MONTANT HORS TAXE</th>
-                                <td>{{$devis->montant_hors_taxe }}</td>
+                                <td>{{$vente->montant_hors_taxe }}</td>
                             </tr>
                             <tr>
                                 <th>TVA</th>
-                                <td>{{$devis->tva }}</td>
+                                <td>{{$vente->tva }}</td>
                             </tr>
                             <tr>
-                                <th>MONTANT TOTAL DEVIS:</th>
-                                <td>{{$devis->montant_ttc}}</td>
+                                <th>MONTANT TOTAL VENTE:</th>
+                                <td>{{$vente->montant_ttc}}</td>
+                            </tr>
+                            <tr>
+                                <th>ACOMPTE:</th>
+                                <td>{{$vente->avance}}</td>
+                            </tr>
+                            <tr>
+                                <th>RESTE A PAYER:</th>
+                                <td>{{$vente->solde}}</td>
                             </tr>
                         </table>
-                         <p>
-                       <i>Arrêté le présent devis à la somme de: </i> :
-                        <span style="font-weight:bold;"> {{ strtoupper(NumberHelper::inFrenchWords($devis->montant_ttc)) }}</span>
+                        <p>
+                       <i>Arrêté la présente facture à la somme de: </i> :
+                        <span style="font-weight:bold;"> {{ strtoupper(NumberHelper::inFrenchWords($vente->montant_ttc)) }}</span>
                     </p>
                      <div align="right" style="font-size:16px;margin-right:50px;font-weight:bold;">
                         <p><u>Signature & Cachet</u></p>
@@ -209,7 +217,7 @@
     </div>
 
     <footer>
-        <p style="color:#000000 ">{{ $devis->agence->pied_page}}</p>
+        <p style="color:#000000 ">{{ $vente->agence->pied_page}}</p>
     </footer>
 {{-- <script type="text/php">
     if (isset($pdf)) {

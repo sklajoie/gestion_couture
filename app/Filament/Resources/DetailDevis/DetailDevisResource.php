@@ -49,10 +49,10 @@ class DetailDevisResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListDetailDevis::route('/'),
-            'create' => CreateDetailDevis::route('/create'),
-            'view' => ViewDetailDevis::route('/{record}'),
-            'edit' => EditDetailDevis::route('/{record}/edit'),
+            // 'index' => ListDetailDevis::route('/'),
+            // 'create' => CreateDetailDevis::route('/create'),
+            // 'view' => ViewDetailDevis::route('/{record}'),
+            // 'edit' => EditDetailDevis::route('/{record}/edit'),
         ];
     }
 }

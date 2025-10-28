@@ -1,23 +1,25 @@
 <?php
 
-namespace App\Filament\Resources\Produits\Tables;
+namespace App\Filament\Resources\Accessoires\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class ProduitsTable
+class AccessoiresTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('nom')
-                    ->searchable(),
                 TextColumn::make('code_barre')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('nom')
                     ->searchable(),
                 TextColumn::make('prix_achat')
                     ->numeric()
@@ -27,15 +29,33 @@ class ProduitsTable
                     ->sortable(),
                 TextColumn::make('stock_minimum')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('stock')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('unite')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('categorieProduit.nom')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('marque.nom')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('user.name')
                     ->label('Utilisateur')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('taille.nom')
+                    ->label('Taille')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('couleur.nom')
+                    ->label('Couleur')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -44,9 +64,7 @@ class ProduitsTable
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('categorieProduit.nom')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+            
             ])
             ->filters([
                 //
