@@ -16,6 +16,7 @@ class ProduitCouture extends Model
         'mesure_robe_id',
         'mesure_pantalon_id',
         'mesure_ensemble_id',
+        'autre_mesure_id',
     ];
 
      public function produit()
@@ -37,5 +38,9 @@ class ProduitCouture extends Model
      public function produitEnsemnble()
     {
         return $this->belongsTo(MesureEnsemble::class);
+    }
+     public function produitAutreMesure()
+    {
+        return $this->belongsTo(AutreMesure::class);
     }
 }

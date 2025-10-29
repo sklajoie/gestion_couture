@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Vente extends Model
 {
@@ -43,7 +44,7 @@ class Vente extends Model
 
     public function agence()
     {
-        return $this->belongsTo(Agence::class, 'agence_id');
+        return $this->belongsTo(Agence::class);
     }
     public function user()
     {
@@ -53,6 +54,12 @@ class Vente extends Model
             protected static function booted()
             {
                 static::creating(function ($model) {
+
+                $model->agence_id = $model->agence_id
+                        ?? (Auth::check() ? Auth::user()->agence_id : null)
+                        ?? 1;
+
+                    //dd($model);
                     $now = \Carbon\Carbon::now();
                     $prefix = $now->format('ym');
 

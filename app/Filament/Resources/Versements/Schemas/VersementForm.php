@@ -43,10 +43,10 @@ class VersementForm
                             TextInput::make('detail')
                                 ->label('Detail Versement')
                                  ->columnSpan(2),
-                            Hidden::make('agence_id')
-                                ->default(fn () => Auth::user()->agence_id),
+                            // Hidden::make('agence_id')
+                            //     ->default(fn () => Auth::user()->agence_id),
                             Hidden::make('user_id')
-                                ->default(fn () => Auth::user()->agence_id),
+                                ->default(fn () => Auth::id()),
                         
                     ])
                      ->columnSpan(4)

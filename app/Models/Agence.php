@@ -25,6 +25,26 @@ class Agence extends Model
     {
         return $this->belongsTo(Entreprise::class);
     }
+    public function devis()
+    {
+        return $this->hasMany(Devis::class);
+    }
+    public function vente()
+    {
+        return $this->hasMany(Vente::class);
+    }
+    public function stockAgence()
+    {
+        return $this->hasMany(StockAgence::class);
+    }
+    public function distribution()
+    {
+        return $this->hasMany(DistributionAgence::class);
+    }
+    public function versement()
+    {
+        return $this->hasMany(Versement::class);
+    }
 
 
 

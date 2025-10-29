@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('mesure_robe_id')->nullable()->constrained('mesure_robes')->onDelete('cascade');
             $table->foreignId('mesure_pantalon_id')->nullable()->constrained('mesure_pantalons')->onDelete('cascade');
             $table->foreignId('mesure_ensemble_id')->nullable()->constrained('mesure_ensembles')->onDelete('cascade');
+            $table->foreignId('autre_mesure_id')->nullable()->constrained('autre_mesures')->onDelete('cascade');
             $table->foreignId('etape_production_id')->constrained('etape_productions')->onDelete('set null');
             $table->foreignId('responsable_id')->nullable()->constrained('users')->onDelete('set null');
             $table->boolean('is_completed')->default(false);

@@ -32,10 +32,12 @@ class DevisTable
             ->columns([
                 TextColumn::make('reference')->label('Référence')->searchable()->sortable(),
                 TextColumn::make('client.nom')->label('Client')->searchable()->sortable(),
-                TextColumn::make('agence.nom')->label('Agence')->searchable()->sortable(),
+                // TextColumn::make('agence.nom')->label('Agence')->searchable()->sortable(),
                 TextColumn::make('montant_ttc')->label('Montant TTC')->money('XAF', true)->sortable(),
-                TextColumn::make('statut')->label('Statut')->sortable(),
-                TextColumn::make('date_devis')->label('Date Devis')->sortable(),
+                TextColumn::make('statut')->label('Statut')->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('date_devis')->label('Date Devis')->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
@@ -60,9 +62,9 @@ class DevisTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    BulkAction::make('transformer_devis_facture'),
-                     BulkAction::make('Imprimer_devis_select'),
+                    // DeleteBulkAction::make(),
+                    // BulkAction::make('transformer_devis_facture'),
+                    //  BulkAction::make('Imprimer_devis_select'),
                 ]),
             ])
 

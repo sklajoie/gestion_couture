@@ -3,6 +3,12 @@
 namespace App\Filament\Resources\Agences;
 
 use App\Filament\Resources\Agences\Pages\ManageAgences;
+use App\Filament\Resources\Agences\Pages\ViewAgence;
+use App\Filament\Resources\Agences\RelationManagers\DevisRelationManager;
+use App\Filament\Resources\Agences\RelationManagers\DistributionRelationManager;
+use App\Filament\Resources\Agences\RelationManagers\StockAgenceRelationManager;
+use App\Filament\Resources\Agences\RelationManagers\VenteRelationManager;
+use App\Filament\Resources\Agences\RelationManagers\VersementRelationManager;
 use App\Models\Agence;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -140,10 +146,21 @@ class AgenceResource extends Resource
             ]);
     }
 
+        public static function getRelations(): array
+    {
+        return [
+            DevisRelationManager::class,
+            VenteRelationManager::class,
+            DistributionRelationManager::class,
+            StockAgenceRelationManager::class,
+            VersementRelationManager::class,
+        ];
+    }
     public static function getPages(): array
     {
         return [
             'index' => ManageAgences::route('/'),
+            'view' => ViewAgence::route('/{record}'),
         ];
     }
 }

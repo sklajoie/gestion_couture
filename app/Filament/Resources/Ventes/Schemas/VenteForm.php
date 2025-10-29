@@ -33,10 +33,10 @@ class VenteForm
 
                  Grid::make()
                 ->schema([
-                     Hidden::make('agence_id')
-                        ->default(fn () => Auth::user()->agence_id),
+                    //  Hidden::make('agence_id')
+                    //     ->default(fn () => Auth::user()->agence_id),
                     Hidden::make('user_id')
-                        ->default(fn () => Auth::user()->agence_id),
+                        ->default(fn () => Auth::id()),
                     Select::make('client_id')
                         ->label('Client')
                         ->relationship('client', 'nom')
@@ -137,7 +137,7 @@ class VenteForm
                             Hidden::make('agence_id')
                                 ->default(fn () => Auth::user()->agence_id),
                             Hidden::make('user_id')
-                                ->default(fn () => Auth::user()->agence_id),
+                                ->default(fn () => Auth::id()),
 
                             TextInput::make('quantite')
                                     ->numeric()
@@ -302,17 +302,20 @@ class VenteForm
                             Hidden::make('agence_id')
                                 ->default(fn () => Auth::user()->agence_id),
                             Hidden::make('user_id')
-                                ->default(fn () => Auth::user()->agence_id),
+                                ->default(fn () => Auth::id()),
                                 
                     ])
                      ->columnSpan(3)
                       ->addActionLabel('Ajouter un versement')
                       ->live()
                         ->reactive()
+                        ->default([]) // ← important pour éviter les erreurs si vide
+                         ->dehydrated(true)
                         ->afterStateUpdated(function ($state, callable $set, callable $get) {
                             self::calculTotaux($state, $set, $get);
                         }),
-                    ])->columnSpanFull(),
+                    ])->columnSpanFull()
+                 
                
                 ]),
                 ])->columnSpanFull(),

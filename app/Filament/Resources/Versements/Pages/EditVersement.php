@@ -20,33 +20,32 @@ class EditVersement extends EditRecord
         return $data;
     }
 
-            protected function afterSave(): void
-                {
+//             protected function afterSave(): void
+//                 {
 
-                    $record = $this->record;
-                    $ancienrecord = $this->ancienMontant;
-                //dd($record ,$ancienrecord);
+//                     $record = $this->record;
+//                     $ancienrecord = $this->ancienMontant;
+//                 //dd($record ,$ancienrecord);
                     
                     
-            // Récupérer la vente concernée
-            $vente = Vente::where('id', $record->vente_id)
-                ->where('agence_id', $record->agence_id)
-                ->first();
-//dd($record);
-            if ($vente) {
-            $delta = floatval($record->montant) - $ancienrecord;
+//             // Récupérer la vente concernée
+//             $vente = Vente::where('id', $record->vente_id)
+//                 ->first();
+// //dd($record);
+//             if ($vente) {
+//             $delta = floatval($record->montant) - $ancienrecord;
 
-            $nouvelleAvance = floatval($vente->avance) + $delta;
-            $nouveauSolde = floatval($vente->solde) - $delta;
+//             $nouvelleAvance = floatval($vente->avance) + $delta;
+//             $nouveauSolde = floatval($vente->solde) - $delta;
 
-            $vente->update([
-                'avance' => round($nouvelleAvance, 2),
-                'solde' => round($nouveauSolde, 2),
-                'statut' => $nouveauSolde <= 0 ? 'SOLDEE' : 'PAS SOLDEE',
-            ]);
-          }
+//             $vente->update([
+//                 'avance' => round($nouvelleAvance, 2),
+//                 'solde' => round($nouveauSolde, 2),
+//                 'statut' => $nouveauSolde <= 0 ? 'SOLDEE' : 'PAS SOLDEE',
+//             ]);
+//           }
 
-        }
+//         }
 
 
     protected function getHeaderActions(): array

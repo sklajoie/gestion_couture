@@ -36,7 +36,8 @@ class CreateApprovisionnementStock extends CreateRecord
                     'robe' => \App\Models\MesureRobe::class,
                     'pantalon' => \App\Models\MesurePantalon::class,
                     'ensemble' => \App\Models\MesureEnsemble::class,
-                    'Autre Produit' => \App\Models\Accessoire::class,
+                    'autre_mesure' => \App\Models\AutreMesure::class,
+                    'autre_produit' => \App\Models\Accessoire::class,
                     default => null,
                 };
 

@@ -22,8 +22,11 @@ class VersementsTable
                 TextColumn::make('vente.reference')->label('Référence Vente')->searchable()->sortable(),
                 TextColumn::make('montant')->label('Montant')->money('XAF')->sortable(),
                 TextColumn::make('mode_paiement')->label('Mode de Paiement')->sortable(),
-                TextColumn::make('detail')->label('Détail')->sortable(),
                 TextColumn::make('created_at')->label('Date de Création')->sortable(),
+                TextColumn::make('agence.nom')->label('Agence')->searchable()->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('detail')->label('Détail')->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

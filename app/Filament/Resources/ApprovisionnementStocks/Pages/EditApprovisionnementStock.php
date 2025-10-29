@@ -57,6 +57,8 @@ class EditApprovisionnementStock extends EditRecord
                     'robe' => \App\Models\MesureRobe::class,
                     'pantalon' => \App\Models\MesurePantalon::class,
                     'ensemble' => \App\Models\MesureEnsemble::class,
+                    'autre_mesure' => \App\Models\AutreMesure::class,
+                    'autre_produit' => \App\Models\Accessoire::class,
                     default => null,
                 };
 
@@ -69,7 +71,9 @@ class EditApprovisionnementStock extends EditRecord
                    $ancienneQuantite = $this->ancienstock[$mesureId]->quantite ?? 0;
                      $delta = $quantiteapp - $ancienneQuantite;
 
-                    $produit = StockEntreprise::where('reference', $couture->Reference)->first();
+                        $designation = !empty($couture->Reference) ? $couture->Reference : $couture->nom;
+                        $ref = !empty($couture->Reference) ? $couture->Reference : $couture->code_barre;
+                        $produit = StockEntreprise::where('reference', $ref)->first();
 
                     if ($produit) {
                         if ($delta > 0) {
@@ -79,9 +83,9 @@ class EditApprovisionnementStock extends EditRecord
                         }
                     } else {
                         StockEntreprise::create([
-                            'designation' => $couture->Reference,
+                            'designation' => $designation,
                             // 'code_barre' => $couture->Reference,
-                            'reference' => $couture->Reference,
+                            'reference' =>  $ref,
                             'stock' => $quantiteapp,
                             'prix' => $couture->prix_vente,
                             'stock_alerte' => 1,

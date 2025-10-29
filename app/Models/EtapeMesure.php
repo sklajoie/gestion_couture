@@ -12,6 +12,7 @@ class EtapeMesure extends Model
         'mesure_robe_id',
         'mesure_pantalon_id',
         'mesure_ensemble_id',
+        'autre_mesure_id',
         'etape_production_id',
         'responsable_id',
         'is_completed',
@@ -42,6 +43,10 @@ class EtapeMesure extends Model
     public function mesureEnsemble()
     {
         return $this->belongsTo(MesureEnsemble::class);
+    }
+    public function autreMesure()
+    {
+        return $this->belongsTo(AutreMesure::class);
     }
     public function etapeProduction()
     {

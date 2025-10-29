@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Devis extends Model
 {
@@ -26,6 +27,7 @@ class Devis extends Model
 
     public function detailDevis()
     {
+        
         return $this->hasMany(DetailDevis::class, 'devis_id');
     }
 
@@ -40,7 +42,7 @@ class Devis extends Model
 
     public function agence()
     {
-        return $this->belongsTo(Agence::class, 'agence_id');
+        return $this->belongsTo(Agence::class);
     }
     public function user()
     {
@@ -49,7 +51,16 @@ class Devis extends Model
 
       protected static function booted()
         {
+
+         
+            
+            
             static::creating(function ($model) {
+                
+               $model->agence_id = $model->agence_id ?? Auth::user()->agence_id;
+        
+       // dd($model->toArray()); // pour debug
+        // dd($model->agence_id);
                 $now = \Carbon\Carbon::now();
                 $prefix = $now->format('ym');
 
@@ -59,6 +70,15 @@ class Devis extends Model
                     $numero = "D$prefix{$suffix}"; // ex: 2510001
                     $model->reference =  $numero;
             });
+
+    //     static::created(function ($model) {
+    //     // Une fois le devis créé, on met à jour les détails
+    //    // dd($devis->agence_id);
+    //     if ($model->relationLoaded('detailDevis') || $model->detailDevis()->exists()) {
+    //         $model->detailDevis()->update(['agence_id' => $model->agence_id]);
+    //     }
+    //          });
+
 
             static::deleting(function ($vente) {
                     foreach ($vente->detailDevis as $detail) {

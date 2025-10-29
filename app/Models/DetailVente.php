@@ -23,4 +23,16 @@ class DetailVente extends Model
     {
         return $this->belongsTo(StockEntreprise::class, 'stock_entreprise_id');
     }
+
+
+    protected static function booted()
+{
+    static::creating(function ($detail) {
+        // On récupère automatiquement l'agence du devis parent
+        if (empty($detail->agence_id) && $detail->vente) {
+            $detail->agence_id = $detail->vente->agence_id;
+        }
+    });
+}
+
 }

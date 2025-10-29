@@ -29,12 +29,12 @@ class DevisForm
 
                  Grid::make()
                 ->schema([
-                     Hidden::make('agence_id')
-                        ->default(fn () => Auth::user()->agence_id),
+                    //  Hidden::make('agence_id')
+                    //     ->default(fn () => Auth::user()->agence_id),
                     Hidden::make('statut')
                         ->default("DEVIS"),
                     Hidden::make('user_id')
-                        ->default(fn () => Auth::user()->agence_id),
+                        ->default(fn () => Auth::id()),
                     Select::make('client_id')
                         ->label('Client')
                         ->relationship('client', 'nom')
@@ -132,10 +132,10 @@ class DevisForm
                                             }),
                             Hidden::make('stock'),
 
-                            Hidden::make('agence_id')
-                                ->default(fn () => Auth::user()->agence_id),
+                            // Hidden::make('agence_id')
+                            //     ->default(fn () => Auth::user()->agence_id),
                             Hidden::make('user_id')
-                                ->default(fn () => Auth::user()->agence_id),
+                                ->default(fn () => Auth::id()),
 
                             TextInput::make('quantite')
                                     ->numeric()

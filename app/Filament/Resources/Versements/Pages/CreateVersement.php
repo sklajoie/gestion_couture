@@ -12,29 +12,28 @@ class CreateVersement extends CreateRecord
 
 
         
-        protected function afterCreate(): void
-        {
-            $record = $this->record;
+        // protected function afterCreate(): void
+        // {
+        //     $record = $this->record;
 
-            // Récupérer la vente concernée
-            $vente = Vente::where('id', $record->vente_id)
-                ->where('agence_id', $record->agence_id)
-                ->first();
+        //     // Récupérer la vente concernée
+        //     $vente = Vente::where('id', $record->vente_id)
+        //         ->first();
 
-            if ($vente) {
-                $montantVerse = floatval($record->montant);
-                $avanceActuelle = floatval($vente->avance ?? 0);
-                $soldeActuel = floatval($vente->solde ?? 0);
+        //     if ($vente) {
+        //         $montantVerse = floatval($record->montant);
+        //         $avanceActuelle = floatval($vente->avance ?? 0);
+        //         $soldeActuel = floatval($vente->solde ?? 0);
 
-                $nouvelleAvance = $avanceActuelle + $montantVerse;
-                $nouveauSolde = $soldeActuel - $montantVerse;
+        //         $nouvelleAvance = $avanceActuelle + $montantVerse;
+        //         $nouveauSolde = $soldeActuel - $montantVerse;
 
-                $vente->update([
-                    'avance' => round($nouvelleAvance, 2),
-                    'solde' => round($nouveauSolde, 2),
-                    'statut' => $nouveauSolde <= 0 ? 'SOLDEE' : 'PAS SOLDEE',
-                ]);
-            }     
-        }
+        //         $vente->update([
+        //             'avance' => round($nouvelleAvance, 2),
+        //             'solde' => round($nouveauSolde, 2),
+        //             'statut' => $nouveauSolde <= 0 ? 'SOLDEE' : 'PAS SOLDEE',
+        //         ]);
+        //     }     
+        // }
         
 }

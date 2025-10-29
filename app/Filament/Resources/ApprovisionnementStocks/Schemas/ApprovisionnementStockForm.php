@@ -38,7 +38,8 @@ class ApprovisionnementStockForm
                                 'robe' => 'Robe',
                                 'pantalon' => 'Pantalon',
                                 'ensemble' => 'Ensemble',
-                                'Autre Produit' => 'Autre Produit',
+                                'autre_mesure' => 'Autre Mesure',
+                                'autre_produit' => 'Autre Produit',
                             ])
                             ->required(),
 
@@ -54,7 +55,8 @@ class ApprovisionnementStockForm
                             'robe' => \App\Models\MesureRobe::pluck('reference', 'id'),
                             'pantalon' => \App\Models\MesurePantalon::pluck('reference', 'id'),
                             'ensemble' => \App\Models\MesureEnsemble::pluck('reference', 'id'),
-                            'Autre Produit' => \App\Models\Accessoire::all()->mapWithKeys(function ($item) {
+                            'autre_mesure' => \App\Models\AutreMesure::pluck('reference', 'id'),
+                            'autre_produit' => \App\Models\Accessoire::all()->mapWithKeys(function ($item) {
                                         return [
                                             $item->id => "{$item->code_barre} - {$item->nom} - {$item->prix_vente} FCFA - {$item->taille?->nom} - {$item->couleur?->nom} -  {$item->marque?->nom}"
                                         ];
@@ -75,7 +77,8 @@ class ApprovisionnementStockForm
                             'robe' => \App\Models\MesureRobe::class,
                             'pantalon' => \App\Models\MesurePantalon::class,
                             'ensemble' => \App\Models\MesureEnsemble::class,
-                            'Autre Produit' => \App\Models\Accessoire::class,
+                            'autre_mesure' => \App\Models\AutreMesure::class,
+                            'autre_produit' => \App\Models\Accessoire::class,
                             default => null,
                         };
 
@@ -86,22 +89,30 @@ class ApprovisionnementStockForm
                         $set('prix_unitaire', $prix);
                         $set('reference', $reference);
 
-                        $qte = floatval($produit?->quantite ?? 1);
+                        $qte = floatval($produit?->quantite ?? 0);
                         $set('total', $qte * $prix);
                     }),
 
                 Hidden::make('reference'),
+                TextInput::make('prix_unitaire')->label('Prix')->numeric()->default(0)
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        $qte = floatval($get('quantite') ?? 0);
+                                        $set('total', $state * $qte);
+                                        self::calculTotals($state, $set, $get);
+                                    }),
                 TextInput::make('quantite')
-                            ->numeric()
-                            ->default(1)
-                            ->reactive()
-                            ->live()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                $prix = floatval($get('prix_unitaire') ?? 0);
-                                $set('total', $state * $prix);
-                                  self::calculTotals($state, $set, $get);
-                            }),
-                TextInput::make('prix_unitaire')->label('Prix')->numeric()->default(0),
+                        ->numeric()
+                        ->default(0)
+                        ->minValue(1)
+                        ->required()
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                            $prix = floatval($get('prix_unitaire') ?? 0);
+                            $set('total', $state * $prix);
+                                self::calculTotals($state, $set, $get);
+                        }),
+               
                 TextInput::make('total')->label('Total')->numeric()->default(0)->readOnly(),
             ])
 
@@ -113,7 +124,10 @@ class ApprovisionnementStockForm
                       ->reactive()
                       ->live()
                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
-
+                          $details = $get('detailApproStocks') ?? [] ;
+                        $totalAppro = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
+                    
+                        $set('total_appro', round( $totalAppro, 2));
                         self::calculTotals($state, $set, $get);
                     }),
             ]);
@@ -122,13 +136,9 @@ class ApprovisionnementStockForm
 
         public static function calculTotals( $state,callable $set, callable $get)
     {
-        $details = $get('detailApproStocks') ;
-
-        $totalcouture = collect($details)
-            ->pluck('total')
-            ->filter(fn($v) => is_numeric($v))
-            ->map(fn($v) => floatval($v))
-            ->sum();
-        $set('total_appro', round( $totalcouture, 2));
+        $details = $get('detailApproStocks') ?? [] ;
+        $totalAppro = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
+       
+        $set('total_appro', round( $totalAppro, 2));
     }
 }
