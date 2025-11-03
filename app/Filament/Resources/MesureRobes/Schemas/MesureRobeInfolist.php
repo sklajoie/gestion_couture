@@ -66,6 +66,7 @@ class MesureRobeInfolist
                     TableColumn::make('ETAPE')
                         ->alignment(Alignment::Center),
                     TableColumn::make('RESPONSABLE'),
+                    TableColumn::make('ATELIER'),
                     TableColumn::make('STATUT'),
                     TableColumn::make('DATE DEBUT'),
                     TableColumn::make('DATE FIN'),
@@ -73,6 +74,7 @@ class MesureRobeInfolist
                         ])
                         ->schema([
                             TextEntry::make('etapeProduction.nom'),
+                            TextEntry::make('atelier.nom'),
                             TextEntry::make('responsable.name'),
                             IconEntry::make('is_completed')
                             ->boolean(),

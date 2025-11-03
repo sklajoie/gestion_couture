@@ -15,11 +15,13 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-
+use UnitEnum;
 class AccessoireResource extends Resource
 {
     protected static ?string $model = Accessoire::class;
 
+        protected static string | UnitEnum | null $navigationGroup = 'GESTION STOCK';
+    protected static ?int $navigationSort = 9;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'nom';

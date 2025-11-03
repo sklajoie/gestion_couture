@@ -9,7 +9,8 @@ class AutreMesureDetail extends Model
      protected $fillable = [
         'nom',
         'mesure',
-        'autre_mesure_id'
+        'autre_mesure_id',
+        'detail',
     ];
 
       public function autreMesure()

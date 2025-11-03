@@ -24,7 +24,7 @@ class AutreMesureInfolist
                     ->label('Description'), 
                 TextEntry::make('user.name')
                     ->label('Utilisateur'),
-                RepeatableEntry::make('mesureDetail')
+                RepeatableEntry::make('autreMesureDetail')
                         ->columnSpanFull()
                         ->table([
                             TableColumn::make('NOM'),
@@ -58,6 +58,7 @@ class AutreMesureInfolist
                     TableColumn::make('ETAPE')
                         ->alignment(Alignment::Center),
                     TableColumn::make('RESPONSABLE'),
+                    TableColumn::make('ATELIER'),
                     TableColumn::make('STATUT'),
                     TableColumn::make('DATE DEBUT'),
                     TableColumn::make('DATE FIN'),
@@ -65,6 +66,7 @@ class AutreMesureInfolist
                         ])
                         ->schema([
                             TextEntry::make('etapeProduction.nom'),
+                            TextEntry::make('atelier.nom'),
                             TextEntry::make('responsable.name'),
                             IconEntry::make('is_completed')
                             ->boolean(),

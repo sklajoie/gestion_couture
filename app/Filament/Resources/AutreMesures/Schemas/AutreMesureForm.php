@@ -47,7 +47,9 @@ return $schema
                                 ->label('Type')
                                 ->required(),
                
-                            Repeater::make('mesureDetail')
+                            Repeater::make('autreMesureDetail') 
+                              ->label('Mesures')
+                                ->relationship('autreMesureDetail')
                                 ->schema([
                                     TextInput::make('nom')->required(),
                                     TextInput::make('mesure')->numeric()->required(),
@@ -238,6 +240,9 @@ return $schema
                     ->label('Temps mis')
                     ->readOnly()
                     ->nullable(),
+                Select::make("etapes.{$etape->id}.atelier_id")
+                    ->label('Atelier')
+                   ->options(\App\Models\Atelier::pluck('nom', 'id')),
                 Hidden::make("etapes.{$etape->id}.user_id")->default(Auth::id()),
             ]);
     }

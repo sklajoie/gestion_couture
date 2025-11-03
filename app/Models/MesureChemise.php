@@ -75,6 +75,9 @@ class MesureChemise extends Model
 
         protected static function booted()
     {
+        // static::saved(function ($model) {
+        //     dd($model->etapeMesures);
+        // });
         static::deleting(function ($etapeMesures) {
             $etapeMesures->etapeMesures()->delete();
             $etapeMesures->produitCouture()->delete();

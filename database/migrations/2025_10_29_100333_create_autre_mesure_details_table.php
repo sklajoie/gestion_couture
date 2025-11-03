@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nom');
             $table->string('mesure');
             $table->text('detail')->nullable();
-                 $table->foreignId('autre_mesure_id')->nullable()->constrained('autre_mesures')->onDelete('set null');
+            $table->foreignId('autre_mesure_id')->nullable()->constrained('autre_mesures')->onDelete('set null');
             $table->timestamps();
         });
     }

@@ -60,6 +60,20 @@ foreach ($etapes as $etapeId => $etapeData) {
         }
     }
 
+      if (!$etapeMesure?->atelier_id && !empty($etapeData['atelier_id'])) {
+
+            \App\Models\EtapeAtelier::create([
+            'responsable_id'   => $etapeData['responsable_id'],
+            'etape_production_id' => $etapeData['etape_production_id'],
+            'atelier_id' => $etapeData['atelier_id'],
+            'date'       => date(now()), 
+            'user_id'    => Auth::id(),
+            'mesure_type' => "ROBE",
+            'mesure_id'   => $this->record->id,
+            ]);              
+    }
+
+
     // Mise à jour ou création de l'étape
     $this->record->etapeMesures()->updateOrCreate(
         ['etape_production_id' => $etapeData['etape_production_id']],
@@ -71,6 +85,7 @@ foreach ($etapes as $etapeId => $etapeData) {
             'date_fin' => $etapeData['date_fin'] ?? null,
             'user_id' => $etapeData['user_id'] ?? Auth::id(),
             'temp_mis' => $temp_mis,
+            'atelier_id' => $etapeData['atelier_id'] ?? null,
         ]
     );
 }
@@ -124,6 +139,7 @@ protected function mutateFormDataBeforeFill(array $data): array
                 'date_fin' => $etape->date_fin,
                 'user_id' => $etape->user_id,
                 'temp_mis' => $etape->temp_mis,
+                'atelier_id' => $etape->atelier_id,
             ],
         ];
     })->toArray();

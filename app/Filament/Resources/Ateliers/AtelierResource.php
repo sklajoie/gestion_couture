@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Ateliers;
 
+use App\Filament\Resources\Atelier\Pages\ViewAtelier;
 use App\Filament\Resources\Ateliers\Pages\ManageAteliers;
+use App\Filament\Resources\Ateliers\RelationManagers\EtapeMesuresRelationManager;
 use App\Models\Atelier;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -31,8 +33,8 @@ class AtelierResource extends Resource
 {
     protected static ?string $model = Atelier::class;
 
-    protected static string | UnitEnum | null $navigationGroup = 'RESSOURCES HUMAINES';
-    protected static ?int $navigationSort = 6;
+    protected static string | UnitEnum | null $navigationGroup = 'GESTION ATELIER';
+    protected static ?int $navigationSort = 1;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
@@ -143,10 +145,18 @@ class AtelierResource extends Resource
             ]);
     }
 
+       public static function getRelations(): array
+    {
+        return [
+            EtapeMesuresRelationManager::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ManageAteliers::route('/'),
+            'view' => ViewAtelier::route('/{record}'),
         ];
     }
 }

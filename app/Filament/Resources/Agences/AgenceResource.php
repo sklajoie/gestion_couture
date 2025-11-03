@@ -149,11 +149,11 @@ class AgenceResource extends Resource
         public static function getRelations(): array
     {
         return [
-            DevisRelationManager::class,
             VenteRelationManager::class,
+            VersementRelationManager::class,
+            DevisRelationManager::class,
             DistributionRelationManager::class,
             StockAgenceRelationManager::class,
-            VersementRelationManager::class,
         ];
     }
     public static function getPages(): array

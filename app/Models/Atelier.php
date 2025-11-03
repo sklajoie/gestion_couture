@@ -25,6 +25,11 @@ class Atelier extends Model
     {
         return $this->belongsTo(Entreprise::class);
     }
+    
+    public function etapeMesures()
+    {
+        return $this->HasMany(EtapeMesure::class);
+    }
 
 
     

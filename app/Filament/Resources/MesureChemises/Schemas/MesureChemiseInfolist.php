@@ -77,6 +77,7 @@ class MesureChemiseInfolist
                         ->table([
                     TableColumn::make('ETAPE')
                         ->alignment(Alignment::Center),
+                    TableColumn::make('ATELIER'),
                     TableColumn::make('RESPONSABLE'),
                     TableColumn::make('STATUT'),
                     TableColumn::make('DATE DEBUT'),
@@ -85,6 +86,7 @@ class MesureChemiseInfolist
                         ])
                         ->schema([
                             TextEntry::make('etapeProduction.nom'),
+                            TextEntry::make('atelier.nom'),
                             TextEntry::make('responsable.name'),
                             IconEntry::make('is_completed')
                             ->boolean(),

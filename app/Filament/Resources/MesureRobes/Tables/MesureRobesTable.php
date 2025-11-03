@@ -114,7 +114,10 @@ class MesureRobesTable
                             ->label('Étape de production')
                             ->options(\App\Models\EtapeProduction::pluck('nom', 'id'))
                             ->required(),
-
+                        Select::make('atelier_id')
+                            ->label('Atelier')
+                            ->options(\App\Models\Atelier::pluck('nom', 'id'))
+                            ->searchable(),
                         Select::make('responsable_id')
                             ->label('Responsable')
                             ->options(\App\Models\User::pluck('name', 'id'))
@@ -131,30 +134,44 @@ class MesureRobesTable
                             ->nullable(),
                     ])
                     ->action(function (\Illuminate\Support\Collection $records, array $data) {
-                       foreach ($records as $mesure) {
-                            $etape = $mesure->etapeMesures()
-                                ->where('etape_production_id', $data['etape_production_id'])
-                                ->first();
+                foreach ($records as $mesure) {
+                    $etape = $mesure->etapeMesures()
+                        ->where('etape_production_id', $data['etape_production_id'])
+                        ->first();
 
-                            if ($etape) {
-                                $etape->update([
-                                    'responsable_id' => $data['responsable_id'],
-                                    'comments' => $data['commentaire'],
-                                    'date_debut' => $data['date_debut'],
-                                    'user_id' => Auth::id(),
-                                    'is_completed' => false,
-                                ]);
-                            } else {
-                                $mesure->etapeMesures()->create([
-                                    'etape_production_id' => $data['etape_production_id'],
-                                    'responsable_id' => $data['responsable_id'],
-                                    'comments' => $data['commentaire'],
-                                    'date_debut' => $data['date_debut'],
-                                    'user_id' => Auth::id(),
-                                    'is_completed' => false,
-                                ]);
-                            }
-                        }
+                    $etapeData = [
+                        'responsable_id'   => $data['responsable_id'],
+                        'comments'         => $data['commentaire'],
+                        'date_debut'       => $data['date_debut'],
+                        'user_id'          => Auth::id(),
+                        'is_completed'     => false,
+                    ];
+
+                    // Ajouter atelier_id si présent
+                    if (!empty($data['atelier_id'])) {
+                        $etapeData['atelier_id'] = $data['atelier_id'];
+
+                        \App\Models\EtapeAtelier::create([
+                        'responsable_id'   => $data['responsable_id'],
+                        'etape_production_id' => $data['etape_production_id'],
+                        'atelier_id' => $data['atelier_id'],
+                        'date'       => date(now()), 
+                        'user_id'          => Auth::id(),
+                        'mesure_type'          => "ROBE",
+                        'mesure_id'          => $mesure->id,
+                        ]);              
+                    }
+
+                    if ($etape) {
+                        $etape->update($etapeData);
+                    } else {
+                        $mesure->etapeMesures()->create(array_merge(
+                            ['etape_production_id' => $data['etape_production_id']],
+                            $etapeData
+                        ));
+                    }
+                }
+
 
 
                 Notification::make()

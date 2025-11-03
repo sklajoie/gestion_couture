@@ -24,7 +24,7 @@ class CouleurResource extends Resource
     protected static ?string $model = Couleur::class;
 
     protected static string | UnitEnum | null $navigationGroup = 'GESTION STOCK';
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 7;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

@@ -55,7 +55,7 @@ class AutreMesure extends Model
     {
         return $this->hasMany(EtapeMesure::class);
     }
-    public function mesureDetail()
+    public function autreMesureDetail()
     {
         return $this->hasMany(AutreMesureDetail::class);
     }
@@ -78,7 +78,7 @@ class AutreMesure extends Model
         static::deleting(function ($etapeMesures) {
             $etapeMesures->etapeMesures()->delete();
             $etapeMesures->produitCouture()->delete();
-            $etapeMesures->mesureDetail()->delete();
+            $etapeMesures->autreMesureDetail()->delete();
         });
     }
 

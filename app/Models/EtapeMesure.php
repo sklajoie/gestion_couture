@@ -18,6 +18,7 @@ class EtapeMesure extends Model
         'is_completed',
         'comments',
         'user_id',
+        'atelier_id',
         'date_debut',
         'date_fin',
         'temp_mis',
@@ -30,7 +31,7 @@ class EtapeMesure extends Model
 
     public function mesureChemise()
     {
-        return $this->belongsTo(MesureChemise::class);
+        return $this->belongsTo(MesureChemise::class, 'mesure_chemise_id');
     }
     public function mesurePantalon()
     {
@@ -60,6 +61,11 @@ class EtapeMesure extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function atelier()
+    {
+        return $this->belongsTo(Atelier::class);
+    }
+    
 
     // protected static function booted()
     // {
