@@ -268,7 +268,7 @@ class VenteForm
                     Section::make('PAIEMENT')
                          ->schema([
                      Repeater::make('versements')
-                        ->relationship()
+                        ->relationship('versements')
                         ->schema([
                            TextInput::make('montant')
                                 ->label('Montant')
@@ -289,6 +289,7 @@ class VenteForm
                                     'Virement Bancaire' => 'Virement Bancaire',
                                     'Cheque' => 'Chèque',
                                     'Autre' => 'Autre',
+                                    'Recouvrement' => 'Recouvrement',
                                 ])
                                 ->default('Especes')
                                  ->reactive()
@@ -296,8 +297,17 @@ class VenteForm
                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                     self::calculTotaux($state, $set, $get);
                                     }),
+                            Select::make('caisse_id')
+                                     ->relationship(
+                                        name: 'caisse',
+                                        titleAttribute: 'nom',
+                                        modifyQueryUsing: fn ($query) => $query->where('agence_id', Auth::user()->agence_id)
+                                    )
+                                    ->label('Caisse')
+                                    ->required()
+                                     ->preload(),
                             TextInput::make('detail')
-                                ->label('Detail Versement')
+                                 ->label('Detail Versement')
                                  ->columnSpan(2),
                             Hidden::make('agence_id')
                                 ->default(fn () => Auth::user()->agence_id),

@@ -27,7 +27,7 @@ class MesureChemiseResource extends Resource
     protected static ?int $navigationSort = 1;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'Chemise';
+    protected static ?string $recordTitleAttribute = 'Type';
 
     public static function form(Schema $schema): Schema
     {

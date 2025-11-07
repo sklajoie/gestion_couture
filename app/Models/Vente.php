@@ -30,11 +30,11 @@ class Vente extends Model
 
     public function detailVentes()
     {
-        return $this->hasMany(DetailVente::class, 'vente_id');
+        return $this->hasMany(DetailVente::class);
     }
     public function versements()
     {
-        return $this->hasMany(Versement::class, 'vente_id');
+        return $this->hasMany(Versement::class);
     }
 
     public function client()
@@ -53,6 +53,7 @@ class Vente extends Model
 
             protected static function booted()
             {
+                // a la creation
                 static::creating(function ($model) {
 
                 $model->agence_id = $model->agence_id
@@ -69,8 +70,9 @@ class Vente extends Model
                     } while (self::where('reference', $numero)->exists());
 
                     $model->reference = $numero;
+                 
+
                 });
-      
 
             static::deleting(function ($vente) {
                     foreach ($vente->detailVentes as $detail) {
@@ -81,7 +83,11 @@ class Vente extends Model
                         if ($ligneStock) {
                             $ligneStock->increment('stock', $detail->quantite);
                         }
-              }
+                        }
+
+                    foreach ($vente->versements as $versements) {
+                    Caisse::where('id', $versements->caisse_id)->decrement('montant',$versements->montant);
+                        }
 
                 // Supprimer les versements liés
                 $vente->versements()->delete();

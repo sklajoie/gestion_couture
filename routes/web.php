@@ -17,3 +17,4 @@ Route::get('/vente-ticket/imprimer/{vente}', [DevisController::class, 'impressio
 Route::get('/versement/imprimer', [DevisController::class, 'imprimerPlusieursVersement'])->name('versement.imprimer');
 Route::get('/versement-facture/imprimer', [DevisController::class, 'imprimerPlusieursVersementFacture'])->name('versement-facture.imprimer');
 Route::get('/versement-ticket/imprimer', [DevisController::class, 'versementticketvente'])->name('versement-ticke.imprimer');
+Route::get('/cloture-caisse/{reference}', [DevisController::class, 'impressioncloturecaisse'])->name('cloture-caisse');

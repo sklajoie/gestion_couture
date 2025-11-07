@@ -13,15 +13,25 @@ class Versement extends Model
         'reference',
         'vente_id',
         'agence_id',
+        'caisse_id',
         'montant',
         'mode_paiement',
         'detail',
         'cloture',
+        'user_id'
     ];
 
     public function vente()
     {
         return $this->belongsTo(Vente::class, 'vente_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+    public function caisse()
+    {
+        return $this->belongsTo(Caisse::class);
     }
 
     public function agence()
@@ -36,26 +46,28 @@ class Versement extends Model
                 $model->agence_id = $model->agence_id
                 ?? (Auth::check() ? Auth::user()->agence_id : null)
                 ?? 1;
-
+                //dd($model);
          
             // Récupérer la vente concernée
-            $vente = Vente::where('id', $model->vente_id)
-                ->first();
-                // dd($model, $vente);
-            if ($vente) {
-                $montantVerse = floatval($model->montant);
-                $avanceActuelle = floatval($vente->avance ?? 0);
-                $soldeActuel = floatval($vente->solde ?? 0);
+            // $vente = Vente::where('id', $model->vente_id)
+            //     ->first();
+            //     // dd($model, $vente);
+            // if ($vente) {
+            //     $montantVerse = floatval($model->montant);
+            //     $avanceActuelle = floatval($vente->avance ?? 0);
+            //     $soldeActuel = floatval($vente->solde ?? 0);
 
-                $nouvelleAvance = $avanceActuelle + $montantVerse;
-                $nouveauSolde = $soldeActuel - $montantVerse;
+            //     $nouvelleAvance = $avanceActuelle + $montantVerse;
+            //     $nouveauSolde = $soldeActuel - $montantVerse;
 
-                $vente->update([
-                    'avance' => round($nouvelleAvance, 2),
-                    'solde' => round($nouveauSolde, 2),
-                    'statut' => $nouveauSolde <= 0 ? 'SOLDEE' : 'PAS SOLDEE',
-                ]);
-            }     
+            //     $vente->update([
+            //         'avance' => round($nouvelleAvance, 2),
+            //         'solde' => round($nouveauSolde, 2),
+            //         'statut' => $nouveauSolde <= 0 ? 'SOLDEE' : 'PAS SOLDEE',
+            //     ]);
+            //    // dd($model->montant);
+            //       Caisse::where('id', $model->caisse_id)->increment('montant',$model->montant);
+            // }     
         
                 $now = \Carbon\Carbon::now();
                 $prefix = $now->format('ym');
@@ -65,7 +77,25 @@ class Versement extends Model
 
                     $numero = "VS$prefix{$suffix}"; // ex: 2510001
                     $model->reference =  $numero;
+
+              Caisse::where('id', $model->caisse_id)->increment('montant', $model->montant);
             });
+
+         static::updating(function ($versement) {
+                $ancienMontant = $versement->getOriginal('montant') ?? 0;
+                $nouveauMontant = $versement->montant ?? 0;
+
+                $delta = floatval($nouveauMontant) - floatval($ancienMontant);
+                //dd($ancienMontant, $nouveauMontant, $delta );
+                if ($delta != 0) {
+                    Caisse::where('id', $versement->caisse_id)->increment('montant', $delta);
+                }
+                //   static::created(function ($versement) {
+                //     Caisse::where('id', $versement->caisse_id)->increment('montant', $versement->montant);
+                //     });
+            });
+   
+
         
         static::deleting(function ($versement) {
               $vente = Vente::find($versement->vente_id);
@@ -81,28 +111,10 @@ class Versement extends Model
                 'statut' => $nouveauSolde <= 0 ? 'SOLDEE' : 'PAS SOLDEE',
             ]);
         }
+        // Caisse::where('id', $versement->caisse_id)->decrement('montant',$montant);
     });
 
 
-            static::saved(function ($model) {
-            // Récupérer la vente liée
-            $vente = \App\Models\Vente::find($model->vente_id);
-
-            if ($vente) {
-                // Calcul du delta : différence entre le montant actuel et l'ancien
-                $ancienMontant = $model->getOriginal('montant') ?? 0;
-                $nouveauMontant = $model->montant ?? 0;
-               // dd($nouveauMontant, $ancienMontant);
-                $delta = floatval($nouveauMontant) - floatval($ancienMontant);
-
-                // Mise à jour des champs
-                $vente->avance = round($vente->avance + $delta, 2);
-                $vente->solde = round($vente->solde - $delta, 2);
-                $vente->statut = $vente->solde <= 0 ? 'SOLDEE' : 'PAS SOLDEE';
-
-                $vente->save();
-            }
-        });
         }
 
 

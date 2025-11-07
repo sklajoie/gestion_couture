@@ -71,6 +71,7 @@ class VentesTable
                     
                     $livewire->js('window.open(\'' . $url . '\', \'_blank\');');
                 }),
+                 DeleteBulkAction::make(),
             ]);
     }
 }

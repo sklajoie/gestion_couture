@@ -25,7 +25,7 @@ class EtapeMesureResource extends Resource
     protected static ?int $navigationSort = 7;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'nom';
+    protected static ?string $recordTitleAttribute = 'etapeProduction.nom';
 
     public static function form(Schema $schema): Schema
     {

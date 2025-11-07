@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClotureCaisse;
 use App\Models\Devis;
 use App\Models\Entreprise;
 use App\Models\Vente;
@@ -9,7 +10,7 @@ use App\Models\Versement;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use DB;
 class DevisController extends Controller
 {
 
@@ -143,5 +144,41 @@ public function imprimerPlusieursVersementFacture(Request $request)
 }
 
 
+    public function impressioncloturecaisse($reference)
+{
+        $cloture = ClotureCaisse::where('reference', $reference)->first();
+        $ventes = Vente::where('cloture', $reference)
+                        ->where('solde', 0)
+                        ->get();
+        $vente_en_cours = Vente::where('cloture', $reference)
+                        ->where('solde','>',0)
+                        ->get();
+        $recrouvements = Versement::where('cloture', $reference)
+                        ->where('mode_paiement', "Recouvrement")
+                        ->get();
+        // $encaisse_jour = Versement::where('cloture', $reference)
+        //                 ->select('mode_paiement')
+        //                 ->distinct()
+        //                 ->get();
+        $encaisse_jour = Versement::where('cloture', $reference)
+            ->select('mode_paiement', \DB::raw('SUM(montant) as total'))
+            ->groupBy('mode_paiement')
+            ->get('total', 'mode_paiement'); // retourne une collection [mode => total]
+         // dd( $encaisse_jour);
+        $devis = Devis::where('cloture', $reference)->get();
+        $pdf = Pdf::loadView('pdf.cloture_caisse', compact('ventes','devis','cloture',
+                                            'encaisse_jour','vente_en_cours','recrouvements'))
+                    ->setPaper('A4')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);
+
+
+    return $pdf->stream("vente_{$reference}.pdf");
+}
 
 }

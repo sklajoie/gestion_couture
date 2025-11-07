@@ -25,7 +25,7 @@ class ApprovisionnementStockResource extends Resource
     protected static ?int $navigationSort = 3;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'nom';
+    protected static ?string $recordTitleAttribute = 'reference';
 
     public static function form(Schema $schema): Schema
     {

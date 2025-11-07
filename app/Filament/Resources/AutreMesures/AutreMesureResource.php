@@ -24,7 +24,7 @@ class AutreMesureResource extends Resource
     protected static ?int $navigationSort = 5;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'nom';
+    protected static ?string $recordTitleAttribute = 'Type';
 
     public static function form(Schema $schema): Schema
     {

@@ -31,7 +31,7 @@ class StockAgenceResource extends Resource
     
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'nom';
+    protected static ?string $recordTitleAttribute = 'stockEntreprise.designation';
 
     public static function form(Schema $schema): Schema
     {

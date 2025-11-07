@@ -110,13 +110,13 @@ class EtapeMesure extends Model
     }
 }
 
-    public function getTempMisAttribute()
-    {
-        if ($this->date_debut && $this->date_fin) {
-            return $this->date_debut->diff($this->date_fin)->format('%H:%I:%S');
-        }
+    // public function getTempMisAttribute()
+    // {
+    //     if ($this->date_debut && $this->date_fin) {
+    //         return $this->date_debut->diff($this->date_fin)->format('%H:%I:%S');
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 
 }

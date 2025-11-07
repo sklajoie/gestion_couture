@@ -14,12 +14,14 @@ return new class extends Migration
         Schema::create('versements', function (Blueprint $table) {
             $table->id();
             $table->string('reference')->unique();
-            $table->foreignId('vente_id')->constrained('ventes')->onDelete('cascade');
-            $table->foreignId('agence_id')->constrained('agence')->onDelete('cascade');
+            $table->foreignId('vente_id')->constrained('ventes')->onDelete('set null');
+            $table->foreignId('agence_id')->constrained('agence')->onDelete('set null');
+            $table->foreignId('caisse_id')->constrained('caisses')->onDelete('set null');
             $table->float('montant')->default(0);
             $table->string('mode_paiement')->nullable();
             $table->string('detail')->nullable();
             $table->string('cloture')->nullable();
+             $table->foreignId('user_id')->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
     }

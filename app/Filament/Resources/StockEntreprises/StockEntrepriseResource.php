@@ -25,7 +25,7 @@ class StockEntrepriseResource extends Resource
     protected static ?int $navigationSort = 2;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'designation';
+    // protected static ?string $recordTitleAttribute = 'stockEntreprise.designation';
 
     public static function form(Schema $schema): Schema
     {
