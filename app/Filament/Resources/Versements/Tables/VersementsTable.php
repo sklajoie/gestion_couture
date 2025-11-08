@@ -37,7 +37,7 @@ class VersementsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    // DeleteBulkAction::make(),
                 ]),
             ])
             ->bulkActions([
@@ -57,6 +57,8 @@ class VersementsTable
                     
                     $livewire->js('window.open(\'' . $url . '\', \'_blank\');');
                 }),
+
+                   DeleteBulkAction::make(),
             ]);
     }
 }

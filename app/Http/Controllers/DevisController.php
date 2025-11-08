@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agence;
+use App\Models\Atelier;
 use App\Models\ClotureCaisse;
 use App\Models\Devis;
 use App\Models\Entreprise;
+use App\Models\MouvementCaisse;
 use App\Models\Vente;
 use App\Models\Versement;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -153,6 +156,8 @@ public function imprimerPlusieursVersementFacture(Request $request)
         $vente_en_cours = Vente::where('cloture', $reference)
                         ->where('solde','>',0)
                         ->get();
+        $mouvementcaisse = MouvementCaisse::where('cloture', $reference)
+                           ->get();
         $recrouvements = Versement::where('cloture', $reference)
                         ->where('mode_paiement', "Recouvrement")
                         ->get();
@@ -164,10 +169,15 @@ public function imprimerPlusieursVersementFacture(Request $request)
             ->select('mode_paiement', \DB::raw('SUM(montant) as total'))
             ->groupBy('mode_paiement')
             ->get('total', 'mode_paiement'); // retourne une collection [mode => total]
+
+        $montant_encaisse = Versement::where('cloture', $reference)
+            ->select('caisse_id', \DB::raw('SUM(montant) as total'))
+            ->groupBy('caisse_id')
+            ->get('total', 'caisse_id'); // retourne une collection [mode => total]
          // dd( $encaisse_jour);
         $devis = Devis::where('cloture', $reference)->get();
-        $pdf = Pdf::loadView('pdf.cloture_caisse', compact('ventes','devis','cloture',
-                                            'encaisse_jour','vente_en_cours','recrouvements'))
+        $pdf = Pdf::loadView('pdf.cloture_caisse', compact('ventes','devis','cloture','mouvementcaisse'
+                                           ,'montant_encaisse' ,'encaisse_jour','vente_en_cours','recrouvements'))
                     ->setPaper('A4')
                     ->setOptions([
                         'isHtml5ParserEnabled' => true,
@@ -180,5 +190,46 @@ public function imprimerPlusieursVersementFacture(Request $request)
 
     return $pdf->stream("vente_{$reference}.pdf");
 }
+
+    public function impressionmouvementcaisse($id)
+{
+    $mouvements = MouvementCaisse::where('id', $id)
+                        ->first();
+            if($mouvements->structure_type =="AGENCE")        
+        $agence = Agence::where('id', $mouvements->structure_id)->first();
+        if($mouvements->structure_type =="ATELIER"){
+            $agence = Atelier::where('id',$mouvements->structure_id)->first();
+        }
+        //dd($agence);
+        $pdf = Pdf::loadView('pdf.mouvement_caisse', compact('mouvements','agence'))
+                    ->setPaper('A4')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);
+
+
+    return $pdf->stream("mouvement_{$agence->nom}.pdf");
+}
+
+public function imprimermouvementcaissegroup(Request $request)
+{
+    $ids = $request->input('mouvement_ids', []);
+
+    $mouvementliste = MouvementCaisse::whereIn('id', $ids)->get();
+
+    // Regrouper les versements par facture
+    $mouvementlistes = $mouvementliste->groupBy('type_mouvement');
+     $agence = Entreprise::first();    
+    // Récupérer les ventes concernées
+    $mouvementgroups = MouvementCaisse::whereIn('type_mouvement', $mouvementlistes->keys())->get()->keyBy('id');
+//dd($mouvementgroups);
+    $pdf = Pdf::loadView('pdf.mouvement_caisse_group', compact('mouvementgroups','agence'));
+    return $pdf->stream('mouvement_groups.pdf');
+}
+
 
 }

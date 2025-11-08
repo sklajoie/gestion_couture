@@ -135,7 +135,7 @@
 
             <!-- Table produits -->
             <div class="table-responsive">
-                <p>LISTE DES DEVIS </p>
+                <p style="text-align: center">LISTE DES DEVIS </p>
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -315,6 +315,117 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <div class="table-responsive">
+                <p style="text-align: center">LISTE DES MOUVEMENTS CAISSE </p>
+             <table style="width: 100%; font-size: 11px; table-layout: fixed; word-wrap: break-word;">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">REFERENCE</th>
+                        <th style="width: 60px;">TYPE</th>
+                        <th style="width: 100px;">NATURE</th>
+                        <th style="width: 60px;">MONTANT</th>
+                        <th style="width: 40px;">MODE</th>
+                        {{-- <th style="width: 80px;">STRUCTURE</th>
+                        <th style="width: 80px;">CAISSE</th> --}}
+                        <th style="width: 120px;">BENEFICIAIRE</th>
+                        <th style="width: 80px;">DATE</th>
+                        {{-- <th style="width: 100px;">DETAIL</th> --}}
+                        <th style="width: 100px;">UTILISATEUR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php  $ttrest=0; $ttmvmtentre =0;  $ttmvmtsorti =0; $structure = null;$nomstructure = "-"; @endphp
+                        @foreach ($mouvementcaisse as $mouvementgroup )
+                           @php
+                           if($mouvementgroup->type_mouvement =="ENTREE EN CAISSE")
+                           {
+                               $ttmvmtentre += $mouvementgroup->montant;
+                           }elseif($mouvementgroup->type_mouvement =="SORTIE DE CAISSE")
+                           {
+                               $ttmvmtsorti += $mouvementgroup->montant;
+                           }
+                           $ttrest =$ttmvmtentre - $ttmvmtsorti;
+                                   
+                                    if ($mouvementgroup->structure_type == "AGENCE") {
+                                        $structure = App\Models\Agence::find($mouvementgroup->structure_id);
+                                    } elseif ($mouvementgroup->structure_type == "ATELIER") {
+                                        $structure = App\Models\Atelier::find($mouvementgroup->structure_id);
+                                    } else {
+                                        $nomstructure ="-";
+                                            }
+
+                         $nomstructure = $structure->nom . ' - ' . $structure->ville;
+                       @endphp
+                            <tr>
+                                <td>
+                                    {{$mouvementgroup->reference}}
+                                </td>
+                                <td>{{$mouvementgroup->type_mouvement}}</td>
+                                <td>{{$mouvementgroup->mouvementNature->nom}}</td>
+                                <td>{{$mouvementgroup->montant}}</td>
+                                <td>{{$mouvementgroup->mode_reglement}}</td>
+                                {{-- <td> {{$nomstructure}}</td>
+                                <td>{{$mouvementgroup->caisse->nom}}</td> --}}
+                                <td>{{$mouvementgroup->employe->nom}} {{$mouvementgroup->employe->prenom}}</td>
+                                <td>{{date('d F Y', strtotime($mouvementgroup->date))}}</td>
+                                {{-- <td>{{$mouvementgroup->detail}}</td> --}}
+                                <td>{{$mouvementgroup->user->name}}</td>
+                            </tr>
+                        @endforeach
+                        <tr>
+                            <td colspan="7">TOTAL ENTREE</td>
+                            <td >{{$ttmvmtentre}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="7">TOTAL SORTIE</td>
+                            <td >{{$ttmvmtsorti}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="7">ETAT RESTE</td>
+                            <td >{{ $ttrest}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-responsive" style="font-size:16px;margin-right:50px;font-weight:bold;">
+                <p style="text-align: center">MONTANT EN CAISSE</p>
+                <table class="table table-striped" >
+                    <thead>
+                        <tr>
+                            <th>CAISSE</th>
+                            <th>MONTANT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php $totalcassie = 0; @endphp
+                        @foreach ($montant_encaisse  as $montantencaisse )
+                        @php 
+                         $totalcassie += $montantencaisse->total;
+                        @endphp
+                            <tr>
+                                <td>{{$montantencaisse->caisse->nom}}</td>
+                                <td>{{$montantencaisse->total}}</td>
+                            </tr>
+                        @endforeach
+                        <tr>
+                            <td colspan="1">TOTAL</td>
+                            <td>{{ $totalcassie}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="1">TOTAL - MOUVEMENT</td>
+                            <td>{{ $totalcassie +  $ttrest}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <br>
+                <br>
+                 <div align="right" style="font-size:16px;margin-right:50px;font-weight:bold;">
+                        <p><u>Signature & Cachet</u></p>
+                    </div>
             </div>
         </section>
     </div>

@@ -66,6 +66,12 @@ class ClotureCaisse extends Model
             ->where('user_id', $userId)
             ->where('agence_id', $agenceId)
             ->update(['cloture' => $reference]);
+        // $mouvementcaisse = MouvementCaisse::where('structure_type')
+        MouvementCaisse::whereNull('cloture')
+            ->where('structure_type', "AGENCE")
+            ->where('structure_id', $agenceId)
+            ->where('user_id', $userId)
+            ->update(['cloture' => $reference]);
 
         // Calcul des totaux
         $model->montant_vente = Vente::where('cloture', $reference)->sum('montant_ttc');
