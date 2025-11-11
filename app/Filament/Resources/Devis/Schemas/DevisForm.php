@@ -99,32 +99,43 @@ class DevisForm
                         ->schema([
                             Select::make('stock_entreprise_id')
                                 ->label('Produits')
-                                ->relationship('stockEntreprise', 'designation')
                                 ->required()
                                 ->searchable()
                                 ->reactive()
                                 ->live()
                                 ->preload()
-                                ->getSearchResultsUsing(fn (string $search): array => 
-                                    StockAgence::query()
-                                            ->whereHas('stockEntreprise', fn ($query) => 
-                                                    $query->where('code_barre', 'like', "%{$search}%")
-                                                        ->orWhere('reference', 'like', "%{$search}%")
-                                                        ->orWhere('prix', 'like', "%{$search}%")
-                                                        ->orWhere('designation', 'like', "%{$search}%")
-                                                )
-                                            ->with(['stockEntreprise.couleur', 'stockEntreprise.taille']) // important pour éviter les requêtes N+1
-                                            
+                                ->options(function (callable $get) {
+                                    $agenceId = $get('../../agence_id'); // remonte hors du repeater si nécessaire
+
+                                    return \App\Models\StockAgence::where('agence_id', $agenceId)
+                                        ->with(['stockEntreprise.couleur', 'stockEntreprise.taille'])
+                                        ->get()
+                                        ->mapWithKeys(fn ($record) => [
+                                            $record->stock_entreprise_id => "{$record->stockEntreprise->designation} -{$record->stockEntreprise->code_barre} - {$record->stockEntreprise->reference} - {$record->stockEntreprise->couleur?->nom} - {$record->stockEntreprise->taille?->nom} ({$record->stockEntreprise->prix} XOF)"
+                                        ])
+                                        ->all();
+                                })
+                                ->getSearchResultsUsing(function (string $search, callable $get): array {
+                                        $agenceId = $get('../../agence_id');
+
+                                        return \App\Models\StockAgence::where('agence_id', $agenceId)
+                                            ->whereHas('stockEntreprise', fn ($query) =>
+                                                $query->where('code_barre', 'like', "%{$search}%")
+                                                    ->orWhere('reference', 'like', "%{$search}%")
+                                                    ->orWhere('designation', 'like', "%{$search}%")
+                                            )
+                                            ->with(['stockEntreprise.couleur', 'stockEntreprise.taille'])
                                             ->get()
                                             ->mapWithKeys(fn ($record) => [
-                                                $record->id => "{$record->code_barre} - {$record->reference} - {$record->couleur?->nom} - {$record->taille?->nom} ({$record->prix} XOF)"
+                                                $record->stockEntreprise->stock_entreprise_id  => "{$record->stockEntreprise->designation} - {$record->stockEntreprise->reference} - {$record->stockEntreprise->couleur?->nom} - {$record->stockEntreprise->taille?->nom} ({$record->stockEntreprise->prix} XOF)"
                                             ])
-                                            ->all()
-                                    )
+                                            ->all();
+                                    })
+
                                     ->getOptionLabelFromRecordUsing(fn (StockEntreprise $record) => 
-                                        "{$record->code_barre} - {$record->reference} - {$record->couleur?->nom} - {$record->taille?->nom} ({$record->prix} XOF)")
+                                        "{$record->designation} - {$record->reference} - {$record->couleur?->nom} - {$record->taille?->nom} ({$record->prix} XOF)")
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                                $produit = StockAgence::find($state);
+                                              $produit = StockAgence::where('stock_entreprise_id', $state)->first();
                                                 $stock = $produit?->stock ?? 0;
                                                 $prix = $produit?->stockEntreprise?->prix ?? 0;
                                                 $qte = floatval($get('quantite') ?? 0);
