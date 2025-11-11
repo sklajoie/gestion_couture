@@ -10,7 +10,7 @@
     <style>
         @page {
             /* Crée de l'espace pour l'en-tête et le pied de page */
-            margin: 100px 50px 100px 50px;
+            margin: 100px 40px 100px 40px;
         }
         
         header {
@@ -78,7 +78,7 @@
             text-align: center;
         }
         table {
-        font-size: 12px;
+        font-size: 10px;
     }
     </style>
 </head>
@@ -89,9 +89,9 @@
         <table class="table1" style="margin-bottom: 25px">
             <tr>
                 <td width="33%" style="text-align: left;">
-                    @if ($agence->logo)
+                    @if ($entreprise->logo)
                         @php
-                            $logoPath = public_path("storage/".$agence->logo);
+                            $logoPath = public_path("storage/".$entreprise->logo);
                             $logoType = pathinfo($logoPath, PATHINFO_EXTENSION);
                             $logoData = base64_encode(file_get_contents($logoPath));
                             $logoSrc = "data:image/{$logoType};base64,{$logoData}";
@@ -101,17 +101,17 @@
                         <img src="data:image/jpg;base64,{{ base64_encode(file_get_contents(public_path('logo/logo.jpg'))) }}" width="80" alt="Logo de l'entreprise">
                     @endif
                     <br><br>
-                      <strong>{{ $agence->nom }}</strong><br>
-                    {{ $agence->adresse }}<br>
+                      <strong>{{ $entreprise->nom }}</strong><br>
+                    {{ $entreprise->adresse }}<br>
                 </td>
                 <td width="33%" style="text-align: center;">
                   
                 </td>
                 <td width="33%" style="text-align: right;">
-                    {{ $agence->telephone?? 'N/A' }}<br>
-                    {{ $agence->contact?? 'N/A' }}<br>
-                    {{ $agence->email?? 'N/A' }} <br><br>
-                    {{$agence->ville}} Le: {{ date('d-m-Y') }}
+                    {{ $entreprise->telephone?? 'N/A' }}<br>
+                    {{ $entreprise->contact?? 'N/A' }}<br>
+                    {{ $entreprise->email?? 'N/A' }} <br><br>
+                    {{$entreprise->ville}} Le: {{ date('d-m-Y') }}
                 </td>
             </tr>
         </table>
@@ -122,73 +122,58 @@
 
             <!-- Table produits -->
             <div class="table-responsive">
-                <p style="text-align: center">ETAT MOUVEMENT CAISSE </p>
+                <p style="text-align: center">MESURE CHEMISE </p>
              <table style="width: 100%; font-size: 12px; table-layout: fixed; word-wrap: break-word;">
                 <thead>
                     <tr>
-                        <th style="width: 9%;">REFERENCE</th>
-                        <th style="width: 8%;">TYPE</th>
-                        <th style="width: 100px;">NATURE</th>
-                        <th style="width: 7%;">MONTANT</th>
-                        <th style="width: 7%;">MODE</th>
-                        <th style="width: 80px;">STRUCTURE</th>
-                        <th style="width: 8%;">CAISSE</th>
-                        <th style="width: 100px;">BENEFICIAIRE</th>
-                        <th style="width: 8%;">DATE</th>
-                        <th style="width: 100px;">DETAIL</th>
-                        <th style="width: 100px;">UTILISATEUR</th>
+                        <th style="width:12% !important;">Reference</th>
+                        <th >Cou</th>
+                        <th >Poitrine</th>
+                        <th >Taille</th>
+                        <th >Bassin</th>
+                        <th >Epaule</th>
+                        <th >Manche</th>
+                        <th >Bas</th>
+                        <th >Poignet</th>
+                        <th >Longueur</th>
+                        <th >Detail</th>
+                        <th style="width:12% !important;">Date</th>
+                        <th style="width:12% !important;">MODEL</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @php $ttmvmtentre =0; $ttmvmtsorti =0; $structure = null;$nomstructure = "-"; @endphp
-                        @foreach ($mouvementgroups as $mouvementgroup )
-                           @php
-                           if($mouvementgroup->type_mouvement =="ENTREE EN CAISSE")
-                           {
-                               $ttmvmtentre += $mouvementgroup->montant;
-                           }elseif($mouvementgroup->type_mouvement =="SORTIE DE CAISSE")
-                           {
-                               $ttmvmtsorti += $mouvementgroup->montant;
-                           }
-                                   
-                                    if ($mouvementgroup->structure_type == "AGENCE") {
-                                        $structure = App\Models\Agence::find($mouvementgroup->structure_id);
-                                    } elseif ($mouvementgroup->structure_type == "ATELIER") {
-                                        $structure = App\Models\Atelier::find($mouvementgroup->structure_id);
-                                    } else {
-                                        $nomstructure ="-";
-                                            }
-
-                         $nomstructure = $structure->nom . ' - ' . $structure->ville;
-                       @endphp
+                        @foreach ($chemises as $chemise )
+                        
                             <tr>
-                                <td>
-                                    {{$mouvementgroup->reference}}
+                                <td >
+                                    {{$chemise->Reference}}
                                 </td>
-                                <td>{{$mouvementgroup->type_mouvement}}</td>
-                                <td>{{$mouvementgroup->mouvementNature->nom}}</td>
-                                <td>{{$mouvementgroup->montant}}</td>
-                                <td>{{$mouvementgroup->mode_reglement}}</td>
-                                <td> {{$nomstructure}}</td>
-                                <td>{{$mouvementgroup->caisse->nom}}</td>
-                                <td>{{$mouvementgroup->employe->nom}} {{$mouvementgroup->employe->prenom}}</td>
-                                <td>{{date('d-m-Y', strtotime($mouvementgroup->date))}}</td>
-                                <td>{{$mouvementgroup->detail}}</td>
-                                <td>{{$mouvementgroup->user->name}}</td>
+                                <td >{{$chemise->Tour_cou}}</td>
+                                <td>{{$chemise->Tour_poitrine}}</td>
+                                <td>{{$chemise->Tour_taille}}</td>
+                                <td>{{$chemise->Tour_bassin}}</td>
+                                <td> {{$chemise->Largeur_epaule}}</td>
+                                <td>{{$chemise->Longueur_manche}}</td>
+                                <td>{{$chemise->Tour_bas}} </td>
+                                <td>{{$chemise->Tour_poignet}}</td>
+                                <td>{{$chemise->Longueur_chemise}}</td>
+                                <td>{{$chemise->Description}}</td>
+                                <td>{{date('d-m-Y H:i', strtotime($chemise->created_at))}}</td>
+                                {{-- <td><img src="storage/{{base64_encode(file_get_contents(public_path($chemise->Model_mesure))) }}" width="80" alt="Logo de l'entreprise"></td> --}}
+                                @if ($chemise->Model_mesure)
+                                    @php
+                                    //dd($chemise->Model_mesure);
+                                        $logoPathm = public_path("storage/".$chemise->Model_mesure[0]?? null);
+                                        $logoTypem = pathinfo($logoPathm, PATHINFO_EXTENSION);
+                                        $logoDatam = base64_encode(file_get_contents($logoPathm));
+                                        $logoSrcm = "data:image/{$logoTypem};base64,{$logoDatam}";
+                                    @endphp
+                                  <td>  <img src="{{ $logoSrcm }}" width="90px" alt="CHEMISE"> </td>
+                                  @else
+                                  <td></td>
+                                    @endif
                             </tr>
                         @endforeach
-                        <tr style="font-size:14px;font-weight:bold;">
-                            <td colspan="10">TOTAL ENTREE</td>
-                            <td >{{$ttmvmtentre}}</td>
-                        </tr>
-                        <tr style="font-size:14px;font-weight:bold;">
-                            <td colspan="10">TOTAL SORTIE</td>
-                            <td >{{$ttmvmtsorti}}</td>
-                        </tr>
-                        <tr style="font-size:14px;font-weight:bold;">
-                            <td colspan="10">RESTE</td>
-                            <td >{{$ttmvmtentre - $ttmvmtsorti}}</td>
-                        </tr>
                     </tbody>
                 </table>
                 <br>
@@ -202,7 +187,7 @@
     </div>
 
     <footer>
-        <p style="color:#000000 ">{{$agence->pied_page}}</p>
+        <p style="color:#000000 ">{{$entreprise->pied_page}}</p>
     </footer>
 {{-- <script type="text/php">
     if (isset($pdf)) {

@@ -14,7 +14,7 @@ class EtapeMesure extends Model
         'mesure_ensemble_id',
         'autre_mesure_id',
         'etape_production_id',
-        'responsable_id',
+        'employe_id',
         'is_completed',
         'comments',
         'user_id',
@@ -22,6 +22,8 @@ class EtapeMesure extends Model
         'date_debut',
         'date_fin',
         'temp_mis',
+        'montant',
+        'cloture',
     ];
     protected $casts = [
     'date_debut' => 'datetime',
@@ -55,7 +57,7 @@ class EtapeMesure extends Model
     }
     public function responsable()
     {
-        return $this->belongsTo(User::class, 'responsable_id');
+        return $this->belongsTo(Employe::class, 'employe_id');
     }
     public function user()
     {
@@ -81,7 +83,7 @@ class EtapeMesure extends Model
     //             EtapeMesure::create([
     //                 'mesure_chemise_id' => $etapeMesure->mesure_chemise_id,
     //                 'etape_production_id' => $etape->id,
-    //                 'responsable_id' => $etape->id == 1 ? Auth::id() : null,
+    //                 'employe_id' => $etape->id == 1 ? Auth::id() : null,
     //                 'is_completed' => $etape->id == 1,
     //                 'comments' => null,
     //                 'user_id' => Auth::id(),
@@ -104,7 +106,7 @@ class EtapeMesure extends Model
             'etape_production_id' => $etapeData['etape_production_id'],
             'comments' => $etapeData['comments'] ?? null,
             'is_completed' => $etapeData['is_completed'] ?? false,
-            'responsable_id' => $etapeData['responsable_id'] ?? null,
+            'employe_id' => $etapeData['employe_id'] ?? null,
             'user_id' => $etapeData['user_id'] ?? Auth::id(),
         ]);
     }

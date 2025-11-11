@@ -25,9 +25,9 @@ class EmployeInfolist
                 TextEntry::make('date_embauche')
                     ->label('Date d\'embauche')
                      ->date(),
-                TextEntry::make('atelier_id')
+                TextEntry::make('atelier.nom')
                     ->label('Atelier'),
-                TextEntry::make('agence_id')
+                TextEntry::make('agence.nom')
                     ->label('Agence'),
                     
             ]);

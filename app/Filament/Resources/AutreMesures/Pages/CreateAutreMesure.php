@@ -40,8 +40,9 @@ protected function afterCreate(): void
                 'temp_mis' => $temp_mis,
                 'comments' => $etapeData['comments'] ?? null,
                 'is_completed' => $isFirst ? true : ($etapeData['is_completed'] ?? false),
-                'responsable_id' => $isFirst ? Auth::id() : ($etapeData['responsable_id'] ?? null),
+                'employe_id' => $isFirst ? Auth::user()->employe_id : ($etapeData['employe_id'] ?? null),
                 'user_id' => $etapeData['user_id'] ?? Auth::id(),
+                'montant' => $etapeData['montant'],
             ]);
 
 

@@ -89,7 +89,7 @@ return $schema
                     Toggle::make("etapes.{$etape->id}.is_completed")
                         ->label('Terminée'),
 
-                    Select::make("etapes.{$etape->id}.responsable_id")
+                    Select::make("etapes.{$etape->id}.employe_id")
                         ->label('Responsable')
                         ->options(User::pluck('name', 'id'))
                         ->searchable(),

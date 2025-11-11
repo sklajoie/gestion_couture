@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('mesure_type')->nullable();
             $table->unsignedBigInteger('mesure_id')->nullable();
             $table->foreignId('etape_production_id')->constrained('etape_productions')->onDelete('set null');
-            $table->foreignId('responsable_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('employe_id')->nullable()->constrained('users')->onDelete('set null');
             $table->dateTime('date');
             $table->foreignId('atelier_id')->nullable()->constrained('ateliers')->onDelete('set null');
             $table->foreignId('user_id')->constrained('users')->onDelete('set null');

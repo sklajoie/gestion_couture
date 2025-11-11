@@ -19,11 +19,13 @@ return new class extends Migration
             $table->foreignId('mesure_ensemble_id')->nullable()->constrained('mesure_ensembles')->onDelete('cascade');
             $table->foreignId('autre_mesure_id')->nullable()->constrained('autre_mesures')->onDelete('cascade');
             $table->foreignId('etape_production_id')->constrained('etape_productions')->onDelete('set null');
-            $table->foreignId('responsable_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('employe_id')->nullable()->constrained('employes')->onDelete('set null');
             $table->boolean('is_completed')->default(false);
             $table->datetime('date_debut')->nullable();
             $table->datetime('date_fin')->nullable();
             $table->string('temp_mis')->nullable();
+            $table->string('cloture')->nullable();
+            $table->float('montant')->nullable();
             $table->text('comments')->nullable();
             $table->foreignId('user_id')->constrained('users')->onDelete('set null');
             $table->foreignId('atelier_id')->nullable()->constrained('ateliers')->onDelete('set null');

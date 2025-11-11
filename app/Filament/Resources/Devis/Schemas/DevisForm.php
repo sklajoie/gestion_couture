@@ -29,8 +29,14 @@ class DevisForm
 
                  Grid::make()
                 ->schema([
-                    //  Hidden::make('agence_id')
-                    //     ->default(fn () => Auth::user()->agence_id),
+                     Select::make('agence_id')
+                      ->relationship('agence', 'nom')
+                        ->required()
+                        ->searchable()
+                        ->reactive()
+                        ->preload()
+                        ->default(fn () => Auth::user()->agence_id)
+                        ->hidden(fn () => Auth::user()->agence_id),
                     Hidden::make('statut')
                         ->default("DEVIS"),
                     Hidden::make('user_id')
@@ -93,7 +99,7 @@ class DevisForm
                         ->schema([
                             Select::make('stock_entreprise_id')
                                 ->label('Produits')
-                                ->relationship('stockEntreprise', 'code_barre')
+                                ->relationship('stockEntreprise', 'designation')
                                 ->required()
                                 ->searchable()
                                 ->reactive()

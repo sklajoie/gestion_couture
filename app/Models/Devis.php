@@ -57,8 +57,10 @@ class Devis extends Model
             
             static::creating(function ($model) {
                 
-               $model->agence_id = $model->agence_id ?? Auth::user()->agence_id;
-        
+            //    $model->agence_id = $model->agence_id ?? Auth::user()->agence_id;
+                $model->agence_id = $model->agence_id
+                        ?? (Auth::check() ? Auth::user()->agence_id : null)
+                        ?? 1;
        // dd($model->toArray()); // pour debug
         // dd($model->agence_id);
                 $now = \Carbon\Carbon::now();

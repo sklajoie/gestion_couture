@@ -4,9 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Agence;
 use App\Models\Atelier;
+use App\Models\AutreMesure;
 use App\Models\ClotureCaisse;
 use App\Models\Devis;
 use App\Models\Entreprise;
+use App\Models\EtapeMesure;
+use App\Models\MesureChemise;
+use App\Models\MesureEnsemble;
+use App\Models\MesurePantalon;
+use App\Models\MesureRobe;
 use App\Models\MouvementCaisse;
 use App\Models\Vente;
 use App\Models\Versement;
@@ -227,8 +233,124 @@ public function imprimermouvementcaissegroup(Request $request)
     // Récupérer les ventes concernées
     $mouvementgroups = MouvementCaisse::whereIn('type_mouvement', $mouvementlistes->keys())->get()->keyBy('id');
 //dd($mouvementgroups);
-    $pdf = Pdf::loadView('pdf.mouvement_caisse_group', compact('mouvementgroups','agence'));
+    $pdf = Pdf::loadView('pdf.mouvement_caisse_group', compact('mouvementgroups','agence'))
+                    ->setPaper('A4', 'landscape')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);
     return $pdf->stream('mouvement_groups.pdf');
+}
+
+public function imprimerchemise(Request $request)
+{
+    $ids = $request->input('mesure_ids', []);
+
+    $chemises = MesureChemise::whereIn('id', $ids)->get();
+
+    // Regrouper les versements par facture
+    foreach($chemises as $chemise)
+    {
+
+        $etapes = EtapeMesure::where('mesure_chemise_id', $chemise)->get();
+    }
+
+     $entreprise = Entreprise::first();    
+    // Récupérer les ventes concernées
+    $pdf = Pdf::loadView('pdf.imprimer_chemise', compact('etapes','chemises','entreprise'))
+                    ->setPaper('A4', 'landscape')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);;
+    return $pdf->stream('mesure_chemise.pdf');
+}
+public function imprimerpantalon(Request $request)
+{
+    $ids = $request->input('mesure_ids', []);
+
+    $pantalons = MesurePantalon::whereIn('id', $ids)->get();
+
+     $entreprise = Entreprise::first();    
+    // Récupérer les ventes concernées
+    $pdf = Pdf::loadView('pdf.imprimer_pantalon', compact('pantalons','entreprise'))
+                    ->setPaper('A4', 'landscape')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);;
+    return $pdf->stream('mesure_pantalon.pdf');
+}
+public function imprimerensemble(Request $request)
+{
+    $ids = $request->input('mesure_ids', []);
+
+    $ensembles = MesureEnsemble::whereIn('id', $ids)->get();
+
+     $entreprise = Entreprise::first();    
+    // Récupérer les ventes concernées
+    $pdf = Pdf::loadView('pdf.imprimer_ensemble', compact('ensembles','entreprise'))
+                    ->setPaper('A4', 'landscape')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);;
+    return $pdf->stream('mesure_ensemble.pdf');
+}
+public function imprimerrobe(Request $request)
+{
+    $ids = $request->input('mesure_ids', []);
+
+    $robes = MesureRobe::whereIn('id', $ids)->get();
+
+     $entreprise = Entreprise::first();    
+    // Récupérer les ventes concernées
+    
+    $pdf = Pdf::loadView('pdf.imprimer_robe', compact('robes','entreprise'))
+                    ->setPaper('A4', 'landscape')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);;
+    return $pdf->stream('mesure_robe.pdf');
+}
+
+public function imprimerautremesure(Request $request)
+{
+    $ids = $request->input('mesure_ids', []);
+
+    $autremesures = AutreMesure::whereIn('id', $ids)
+                            ->with(['autreMesureDetail', 'user'])
+                            ->get();
+    //dd($autremesures );
+     $entreprise = Entreprise::first();    
+    // Récupérer les ventes concernées
+    
+    $pdf = Pdf::loadView('pdf.imprimer_autremesure', compact('autremesures','entreprise'))
+                    ->setPaper('A4', 'landscape')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);;
+    return $pdf->stream('mesure_autre.pdf');
 }
 
 

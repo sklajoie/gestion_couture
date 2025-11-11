@@ -239,9 +239,12 @@ class MesurePantalonForm
                 Textarea::make("etapes.{$etape->id}.comments")->label('Commentaires')->nullable(),
                 Toggle::make("etapes.{$etape->id}.is_completed")
                     ->label('Terminée'),
-                Select::make("etapes.{$etape->id}.responsable_id")
+                Select::make("etapes.{$etape->id}.employe_id")
                     ->label('Responsable')
-                    ->options(User::pluck('name', 'id'))
+                         ->options(function () {
+                                return \App\Models\Employe::all()
+                                ->mapWithKeys(fn ($e) => [$e->id => $e->nom . ' ' . $e->prenom])
+                                ->toArray(); })
                     ->searchable(),
                 DateTimePicker::make("etapes.{$etape->id}.date_debut")
                     ->label('Date de début')
@@ -257,7 +260,11 @@ class MesurePantalonForm
                     ->nullable(),
                 Select::make("etapes.{$etape->id}.atelier_id")
                     ->label('Atelier')
-                   ->options(\App\Models\Atelier::pluck('nom', 'id')),
+                    ->options(\App\Models\Atelier::pluck('nom', 'id')),
+                TextInput::make("etapes.{$etape->id}.montant")
+                        ->label('montant')
+                        ->numeric()
+                        ->default(0),
                 Hidden::make("etapes.{$etape->id}.user_id")->default(Auth::id()),
             ]);
     }

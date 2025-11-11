@@ -27,9 +27,12 @@ class EtapeMesureForm
             ->searchable()
             ->required(),
 
-        Select::make('responsable_id')
+        Select::make('employe_id')
             ->label('Responsable')
-            ->relationship('responsable', 'name')
+            ->options(function () {
+            return \App\Models\Employe::all()
+            ->mapWithKeys(fn ($e) => [$e->id => $e->nom . ' ' . $e->prenom])
+            ->toArray(); })
             ->searchable()
             ->required(),
 

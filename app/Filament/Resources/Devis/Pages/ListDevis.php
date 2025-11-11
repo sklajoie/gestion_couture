@@ -13,12 +13,12 @@ class ListDevis extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        if (Auth::user()?->agence_id) {
+        // if (Auth::user()?->agence_id) {
         return [
             CreateAction::make(),
         ];
-           }
-    return [];
+    //        }
+    // return [];
            
     }
 }

@@ -66,7 +66,7 @@ foreach ($etapes as $etapeId => $etapeData) {
   if (!$etapeMesure?->atelier_id && !empty($etapeData['atelier_id'])) {
 
             \App\Models\EtapeAtelier::create([
-            'responsable_id'   => $etapeData['responsable_id'],
+            'employe_id'   => $etapeData['employe_id'],
             'etape_production_id' => $etapeData['etape_production_id'],
             'atelier_id' => $etapeData['atelier_id'],
             'date'       => date(now()), 
@@ -82,7 +82,8 @@ foreach ($etapes as $etapeId => $etapeData) {
         [
             'comments' => $etapeData['comments'] ?? null,
             'is_completed' => $etapeData['is_completed'] ?? false,
-            'responsable_id' => $etapeData['responsable_id'] ?? null,
+            'employe_id' => $etapeData['employe_id'] ?? null,
+            'montant' => $etapeData['montant'],
             'date_debut' => $etapeData['date_debut'] ?? null,
             'date_fin' => $etapeData['date_fin'] ?? null,
             'user_id' => $etapeData['user_id'] ?? Auth::id(),
@@ -141,12 +142,13 @@ protected function mutateFormDataBeforeFill(array $data): array
                 'etape_production_id' => $etape->etape_production_id,
                 'comments' => $etape->comments,
                 'is_completed' => $etape->is_completed,
-                'responsable_id' => $etape->responsable_id,
+                'employe_id' => $etape->employe_id,
                 'date_debut' => $etape->date_debut,
                 'date_fin' => $etape->date_fin,
                 'user_id' => $etape->user_id,
                 'temp_mis' => $etape->temp_mis,
                 'atelier_id' => $etape->atelier_id,
+                'montant' => $etape->montant,
             ],
         ];
     })->toArray();

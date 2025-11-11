@@ -26,4 +26,10 @@ class Employe extends Model
     {
         return $this->belongsTo(Agence::class);
     }
+    public function etapeMesure()
+    {
+        return $this->hasMany(EtapeMesure::class);
+    }
+
+
 }

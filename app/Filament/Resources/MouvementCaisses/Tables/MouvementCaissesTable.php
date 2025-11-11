@@ -63,6 +63,11 @@ class MouvementCaissesTable
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('employe.nom')
                     ->label("Employe")
+                     ->formatStateUsing(function ($state, $record) {
+                        return $record->employe
+                            ? "{$record->employe->prenom} {$record->employe->nom}"
+                            : '-';
+                    })
                     ->sortable(),
                 TextColumn::make('user.name')
                     ->label("Utilisateur")

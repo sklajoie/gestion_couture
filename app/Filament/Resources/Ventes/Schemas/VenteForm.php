@@ -33,8 +33,14 @@ class VenteForm
 
                  Grid::make()
                 ->schema([
-                    //  Hidden::make('agence_id')
-                    //     ->default(fn () => Auth::user()->agence_id),
+                     Select::make('agence_id')
+                      ->relationship('agence', 'nom')
+                        ->required()
+                        ->searchable()
+                        ->reactive()
+                        ->preload()
+                        ->default(fn () => Auth::user()->agence_id)
+                        ->hidden(fn () => Auth::user()->agence_id),
                     Hidden::make('user_id')
                         ->default(fn () => Auth::id()),
                     Select::make('client_id')
@@ -134,8 +140,9 @@ class VenteForm
                                             }),
                             Hidden::make('stock'),
 
-                            Hidden::make('agence_id')
-                                ->default(fn () => Auth::user()->agence_id),
+                            // Hidden::make('agence_id')
+                            //     ->default(fn () => Auth::user()->agence_id),
+
                             Hidden::make('user_id')
                                 ->default(fn () => Auth::id()),
 
@@ -298,19 +305,27 @@ class VenteForm
                                     self::calculTotaux($state, $set, $get);
                                     }),
                             Select::make('caisse_id')
-                                     ->relationship(
-                                        name: 'caisse',
-                                        titleAttribute: 'nom',
-                                        modifyQueryUsing: fn ($query) => $query->where('agence_id', Auth::user()->agence_id)
-                                    )
+                                     ->relationship('caisse', 'nom')
                                     ->label('Caisse')
                                     ->required()
-                                     ->preload(),
+                                     ->preload()
+                                      ->options(function (callable $get) {
+                                        $agenceId = $get('../../agence_id'); // ou '../../agence_id' si en dehors du repeater
+
+                                        return \App\Models\Caisse::where('agence_id', $agenceId)
+                                            ->pluck('nom', 'id');
+                                    }),
                             TextInput::make('detail')
                                  ->label('Detail Versement')
                                  ->columnSpan(2),
-                            Hidden::make('agence_id')
-                                ->default(fn () => Auth::user()->agence_id),
+                            // TextInput::make('agence_id')
+                            //     ->default(
+                            //        function (callable $get) {
+                            //             $agenceId = $get('../../agence_id'); // ou '../../agence_id' si en dehors du repeater
+                            //           return \App\Models\Agence::find($agenceId)?->id;
+                            //         }
+                            //     )->reactive(),
+
                             Hidden::make('user_id')
                                 ->default(fn () => Auth::id()),
                                 

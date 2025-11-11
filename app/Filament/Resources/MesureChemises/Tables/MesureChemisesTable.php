@@ -17,6 +17,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Illuminate\Support\Collection;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\BadgeColumn;
@@ -28,7 +29,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-
+use Livewire\Component;
 
 class MesureChemisesTable
 {
@@ -41,6 +42,9 @@ class MesureChemisesTable
                     ->dateTime('j M, Y H:i')
                        ->searchable(),
 
+                TextColumn::make('Reference')
+                    ->label('Reference')
+                       ->searchable(),
                 TextColumn::make('Type')
                     ->label('Type')
                        ->searchable(),
@@ -139,9 +143,13 @@ class MesureChemisesTable
                             ->options(\App\Models\Atelier::pluck('nom', 'id'))
                             ->searchable(),
 
-                        Select::make('responsable_id')
+                        Select::make('employe_id')
                             ->label('Responsable')
-                            ->options(\App\Models\User::pluck('name', 'id'))
+                              ->options(function () {
+                                return \App\Models\Employe::all()
+                                ->mapWithKeys(fn ($e) => [$e->id => $e->nom . ' ' . $e->prenom])
+                                ->toArray();
+                            })
                             ->searchable()
                             ->required(),
                         DateTimePicker::make('date_debut')
@@ -161,7 +169,7 @@ class MesureChemisesTable
                         ->first();
 
                     $etapeData = [
-                        'responsable_id'   => $data['responsable_id'],
+                        'employe_id'   => $data['employe_id'],
                         'comments'         => $data['commentaire'],
                         'date_debut'       => $data['date_debut'],
                         'user_id'          => Auth::id(),
@@ -173,7 +181,7 @@ class MesureChemisesTable
                         $etapeData['atelier_id'] = $data['atelier_id'];
 
                         EtapeAtelier::create([
-                        'responsable_id'   => $data['responsable_id'],
+                        'employe_id'   => $data['employe_id'],
                         'etape_production_id' => $data['etape_production_id'],
                         'atelier_id' => $data['atelier_id'],
                         'date'       => date(now()), 
@@ -213,11 +221,15 @@ class MesureChemisesTable
                             ->options(\App\Models\EtapeProduction::pluck('nom', 'id'))
                             ->required(),
 
-                        Select::make('responsable_id')
+                        Select::make('employe_id')
                             ->label('Responsable')
-                            ->options(\App\Models\User::pluck('name', 'id'))
+                              ->options(function () {
+                                return \App\Models\Employe::all()
+                                ->mapWithKeys(fn ($e) => [$e->id => $e->nom . ' ' . $e->prenom])
+                                ->toArray();
+                            })
                             ->searchable()
-                            ->default(Auth::id())
+                            ->default(Auth::user()->employe_id)
                             ->required(),
                         DateTimePicker::make('date_fin')
                             ->label('Date Fin')
@@ -251,7 +263,7 @@ class MesureChemisesTable
 
                         if ($etape) {
                             $etape->update([
-                                'responsable_id' => $data['responsable_id'],
+                                'employe_id' => $data['employe_id'],
                                 'comments' => $data['commentaire'],
                                 'date_debut' => $dateDebut,
                                 'date_fin' => $data['date_fin'],
@@ -262,7 +274,7 @@ class MesureChemisesTable
                         } else {
                             $mesure->etapeMesures()->create([
                                 'etape_production_id' => $data['etape_production_id'],
-                                'responsable_id' => $data['responsable_id'],
+                                'employe_id' => $data['employe_id'],
                                 'comments' => $data['commentaire'],
                                 'date_debut' => Carbon::now(),
                                 'date_fin' => Carbon::now(),
@@ -290,14 +302,25 @@ class MesureChemisesTable
                     ->title('Étape validée avec succès')
                     ->success()
                     ->send();
-            })
-            /////valider etape////////
+            }),
+            /////impression////////
+                BulkAction::make('Imprimer Mesure')
+                ->icon('heroicon-o-printer')
+                ->action(function (Collection $records, Component $livewire) {
+                    $ids = $records->pluck('id')->toArray();
+                    $url = route('imprimer.chemise', ['mesure_ids' => $ids]);
+                    
+                    $livewire->js('window.open(\'' . $url . '\', \'_blank\');');
+                })
 
             ->deselectRecordsAfterCompletion(),
+             DeleteBulkAction::make(),
 
-              DeleteBulkAction::make(),
+        ]);
 
-            ]);
+          
+              
+             
      
             
         }

@@ -20,7 +20,9 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class MesureRobesTable
 {
@@ -118,9 +120,12 @@ class MesureRobesTable
                             ->label('Atelier')
                             ->options(\App\Models\Atelier::pluck('nom', 'id'))
                             ->searchable(),
-                        Select::make('responsable_id')
+                        Select::make('employe_id')
                             ->label('Responsable')
-                            ->options(\App\Models\User::pluck('name', 'id'))
+                            ->options(function () {
+                                return \App\Models\Employe::all()
+                                ->mapWithKeys(fn ($e) => [$e->id => $e->nom . ' ' . $e->prenom])
+                                ->toArray(); })
                             ->searchable()
                             ->required(),
                         DateTimePicker::make('date_debut')
@@ -140,7 +145,7 @@ class MesureRobesTable
                         ->first();
 
                     $etapeData = [
-                        'responsable_id'   => $data['responsable_id'],
+                        'employe_id'   => $data['employe_id'],
                         'comments'         => $data['commentaire'],
                         'date_debut'       => $data['date_debut'],
                         'user_id'          => Auth::id(),
@@ -152,7 +157,7 @@ class MesureRobesTable
                         $etapeData['atelier_id'] = $data['atelier_id'];
 
                         \App\Models\EtapeAtelier::create([
-                        'responsable_id'   => $data['responsable_id'],
+                        'employe_id'   => $data['employe_id'],
                         'etape_production_id' => $data['etape_production_id'],
                         'atelier_id' => $data['atelier_id'],
                         'date'       => date(now()), 
@@ -193,9 +198,12 @@ class MesureRobesTable
                             ->options(\App\Models\EtapeProduction::pluck('nom', 'id'))
                             ->required(),
 
-                        Select::make('responsable_id')
+                        Select::make('employe_id')
                             ->label('Responsable')
-                            ->options(\App\Models\User::pluck('name', 'id'))
+                            ->options(function () {
+                                return \App\Models\Employe::all()
+                                ->mapWithKeys(fn ($e) => [$e->id => $e->nom . ' ' . $e->prenom])
+                                ->toArray(); })
                             ->searchable()
                             ->default(Auth::id())
                             ->required(),
@@ -225,7 +233,7 @@ class MesureRobesTable
 
                             if ($etape) {
                                 $etape->update([
-                                    'responsable_id' => $data['responsable_id'],
+                                    'employe_id' => $data['employe_id'],
                                     'comments' => $data['commentaire'],
                                     'date_debut' => $dateDebut,
                                     'date_fin' => $data['date_fin'],
@@ -236,7 +244,7 @@ class MesureRobesTable
                             } else {
                               $mesure->etapeMesures()->create([
                                     'etape_production_id' => $data['etape_production_id'],
-                                    'responsable_id' => $data['responsable_id'],
+                                    'employe_id' => $data['employe_id'],
                                     'comments' => $data['commentaire'],
                                     'date_debut' => Carbon::now(),
                                     'date_fin' => Carbon::now(),
@@ -265,8 +273,16 @@ class MesureRobesTable
                     ->title('Étape validée avec succès')
                     ->success()
                     ->send();
-            })
-            /////valider etape////////
+            }),
+           /////impression////////
+             BulkAction::make('Imprimer Mesure')
+                ->icon('heroicon-o-printer')
+                ->action(function (Collection $records, Component $livewire) {
+                    $ids = $records->pluck('id')->toArray();
+                    $url = route('imprimer.robe', ['mesure_ids' => $ids]);
+                    
+                    $livewire->js('window.open(\'' . $url . '\', \'_blank\');');
+                })
             ->deselectRecordsAfterCompletion(),
 
               DeleteBulkAction::make(),

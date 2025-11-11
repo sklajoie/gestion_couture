@@ -20,3 +20,8 @@ Route::get('/versement-ticket/imprimer', [DevisController::class, 'versementtick
 Route::get('/cloture-caisse/{reference}', [DevisController::class, 'impressioncloturecaisse'])->name('cloture-caisse');
 Route::get('/mouvement-caisse/{id}', [DevisController::class, 'impressionmouvementcaisse'])->name('mouvement-caisse');
 Route::get('/imprimer-mouvement-caisse', [DevisController::class, 'imprimermouvementcaissegroup'])->name('imprimer-mouvement-caisse');
+Route::get('/imprimer-chemise', [DevisController::class, 'imprimerchemise'])->name('imprimer.chemise');
+Route::get('/imprimer-pantalon', [DevisController::class, 'imprimerpantalon'])->name('imprimer.pantalon');
+Route::get('/imprimer-ensemble', [DevisController::class, 'imprimerensemble'])->name('imprimer.ensemble');
+Route::get('/imprimer-robe', [DevisController::class, 'imprimerrobe'])->name('imprimer.robe');
+Route::get('/imprimer-autre-mesure', [DevisController::class, 'imprimerautremesure'])->name('imprimer.autre-mesure');

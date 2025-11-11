@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MesureChemises\Schemas;
 
 use App\Models\Couleur;
+use App\Models\Employe;
 use App\Models\EtapeProduction;
 use App\Models\Produit;
 use App\Models\Taille;
@@ -223,10 +224,15 @@ return $schema
                 Textarea::make("etapes.{$etape->id}.comments")->label('Commentaires')->nullable(),
                 Toggle::make("etapes.{$etape->id}.is_completed")
                     ->label('Terminée'),
-                Select::make("etapes.{$etape->id}.responsable_id")
-                    ->label('Responsable')
-                    ->options(User::pluck('name', 'id'))
-                    ->searchable(),
+               Select::make("etapes.{$etape->id}.employe_id")
+                    ->options(function () {
+                        return \App\Models\Employe::all()
+                        ->mapWithKeys(fn ($e) => [$e->id => $e->nom . ' ' . $e->prenom])
+                        ->toArray();
+                    })
+                    //->getOptionLabelFromRecordUsing(fn ($record) => "{$record->prenom} {$record->nom}")
+                    ->searchable()
+                    ->preload(),
                 DateTimePicker::make("etapes.{$etape->id}.date_debut")
                     ->label('Date de début')
                     ->nullable(),
@@ -239,6 +245,10 @@ return $schema
                     ->label('Temps mis')
                     ->readOnly()
                     ->nullable(),
+                TextInput::make("etapes.{$etape->id}.montant")
+                    ->label('Montant')
+                    ->numeric()
+                    ->default(0),
                 // TextInput::make("etapes.{$etape->id}.atelier_id")
                 //     ->label('Atelier')
                 //     ->readOnly()

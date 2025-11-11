@@ -11,11 +11,14 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class EtapeMesuresTable
@@ -33,13 +36,23 @@ class EtapeMesuresTable
             TextColumn::make('etapeProduction.nom')->label('Étape')
               ->searchable()
               ->sortable(),
-            TextColumn::make('responsable.name')->label('Responsable')
-            ->searchable()
-              ->sortable(),
+            TextColumn::make('created_at')->label('Date')
+            //   ->searchable()
+              ->sortable()
+              ->date('d-m-Y H:i'),
+            TextColumn::make('responsable.nom')->label('Responsable')
+                ->searchable()
+                ->formatStateUsing(function ($state, $record) {
+                    return $record->responsable
+                        ? "{$record->responsable->prenom} {$record->responsable->nom}"
+                        : '-';
+                        })
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
             ToggleColumn::make('is_completed')
                 ->label('Statut')
                 ->sortable()
-                ->disabled(fn ($record) => $record->responsable_id !== Auth::id() || $record->is_completed )
+                ->disabled(fn ($record) => $record->employe_id !== Auth::user()->employe_id || $record->is_completed )
                 ->afterStateUpdated(function ($state, $record) {
                      $maxId = \App\Models\EtapeProduction::max('id');
                     // Ce bloc ne sera exécuté que si l'utilisateur est le responsable
@@ -73,36 +86,38 @@ class EtapeMesuresTable
                         ->send();
                             
                             }),
-            TextColumn::make('comments')->label('Commentaires')->limit(50),
-            TextColumn::make('mesure_liee') // n'importe quel nom qui n'entre pas en conflit
-                ->label('Mesure liée')
-                ->getStateUsing(function ($record) {
-                    if ($record->mesureChemise) {
-                        return "Chemise #{$record->mesureChemise->Reference}";
-                    } elseif ($record->mesurePantalon) {
-                        return "Pantalon #{$record->mesurePantalon->Reference}";
-                    } elseif ($record->mesureRobe) {
-                        return "Robe #{$record->mesureRobe->Reference}";
-                    } elseif ($record->mesureEnsemble) {
-                        return "Ensemble #{$record->mesureEnsemble->Reference}";
-                    } elseif ($record->autreMesure) {
-                        return "Autre #{$record->autreMesure->Reference}";
-                    }
+                    TextColumn::make('montant')->label('Montant'),
+                    TextColumn::make('comments')->label('Commentaires')->limit(50)
+                        ->toggleable(isToggledHiddenByDefault: true),
+                    TextColumn::make('mesure_liee') // n'importe quel nom qui n'entre pas en conflit
+                        ->label('Mesure liée')
+                        ->getStateUsing(function ($record) {
+                            if ($record->mesureChemise) {
+                                return "Chemise #{$record->mesureChemise->Reference}";
+                            } elseif ($record->mesurePantalon) {
+                                return "Pantalon #{$record->mesurePantalon->Reference}";
+                            } elseif ($record->mesureRobe) {
+                                return "Robe #{$record->mesureRobe->Reference}";
+                            } elseif ($record->mesureEnsemble) {
+                                return "Ensemble #{$record->mesureEnsemble->Reference}";
+                            } elseif ($record->autreMesure) {
+                                return "Autre #{$record->autreMesure->Reference}";
+                            }
 
-                    return '—';
-                })
-                  ->url(function ($record) {
-                    if ($record->mesureChemise) {
-                        return route('filament.admin.resources.mesure-chemises.view', ['record' => $record->mesureChemise->id]);
-                    } elseif ($record->mesurePantalon) {
-                        return route('filament.admin.resources.mesure-pantalons.view', ['record' => $record->mesurePantalon->id]);
-                    } elseif ($record->mesureRobe) {
-                        return route('filament.admin.resources.mesure-robes.view', ['record' => $record->mesureRobe->id]);
-                    } elseif ($record->mesureEnsemble) {
-                        return route('filament.admin.resources.mesure-ensembles.view', ['record' => $record->mesureEnsemble->id]);
-                    } elseif ($record->autreMesure) {
-                        return route('filament.admin.resources.autre-mesures.view', ['record' => $record->autreMesure->id]);
-                    }
+                            return '—';
+                        })
+                        ->url(function ($record) {
+                            if ($record->mesureChemise) {
+                                return route('filament.admin.resources.mesure-chemises.view', ['record' => $record->mesureChemise->id]);
+                            } elseif ($record->mesurePantalon) {
+                                return route('filament.admin.resources.mesure-pantalons.view', ['record' => $record->mesurePantalon->id]);
+                            } elseif ($record->mesureRobe) {
+                                return route('filament.admin.resources.mesure-robes.view', ['record' => $record->mesureRobe->id]);
+                            } elseif ($record->mesureEnsemble) {
+                                return route('filament.admin.resources.mesure-ensembles.view', ['record' => $record->mesureEnsemble->id]);
+                            } elseif ($record->autreMesure) {
+                                return route('filament.admin.resources.autre-mesures.view', ['record' => $record->autreMesure->id]);
+                            }
 
                     return null;
                 })
@@ -112,10 +127,41 @@ class EtapeMesuresTable
 
         ])
             ->filters([
-                SelectFilter::make('responsable_id')
+                SelectFilter::make('is_completed')
+                    ->label('Validation')
+                    ->options([
+                        true => 'Validée',
+                        false => 'Non validée',
+                    ]),   
+                //   Filter::make('is_completed')
+                // ->query(fn (Builder $query) => $query->where('is_completed', false))
+                //  ->label("N'Est Pas Validée")
+                //  ->toggle(),
+
+                SelectFilter::make('employe_id')
                 ->label('Filtrer par responsable')
                  ->multiple()
-                ->options(User::pluck('name', 'id')),
+                ->options(function () {
+                return \App\Models\Employe::all()
+                ->mapWithKeys(fn ($e) => [$e->id => $e->nom . ' ' . $e->prenom])
+                ->toArray(); }),
+
+                Filter::make('created_at')
+                ->schema([
+                    DatePicker::make('created_from')->label('Debut'),
+                    DatePicker::make('created_until')->label('Fin'),
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                    return $query
+                        ->when(
+                            $data['created_from'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                        )
+                        ->when(
+                            $data['created_until'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                        );
+                })
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -138,7 +184,7 @@ class EtapeMesuresTable
                             $skippedCount = 0;
                         $maxId = \App\Models\EtapeProduction::max('id');
                             foreach ($records as $record) {
-                                if ($record->responsable_id === Auth::id() && ! $record->is_completed) {
+                                if ($record->employe_id === Auth::user()->employe_id && ! $record->is_completed) {
                                     $record->is_completed = true;
                                     $record->date_fin = now();
                                     $record->temp_mis = Carbon::parse($record->date_debut)->diff(now());

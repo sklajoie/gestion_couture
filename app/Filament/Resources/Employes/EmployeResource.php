@@ -6,6 +6,7 @@ use App\Filament\Resources\Employes\Pages\CreateEmploye;
 use App\Filament\Resources\Employes\Pages\EditEmploye;
 use App\Filament\Resources\Employes\Pages\ListEmployes;
 use App\Filament\Resources\Employes\Pages\ViewEmploye;
+use App\Filament\Resources\Employes\RelationManagers\EtapeMesureRelationManager;
 use App\Filament\Resources\Employes\Schemas\EmployeForm;
 use App\Filament\Resources\Employes\Schemas\EmployeInfolist;
 use App\Filament\Resources\Employes\Tables\EmployesTable;
@@ -45,7 +46,7 @@ class EmployeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            EtapeMesureRelationManager::class,
         ];
     }
 

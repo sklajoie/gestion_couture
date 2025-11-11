@@ -83,11 +83,17 @@ class MesureChemiseInfolist
                     TableColumn::make('DATE DEBUT'),
                     TableColumn::make('DATE FIN'),
                     TableColumn::make('TEMPS MIS'),
+                    TableColumn::make('MONTANT'),
                         ])
                         ->schema([
                             TextEntry::make('etapeProduction.nom'),
                             TextEntry::make('atelier.nom'),
-                            TextEntry::make('responsable.name'),
+                            TextEntry::make('responsable.nom')
+                             ->formatStateUsing(function ($state, $record) {
+                        return $record->responsable
+                            ? "{$record->responsable->prenom} {$record->responsable->nom}"
+                            : '-';
+                            }),
                             IconEntry::make('is_completed')
                             ->boolean(),
                             TextEntry::make('date_debut')
@@ -95,7 +101,8 @@ class MesureChemiseInfolist
                             TextEntry::make('date_fin')
                                 ->dateTime('j M , Y H:i:s'),
                             TextEntry::make('temp_mis')
-                               ->html(),
+                            ->html(),
+                            TextEntry::make('montant'),
                         
                                 ]),
                 RepeatableEntry::make('produitCouture')

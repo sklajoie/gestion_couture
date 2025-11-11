@@ -10,7 +10,7 @@ class EtapeAtelier extends Model
             'mesure_type',
             'mesure_id',
             'etape_production_id',
-            'responsable_id',
+            'employe_id',
             'date',
             'atelier_id',
             'user_id',
@@ -27,7 +27,7 @@ class EtapeAtelier extends Model
     }
     public function responsable()
     {
-        return $this->belongsTo(User::class, 'responsable_id');
+        return $this->belongsTo(Employe::class, 'employe_id');
     }
     public function user()
     {

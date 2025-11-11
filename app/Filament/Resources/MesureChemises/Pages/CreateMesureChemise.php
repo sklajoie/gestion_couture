@@ -56,12 +56,13 @@ protected function afterCreate(): void
             EtapeMesure::create([
                 'mesure_chemise_id' => $this->record->id,
                 'etape_production_id' => $etapeData['etape_production_id'],
+                'montant' => $etapeData['montant'],
                 'date_debut' => $dateDebut,
                 'date_fin' => $dateFin,
                 'temp_mis' => $temp_mis,
                 'comments' => $etapeData['comments'] ?? null,
                 'is_completed' => $isFirst ? true : ($etapeData['is_completed'] ?? false),
-                'responsable_id' => $isFirst ? Auth::id() : ($etapeData['responsable_id'] ?? null),
+                'employe_id' => $isFirst ? Auth::user()->employe_id : ($etapeData['employe_id'] ?? null),
                 'user_id' => $etapeData['user_id'] ?? Auth::id(),
             ]);
 
