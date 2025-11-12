@@ -33,7 +33,7 @@ class ClotureCaisse extends Model
     static::creating(function ($model) {
         // Définir l'agence si elle n'est pas déjà définie
         $model->agence_id = $model->agence_id
-            ?? (Auth::check() ? Auth::user()->agence_id : null)
+            ?? (Auth::check() ? Auth::user()->employe->agence_id : null)
             ?? 1;
 
         // Générer le préfixe basé sur la date

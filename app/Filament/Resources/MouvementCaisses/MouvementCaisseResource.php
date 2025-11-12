@@ -17,11 +17,14 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Schema\Builder;
+use UnitEnum;
 
 class MouvementCaisseResource extends Resource
 {
     protected static ?string $model = MouvementCaisse::class;
 
+    protected static string | UnitEnum | null $navigationGroup = 'GESTION CAISSE';
+    protected static ?int $navigationSort = 3;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'reference';

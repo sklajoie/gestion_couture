@@ -30,6 +30,10 @@ class Employe extends Model
     {
         return $this->hasMany(EtapeMesure::class);
     }
+    public function clotureAtelier()
+    {
+        return $this->hasMany(ClotureAtelier::class);
+    }
 
 
 }

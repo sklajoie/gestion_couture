@@ -119,7 +119,7 @@ class MesureRobeForm
                             ->relationship('produit', 'nom')
                             ->searchable()
                             ->preload()
-                            ->reduired()
+                            ->required()
                             ->getOptionLabelFromRecordUsing(fn (Produit $record) => "{$record->nom} ({$record->code_barre})")
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
@@ -142,7 +142,7 @@ class MesureRobeForm
                         TextInput::make('quantite')
                             ->label('Quantité')
                             ->numeric()
-                            ->reduired()
+                            ->required()
                             ->default(0)
                             ->minValue(1)
                             ->required()
@@ -269,7 +269,19 @@ class MesureRobeForm
                 TextInput::make("etapes.{$etape->id}.montant")
                         ->numeric()
                         ->default(0)
-                        ->label('Montant'),
+                        ->label('Montant')
+                          ->reactive()
+                    ->live(onBlur: true)
+                    ->dehydrated(true)
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                              $etapes = $get('etapes') ?? [];
+                            $totalmainoeuvre = collect($etapes)->sum(fn ($item) =>
+                                    floatval($item['montant'] ?? 0)
+                                );
+                                $set('main_oeuvre', round( $totalmainoeuvre, 2));
+                            // dd( $details);
+                        self::calcTotals($state, $set, $get);
+                    }),
                 Hidden::make("etapes.{$etape->id}.user_id")->default(Auth::id()),
             ]);
     }
@@ -285,10 +297,12 @@ class MesureRobeForm
     $details = $get('produitCouture') ?? [];
     $totalProduit = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
     // dump($get('prix_unitaire'));
-    $mainOeuvre = $get('main_oeuvre') ;
-   // dd( $details);
+    $etapes = $get('etapes') ?? [];
+    $totalmainoeuvre = collect($etapes)->sum(fn ($item) => floatval($item['montant'] ?? 0)
+    );
+    $set('main_oeuvre', round( $totalmainoeuvre, 2));
 
-    $prixCouture = $totalProduit + $mainOeuvre;
+    $prixCouture = $totalProduit + $totalmainoeuvre;
     $set('total_produit', round( $totalProduit, 2));
     $set('prix_couture', round( $prixCouture, 2));
     }

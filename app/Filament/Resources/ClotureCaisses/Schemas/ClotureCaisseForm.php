@@ -34,8 +34,8 @@ class ClotureCaisseForm
                 // TextInput::make('agence_id')
                 //     ->required()
                 //     ->numeric(),
-                 Hidden::make('user_id')
-                    ->default(Auth::id()),
+                    Hidden::make('user_id')
+                       ->default(fn () => Auth::id()),
             ]);
     }
 }

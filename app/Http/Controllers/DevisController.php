@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Agence;
 use App\Models\Atelier;
 use App\Models\AutreMesure;
+use App\Models\ClotureAtelier;
 use App\Models\ClotureCaisse;
 use App\Models\Devis;
 use App\Models\Entreprise;
@@ -197,6 +198,30 @@ public function imprimerPlusieursVersementFacture(Request $request)
     return $pdf->stream("vente_{$reference}.pdf");
 }
 
+    public function impressionclotureatelier($reference)
+{
+        $cloture = ClotureAtelier::where('reference', $reference)->first();
+        // $ventes = ClotureAtelier::where('cloture', $reference)
+        //                          ->get();
+        $etapeclotures = EtapeMesure::where('cloture', $reference)
+                            ->with(['mesureChemise', 'etapeProduction','mesurePantalon','mesureRobe',
+                                       'mesureEnsemble','autreMesure','atelier' ])
+                            ->get();
+
+        $pdf = Pdf::loadView('pdf.cloture_atelier', compact('etapeclotures','cloture'))
+                    ->setPaper('A4','landscape')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);
+
+
+    return $pdf->stream("cloture_atelier_{$reference}.pdf");
+}
+
     public function impressionmouvementcaisse($id)
 {
     $mouvements = MouvementCaisse::where('id', $id)
@@ -351,6 +376,49 @@ public function imprimerautremesure(Request $request)
                     ])
                     ->setWarnings(false);;
     return $pdf->stream('mesure_autre.pdf');
+}
+
+public function clotureateliergroup(Request $request)
+{
+    $ids = $request->input('cloture_ids', []);
+
+    $cloture = ClotureAtelier::whereIn('id', $ids)
+                            ->get();
+
+    $etapeclotures = EtapeMesure::whereIn('cloture', $cloture->pluck('reference'))
+                            ->with(['mesureChemise', 'etapeProduction','mesurePantalon','mesureRobe',
+                                       'mesureEnsemble','autreMesure','atelier','responsable.atelier' ])
+                            ->get();
+   //dd($etapeclotures );
+           
+//    $grouped = EtapeMesure::whereIn('id', $etapeclotures->pluck('id'))
+//             ->select('employe_id', \DB::raw('SUM(montant) as total'))
+//             ->groupBy('employe_id')
+//             ->get('total', 'employe_id');
+    //dd( $grouped);
+            $grouped = $etapeclotures->groupBy('employe_id')->map(function ($items) {
+                $first = $items->first();
+                return [
+                 'responsable'=> $first->responsable,
+                    'total' => $items->sum('montant'),
+                    'etapeclotures' => $items,
+                ];
+            });
+           //dd($grouped);
+
+     $entreprise = Entreprise::first();    
+    // Récupérer les ventes concernées
+    
+    $pdf = Pdf::loadView('pdf.cloture_atelier_group', compact('etapeclotures','grouped','entreprise'))
+                    ->setPaper('A4', 'landscape')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);;
+    return $pdf->stream('cloture_atelier_group.pdf');
 }
 
 

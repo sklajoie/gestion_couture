@@ -20,11 +20,13 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
-
+use UnitEnum;
 class CaisseResource extends Resource
 {
     protected static ?string $model = Caisse::class;
 
+    protected static string | UnitEnum | null $navigationGroup = 'GESTION CAISSE';
+    protected static ?int $navigationSort = 1;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'nom';

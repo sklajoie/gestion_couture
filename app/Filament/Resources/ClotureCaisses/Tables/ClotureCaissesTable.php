@@ -54,7 +54,7 @@ class ClotureCaissesTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                Action::make('Coture PDF')
+                Action::make('Cloture PDF')
                      ->label('Imprimer') // aucun texte affiché
                     ->icon('heroicon-o-printer')
                     ->url(fn ($record) => route('cloture-caisse', ['reference' => $record->reference]))

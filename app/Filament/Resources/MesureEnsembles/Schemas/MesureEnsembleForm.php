@@ -312,7 +312,19 @@ class MesureEnsembleForm
                 TextInput::make("etapes.{$etape->id}.montant")
                         ->label('Montant')
                          ->numeric()
-                        ->default(0),
+                        ->default(0)
+                          ->reactive()
+                    ->live(onBlur: true)
+                    ->dehydrated(true)
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                              $etapes = $get('etapes') ?? [];
+                            $totalmainoeuvre = collect($etapes)->sum(fn ($item) =>
+                                    floatval($item['montant'] ?? 0)
+                                );
+                                $set('main_oeuvre', round( $totalmainoeuvre, 2));
+                            // dd( $details);
+                        self::calcTotals($state, $set, $get);
+                    }),
                 Hidden::make("etapes.{$etape->id}.user_id")->default(Auth::id()),
             ]);
     }
@@ -328,10 +340,14 @@ class MesureEnsembleForm
     $details = $get('produitCouture') ?? [];
     $totalProduit = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
     // dump($get('prix_unitaire'));
-    $mainOeuvre = $get('main_oeuvre') ;
+    $etapes = $get('etapes') ?? [];
+   $totalmainoeuvre = collect($etapes)->sum(fn ($item) =>
+        floatval($item['montant'] ?? 0)
+    );
+    $set('main_oeuvre', round( $totalmainoeuvre, 2));
    // dd( $details);
 
-    $prixCouture = $totalProduit + $mainOeuvre;
+    $prixCouture = $totalProduit + $totalmainoeuvre;
     $set('total_produit', round( $totalProduit, 2));
     $set('prix_couture', round( $prixCouture, 2));
     }
