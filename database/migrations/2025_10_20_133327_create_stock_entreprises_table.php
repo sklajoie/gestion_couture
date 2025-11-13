@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('reference')->nullable();
             $table->integer('stock')->default(0);
             $table->float('prix')->default(0);
+            $table->text('image')->nullable();
             $table->integer('stock_alerte')->default(0);
             $table->foreignId('couleur_id')->nullable()->constrained('couleurs')->onDelete('set null');
             $table->foreignId('taille_id')->nullable()->constrained('tailles')->onDelete('set null');

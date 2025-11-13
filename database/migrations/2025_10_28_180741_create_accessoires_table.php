@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nom');
             $table->string('code_barre')->unique();
             $table->text('description')->nullable();
+            $table->text('image')->nullable();
             $table->float('prix_achat')->default(0);
             $table->float('prix_vente')->default(0);
             $table->float('stock_minimum')->default(0);

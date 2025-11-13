@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Agence;
 use App\Models\Atelier;
 use App\Models\AutreMesure;
+use App\Models\Caisse;
+use App\Models\Client;
 use App\Models\ClotureAtelier;
 use App\Models\ClotureCaisse;
+use App\Models\DetailVente;
 use App\Models\Devis;
 use App\Models\Entreprise;
 use App\Models\EtapeMesure;
@@ -15,12 +18,17 @@ use App\Models\MesureEnsemble;
 use App\Models\MesurePantalon;
 use App\Models\MesureRobe;
 use App\Models\MouvementCaisse;
+use App\Models\StockAgence;
+use App\Models\StockEntreprise;
 use App\Models\Vente;
 use App\Models\Versement;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
+
+use App\Http\Controllers\Controller;
 class DevisController extends Controller
 {
 
@@ -98,6 +106,44 @@ public function imprimerPlusieursVente(Request $request)
 
     return $pdf->stream("vente_{$vente->reference}.pdf");
 }
+
+
+    public function dernierimpressionvente()
+{
+     $vente = Vente::latest('id')->first();
+        $pdf = Pdf::loadView('pdf.vente', compact('vente'))
+                    ->setPaper('A4')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);
+
+
+    return $pdf->stream("vente_{$vente->reference}.pdf");
+}
+
+    public function dernierimpressionticketvente()
+{
+
+    //dd($vente);
+    $vente = Vente::latest('id')->first();
+        $pdf = Pdf::loadView('pdf.vente_ticket', compact('vente'))
+                    ->setPaper([0, 0, 250.77, 600], 'portrait')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);
+
+
+    return $pdf->stream("vente_{$vente->reference}.pdf");
+}
+
 
     public function versementticketvente(Request $request)
 {
@@ -421,5 +467,95 @@ public function clotureateliergroup(Request $request)
     return $pdf->stream('cloture_atelier_group.pdf');
 }
 
+
+public function espacevente()
+{
+    $produits = StockEntreprise::all();
+    $caisse = Caisse::all();
+    $agences = Agence::all();
+
+    return view('page/espace_vente', compact('produits','caisse','agences'));
+}
+
+public function recuperationsproduit(Request $request)
+{
+    $data = StockEntreprise::where('designation', 'like', '%' . $request->designation . '%')->get();
+
+    return response()->json($data);
+}
+
+
+public function savevente(Request $request)
+{
+           $request->validate([
+            'myDataQte' => 'required',
+            // 'ind' => 'required',
+           ]);
+
+           
+           $currentYear = Carbon::now()->year;
+           $currentMonth = Carbon::now()->month;
+       try {
+    $client = Client::where('telephone', $request->numeroclient)->first();
+    if (!$client) {
+        $client = Client::create([
+            'nom' => $request->nomclient,
+            'telephone' => $request->numeroclient,
+            'user_id' => Auth::user()->id,
+        ]);
+    }
+       //dd($client);
+    $etat = $request->solde > 0 ? "PAS SOLDEE" : "SOLDEE";
+
+    $idvent = Vente::create([
+        'client_id' => $client->id,
+        'agence_id' => $request->agence,
+        'montant_brut' => $request->totalht,
+        'remise' => $request->remise,
+        'montant_hors_taxe' => $request->totalht,
+        'tva' => $request->tva,
+        'montant_ttc' => $request->totalttc,
+        'avance' => $request->avance,
+        'solde' => $request->solde,
+        'statut' => $etat,
+        'date_vente' => Carbon::now(),
+        'user_id' => Auth::user()->id,
+    ]);
+
+    foreach ($request->ind as $i => $idproduit) {
+        DetailVente::create([
+            'vente_id' => $idvent->id,
+            'stock_entreprise_id' => $idproduit,
+            'agence_id' => $request->agence,
+            'quantite' => $request->nqte[$i],
+            'prix_unitaire' => $request->myDataPrix[$i],
+            'montant' => $request->total[$i],
+        ]);
+
+        // Optionnel : mise à jour du stock
+        // $modif = StockAgence::where('stock_entreprise_id', $idproduit)->first();
+        // if ($modif) {
+        //     $modif->update(['stock' => $modif->stock - $request->nqte[$i]]);
+        // }
+    }
+
+    Versement::create([
+        'vente_id' => $idvent->id,
+        'agence_id' => $request->agence,
+        'caisse_id' => $request->caisse,
+        'montant' => $request->avance,
+        'mode_paiement' => $request->paiement,
+        'detail' => $request->detail,
+        'user_id' => Auth::user()->id,
+    ]);
+
+    return back()->with('success', 'Vente enregistrée avec succès');
+} catch (\Exception $e) {
+    return back()->with('error', 'Erreur : ' . $e->getMessage());
+}
+
+
+    //dd($request->ind , $request->nqte);
+}
 
 }

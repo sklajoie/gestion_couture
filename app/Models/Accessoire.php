@@ -21,6 +21,7 @@ class Accessoire extends Model
         'couleur_id',
         'taille_id',
         'marque_id',
+        'image',
     ];
 
     public function categorieProduit()

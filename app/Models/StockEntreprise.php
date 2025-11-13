@@ -15,6 +15,7 @@ class StockEntreprise extends Model
         'stock_alerte',
         'couleur_id',
         'taille_id',
+        'image',
         'user_id',
     ];
 
