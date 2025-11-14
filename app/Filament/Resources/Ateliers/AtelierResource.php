@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Ateliers;
 
-use App\Filament\Resources\Atelier\Pages\ViewAtelier;
+use App\Filament\Resources\Ateliers\Pages\ViewAtelier;
 use App\Filament\Resources\Ateliers\Pages\ManageAteliers;
 use App\Filament\Resources\Ateliers\RelationManagers\EtapeMesuresRelationManager;
 use App\Models\Atelier;

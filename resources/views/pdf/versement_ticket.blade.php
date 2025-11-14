@@ -51,10 +51,10 @@
             @endphp
             <img src="{{ $logoSrc }}" width="60"><br>
         @endif
-        <div class="bold">{{ $entreprise->nom }}</div>
-        {{ $entreprise->adresse }}<br>
-        {{ $entreprise->telephone }}<br>
-        {{ $entreprise->email }}
+        <div class="bold">{{ $entreprise->nom?? 'N/A' }}</div>
+        {{ $entreprise->adresse?? 'N/A' }}<br>
+        {{ $entreprise->telephone?? 'N/A' }}<br>
+        {{ $entreprise->email?? 'N/A' }}
     </div>
 
     <hr>

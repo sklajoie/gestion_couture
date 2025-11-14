@@ -24,7 +24,11 @@ class MouvementCaissesTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('date', 'desc')
             ->columns([
+                TextColumn::make('date')
+                    ->date('j M, Y')
+                    ->sortable(),
                 TextColumn::make('reference')
                     ->searchable(),
                 TextColumn::make('type_mouvement')
@@ -73,10 +77,7 @@ class MouvementCaissesTable
                     ->label("Utilisateur")
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('date')
-                    ->date()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                
                 TextColumn::make('cloture')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),

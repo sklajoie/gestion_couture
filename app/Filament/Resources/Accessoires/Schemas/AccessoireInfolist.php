@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Accessoires\Schemas;
 
+use App\Models\Accessoire;
 use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -44,6 +46,15 @@ class AccessoireInfolist
                 TextEntry::make('updated_at')
                     ->dateTime()
                     ->placeholder('-'),
+                ImageEntry::make('image') 
+                    ->disk('public')
+                    ->imageWidth(200)
+                    ->imageHeight(200)
+                    // ->square()
+                    ->url(fn ($state) => asset('storage/' . $state))
+                     ->openUrlInNewTab()
+                    ->hidden(fn (Accessoire $record) => empty($record->image))
+                    ->label('Image'),
             ]);
     }
 }

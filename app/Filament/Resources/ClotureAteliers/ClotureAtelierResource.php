@@ -112,15 +112,16 @@ class ClotureAtelierResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('date', 'desc')
             ->recordTitleAttribute('reference')
             ->columns([
+                TextColumn::make('date')
+                    ->date('j M, Y')
+                    ->sortable()
+                    ->label('Date'),
                 TextColumn::make('reference')
                     ->searchable()
                     ->label('Reference'),
-                TextColumn::make('date')
-                    ->date()
-                    ->sortable()
-                    ->label('Date'),
                 TextColumn::make('montant_total')
                     ->numeric()
                     ->sortable()

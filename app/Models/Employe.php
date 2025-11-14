@@ -34,6 +34,10 @@ class Employe extends Model
     {
         return $this->hasMany(ClotureAtelier::class);
     }
+    public function user()
+    {
+        return $this->hasOne(User::class);
+    }
 
 
 }

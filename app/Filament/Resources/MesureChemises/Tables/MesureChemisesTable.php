@@ -36,11 +36,13 @@ class MesureChemisesTable
     public static function configure(Table $table): Table
     {
         return $table
+        ->defaultSort('created_at', 'desc')
             ->columns([
 
                 TextColumn::make('created_at')
                     ->dateTime('j M, Y H:i')
-                       ->searchable(),
+                    ->searchable()
+                    ->label('Date'),
 
                 TextColumn::make('Reference')
                     ->label('Reference')
@@ -95,7 +97,8 @@ class MesureChemisesTable
             
                 ImageColumn::make('Model_mesure') 
                 ->disk('public')
-                ->label('Modèle'),
+                ->label('Modèle')
+                ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Filter::make('status')

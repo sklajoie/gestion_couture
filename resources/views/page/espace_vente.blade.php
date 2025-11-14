@@ -1,6 +1,5 @@
 @extends('layouts.master')
 @section('content')
-
  <!-- Content Wrapper. Contains page content -->
  {{-- <div class="content-wrapper "> --}}
     <!-- Content Header (Page header) -->
@@ -41,6 +40,7 @@
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="{{route('filament.admin.resources.ventes.index')}}">LISTE VENTE</a></li>
+              <li class="breadcrumb-item"><a href="{{route('filament.admin.resources.devis.index')}}">LISTE DEVIS</a></li>
               <li class="breadcrumb-item active">VENTES</li>
             </ol>
           </div>
@@ -61,20 +61,20 @@
                         <input type="text" id="rechercheproduit" placeholder="rechercher produit" required
                             class="form-control"><br>
                     </div>
-                    <div class="col-md-6">
+                    {{-- <div class="col-md-6">
                         <input type="text" id="recherchedesis" placeholder="rechercher service" required
                             class="form-control"><br>
-                    </div>
+                    </div> --}}
 
 
-                    <div class="col-md-12">
+                    {{-- <div class="col-md-12">
                         <h1>Services</h1>
                         <hr>
                         <div class="col-md-12 row" id="service"></div>
-                    </div>
+                    </div> --}}
 
                     <div class="col-md-12">
-                        <h1>Produits</h1>
+                        {{-- <h1>Produits</h1> --}}
                         <hr>
                         <div class="col-md-12 row" id="produit"></div>
                     </div>
@@ -141,7 +141,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label for="checkin">Remise</label>
-                                <input type="text" id="remise" name="remise" onkeyup="remises()" onclick="remises()" class="form-control">
+                                <input type="text" id="remise" value="0" name="remise" onkeyup="remises()" onclick="remises()" class="form-control">
                             </div>
                             <div class="col-md-4">
                                 <label for="checkin">TVA</label>
@@ -158,7 +158,7 @@
 
                             <div class="col-md-4">
                                 <label for="checkin">Montant versé</label>
-                                <input type="text" id="avance" name="avance" onkeyup="avances()" onclick="avances()" required
+                                <input type="text" id="avance" name="avance" onkeyup="avances()" onclick="avances()"
                                     class="form-control">
                             </div>
                             <div class="col-md-4">
@@ -167,7 +167,7 @@
                                 <input type="hidden" id="solde" name="solde">
                             </div>
                            
-                             <div class="col-md-4" style="margin-bottom: 10px">
+                             {{-- <div class="col-md-4" style="margin-bottom: 10px">
                                 <label for="checkin">Agence</label>
                                    <select required type="text" id="agence" name="agence" class="form-control">
                                     <option value="">Choix Agence</option>
@@ -175,10 +175,10 @@
                                     <option value="{{$agence->id}}">{{$agence->nom}}</option>
                                     @endforeach
                                    </select>
-                            </div>
+                            </div> --}}
                              <div class="col-md-4" style="margin-bottom: 10px">
                                 <label for="checkin">Caisse</label>
-                                   <select required type="text" id="caisse" name="caisse" class="form-control">
+                                   <select  type="text" id="caisse" name="caisse" class="form-control">
                                     <option value="">Choix Caisse</option>
                                     @foreach ($caisse as $caiss )
                                     <option value="{{$caiss->id}}">{{$caiss->nom}}</option>
@@ -187,7 +187,7 @@
                             </div>
                              <div class="col-md-4" style="margin-bottom: 10px">
                                 <label for="checkin">Moyen Paiement</label>
-                                   <select required type="text" id="paiement" name="paiement" class="form-control">
+                                   <select type="text" id="paiement" name="paiement" class="form-control">
                                     <option value="Especes">Espèces</option>
                                     <option value="Mobile Money">Mobile Money</option>
                                     <option value="Wave">Wave</option>
@@ -242,16 +242,18 @@
                             </div>
                             </div>
                             
-                            <div class="col-md-4">
+                             <div class="col-md-6">
+                                <hr><input class="btn btn-success btn-block" type="submit" id="direct" name="submit" value="ENREGISTRER" >
+                                  
+                            </div>
+                            <div class="col-md-2">
                             <hr><button class="btn btn-success btn-block" style="background:#f00f0f; margin:10px"
                             onClick="javascript:window.location.reload()">ANNULER</button>
                             </div>
                             <div class="col-md-2">
+                            <hr><input class="btn btn-info btn-block" onClick="return confirm('Êtes-vous sûr de vouloir valider ce devis ?')" type="submit" id="devis" name="submit" value="DEVIS" >
                             </div>
-                            <div class="col-md-4">
-                                <hr><button class="btn btn-success btn-block" style="background:#046b1e; margin:10px" id="direct" onclick="direct()">
-                                    ENREGISTRER</button>
-                            </div>
+                           
 
                         </div>
 

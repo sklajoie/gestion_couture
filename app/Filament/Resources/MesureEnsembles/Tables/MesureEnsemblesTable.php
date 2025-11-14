@@ -31,8 +31,13 @@ class MesureEnsemblesTable
     public static function configure(Table $table): Table
     {
         return $table
+        ->defaultSort('created_at', 'desc')
             ->columns([
                 //////chemise//////
+                TextColumn::make('created_at')
+                    ->dateTime('j M, Y H:i')
+                    ->searchable()
+                    ->label('Date'),
                 TextColumn::make('Type')
                     ->label('Type'),
                    
@@ -88,7 +93,8 @@ class MesureEnsemblesTable
                 //     ->label('Utilisateur'),
                 ImageColumn::make('Model_mesure') 
                     ->disk('public')
-                    ->label('Modèle'),
+                    ->label('Modèle')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('status')
                   ->icon(fn (string $state): Heroicon => match ($state) {
                     '0' => Heroicon::OutlinedPencil,

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\DistributionAgences\Schemas;
 
 use App\Models\StockEntreprise;
 use Closure;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -24,15 +25,18 @@ class DistributionAgenceForm
                     ->relationship('agence', 'nom')
                     ->required(),
 
-                TextInput::make('date_operation')->required()->type('datetime-local'),  
+                DateTimePicker::make('date_operation')
+                    ->required()
+                    ->default(now()),
+
                 Hidden::make('user_id')->default(fn () => Auth::id()),
-                Toggle::make('is_valide')
-                    ->default(false)
-                    ->label('Actif')
-                    ->onIcon(Heroicon::CheckCircle)
-                    ->offIcon(Heroicon::Bolt)
-                    ->onColor('success')
-                    ->offColor('danger'),
+                // Toggle::make('is_valide')
+                //     ->default(false)
+                //     ->label('Actif')
+                //     ->onIcon(Heroicon::CheckCircle)
+                //     ->offIcon(Heroicon::Bolt)
+                //     ->onColor('success')
+                //     ->offColor('danger'),
 
                 Repeater::make('detailDistributionAgences')
                     ->label("Détails Distribution Agence")
@@ -44,6 +48,7 @@ class DistributionAgenceForm
                                 ->required()
                                 ->searchable()
                                 ->preload()
+                                ->live(onBlur: true)
                                 ->getSearchResultsUsing(fn (string $search): array => 
                         StockEntreprise::query()
                                         ->where(function ($query) use ($search) {
@@ -56,19 +61,20 @@ class DistributionAgenceForm
                                         
                                         ->get()
                                         ->mapWithKeys(fn ($record) => [
-                                            $record->id => "{$record->code_barre} - {$record->reference} - {$record->couleur?->nom} - {$record->taille?->nom} ({$record->prix} XOF)"
+                                            $record->id =>"{$record->designation}-{$record->code_barre} - {$record->reference} - {$record->couleur?->nom} - {$record->taille?->nom} ({$record->prix} XOF)"
                                         ])
                                         ->all()
                                 )
                                 ->getOptionLabelFromRecordUsing(fn (StockEntreprise $record) => 
-                                    "{$record->code_barre} - {$record->reference} - {$record->couleur?->nom} - {$record->taille?->nom} ({$record->prix} XOF)")
+                                    "{$record->designation}-{$record->code_barre} - {$record->reference} - {$record->couleur?->nom} - {$record->taille?->nom} ({$record->prix} XOF)")
                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                             $produit = StockEntreprise::find($state);
                                             $stock = $produit?->stock ?? 0;
                                             $set('stock', $stock);
 
                                         }),
-                        Hidden::make('stock'),
+                        TextInput::make('stock')
+                                  ->readOnly(),
                         TextInput::make('quantite')
                             ->label('Quantité')
                             ->required()
@@ -76,13 +82,13 @@ class DistributionAgenceForm
                             ->default(1)
                             ->minValue(1)
                             ->maxValue(fn (callable $get) => $get('stock'))   
-                            ->live(),
+                            ->live(onBlur: true),
                             
 
 
                         Hidden::make('user_id')->default(fn () => Auth::id()),
                     ])
-                     ->columns(2)
+                     ->columns(3)
                     ->createItemButtonLabel('Ajouter un produit')
                     ->columnSpanFull(),
             ]);

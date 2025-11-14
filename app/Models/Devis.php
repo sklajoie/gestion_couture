@@ -16,8 +16,6 @@ class Devis extends Model
         'montant_hors_taxe',
         'tva',
         'montant_ttc',
-        'avance',
-        'solde',
         'statut',
         'cloture',
         'date_devis',
@@ -59,7 +57,7 @@ class Devis extends Model
                 
             //    $model->agence_id = $model->agence_id ?? Auth::user()->agence_id;
                 $model->agence_id = $model->agence_id
-                        ?? (Auth::check() ? Auth::user()->agence_id : null)
+                        ?? (Auth::check() ? Auth::user()->employe->agence_id : null)
                         ?? 1;
        // dd($model->toArray()); // pour debug
         // dd($model->agence_id);

@@ -14,11 +14,12 @@ class ApprovisionnementStocksTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('date_operation', 'desc')
             ->columns([
-                TextColumn::make('reference')->label('Référence'),
                 TextColumn::make('date_operation')
                     ->label('Date Opération')
-                    ->dateTime('d/m/Y H:i'),
+                    ->dateTime('j M, Y H:i'),
+                TextColumn::make('reference')->label('Référence'),
                 TextColumn::make('total_appro')
                     ->label('Montant Total')
                     ->money('XOF', true),

@@ -9,6 +9,7 @@ use App\Filament\Resources\Devis\Pages\ViewDevis;
 use App\Filament\Resources\Devis\Schemas\DevisForm;
 use App\Filament\Resources\Devis\Schemas\DevisInfolist;
 use App\Filament\Resources\Devis\Tables\DevisTable;
+use App\Filament\Resources\Devis\Widgets\DevisStats;
 use App\Models\Devis;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -48,6 +49,13 @@ class DevisResource extends Resource
             //
         ];
     }
+
+    //     public static function getWidgets(): array
+    // {
+    //     return [
+    //         DevisStats::class,
+    //     ];
+    // }
 
     public static function getPages(): array
     {

@@ -154,10 +154,10 @@
                         @foreach ( $vente->detailVentes as $vent )
                             <tr>
                                 <td>
-                                    {{$vent->stockEntreprise->designation}}-
-                                    {{$vent->stockEntreprise->couleur->nom}}-
-                                    {{$vent->stockEntreprise->taille->nom}}-
-                                    {{$vent->stockEntreprise->code_barre}}
+                                    {{$vent->stockEntreprise->designation?? 'N/A'}}-
+                                    {{$vent->stockEntreprise->couleur->nom?? 'N/A'}}-
+                                    {{$vent->stockEntreprise->taille->nom?? 'N/A'}}-
+                                    {{$vent->stockEntreprise->code_barre?? 'N/A'}}
                                 </td>
                                 <td>{{$vent->quantite}}</td>
                                 <td>{{$vent->prix_unitaire}}</td>

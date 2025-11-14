@@ -57,7 +57,7 @@ class Vente extends Model
                 static::creating(function ($model) {
 
                 $model->agence_id = $model->agence_id
-                        ?? (Auth::check() ? Auth::user()->agence_id : null)
+                        ?? (Auth::check() ? Auth::user()->employe->agence_id : null)
                         ?? 1;
 
                     //dd($model);

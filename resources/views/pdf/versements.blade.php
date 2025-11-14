@@ -98,8 +98,8 @@
                         <img src="data:image/jpg;base64,{{ base64_encode(file_get_contents(public_path('logo/logo.jpg'))) }}" width="80" alt="Logo de l'entreprise">
                     @endif
                     <br><br>
-                      <strong>{{ $agence->agence->nom }}</strong><br>
-                    {{ $agence->agence->adresse }}<br>
+                      <strong>{{ $agence->agence->nom?? 'N/A' }}</strong><br>
+                    {{ $agence->agence->adresse?? 'N/A' }}<br>
                 </td>
                 <td width="33%" style="text-align: center;">
                   

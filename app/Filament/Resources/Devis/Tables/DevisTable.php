@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Devis\Tables;
 
 use App\Filament\Resources\Ventes\VenteResource;
+use App\Models\Agence;
 use App\Models\DetailVente;
 use App\Models\StockAgence;
 use App\Models\StockEntreprise;
@@ -18,6 +19,7 @@ use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -29,18 +31,35 @@ class DevisTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('date_devis', 'desc')
             ->columns([
+                TextColumn::make('date_devis')->label('Date Devis')->sortable()->dateTime('d-m-Y H:i'),
                 TextColumn::make('reference')->label('Référence')->searchable()->sortable(),
                 TextColumn::make('client.nom')->label('Client')->searchable()->sortable(),
                 // TextColumn::make('agence.nom')->label('Agence')->searchable()->sortable(),
                 TextColumn::make('montant_ttc')->label('Montant TTC')->money('XAF', true)->sortable(),
                 TextColumn::make('statut')->label('Statut')->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('date_devis')->label('Date Devis')->sortable()
+                TextColumn::make('agence.nom')->label('Agence')->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('user.name')->label('Utilisateur')->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+                
             ])
             ->filters([
-                //
+                SelectFilter::make('user_id')
+                  ->options(function () {
+                        return User::orderBy('name')
+                            ->get()
+                            ->mapWithKeys(fn ($e) => [$e->id => "{$e->name}"])
+                            ->toArray();
+                    })
+                   ->multiple()
+                   ->label('UTILISATEUR'),
+                SelectFilter::make('agence_id')
+                   ->options(fn (): array => Agence::query()->pluck('nom', 'id')->all())
+                   ->multiple()
+                   ->label('AGENCE'),
             ])
             ->recordActions([
                 ViewAction::make(),

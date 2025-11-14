@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Accessoires\Schemas;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
@@ -77,7 +78,19 @@ class AccessoireForm
                             'unite' => 'Unité',
                         ])
                     ->default('unite'),
-
+                FileUpload::make('image')
+                    ->label('Image')
+                    ->disk('public')
+                    ->directory('Model-Mesure')
+                    ->visibility('public')
+                    ->image()
+                    ->imagePreviewHeight('150')
+                    ->enableDownload()
+                    ->enableOpen()
+                    ->openable()
+                    ->previewable()
+                    ->reorderable()
+                    ->appendFiles(),
 
                 Textarea::make('description')
                     ->label('Description')

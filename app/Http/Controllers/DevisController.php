@@ -29,6 +29,8 @@ use Illuminate\Support\Facades\Auth;
 use DB;
 
 use App\Http\Controllers\Controller;
+use App\Models\DetailDevis;
+
 class DevisController extends Controller
 {
 
@@ -470,16 +472,36 @@ public function clotureateliergroup(Request $request)
 
 public function espacevente()
 {
-    $produits = StockEntreprise::all();
-    $caisse = Caisse::all();
+    // dd(Auth::user()->employe->agence_id);
+    $produits = StockAgence::with(['stockEntreprise', 'agence'])->get();
+    $caisse = Caisse::where('agence_id', Auth::user()->employe->agence_id)->get();
     $agences = Agence::all();
 
     return view('page/espace_vente', compact('produits','caisse','agences'));
 }
 
 public function recuperationsproduit(Request $request)
-{
-    $data = StockEntreprise::where('designation', 'like', '%' . $request->designation . '%')->get();
+{           
+ 
+    // $data = StockAgence::with(['stockEntreprise', 'agence'])
+    //                 ->whereRelation('stockEntreprise', 'designation', 'like', '%' . $request->designation . '%')
+    //                 ->get();
+$data = StockAgence::with(['stockEntreprise', 'agence'])
+    ->whereHas('stockEntreprise', function ($query) use ($request) {
+        $query->where(function ($subQuery) use ($request) {
+            $designation = $request->designation;
+            $subQuery->where('designation', 'like', "%$designation%")
+                     ->orWhere('reference', 'like', "%$designation%")
+                     ->orWhere('code_barre', 'like', "%$designation%");
+        });
+    })
+    ->where('agence_id', Auth::user()->employe->agence_id)
+    ->get();
+
+
+
+
+    // $data = StockEntreprise::where('designation', 'like', '%' . $request->designation . '%')->get();
 
     return response()->json($data);
 }
@@ -489,12 +511,13 @@ public function savevente(Request $request)
 {
            $request->validate([
             'myDataQte' => 'required',
-            // 'ind' => 'required',
+            'ind' => 'required',
            ]);
 
-           
+           //dd($request->submit);
            $currentYear = Carbon::now()->year;
            $currentMonth = Carbon::now()->month;
+           $agenceid = Auth::user()->employe->agence_id;
        try {
     $client = Client::where('telephone', $request->numeroclient)->first();
     if (!$client) {
@@ -504,15 +527,47 @@ public function savevente(Request $request)
             'user_id' => Auth::user()->id,
         ]);
     }
-       //dd($client);
-    $etat = $request->solde > 0 ? "PAS SOLDEE" : "SOLDEE";
+        $tthorstax = $request->totalht - $request->remise;
+        $etat = $request->solde > 0 ? "PAS SOLDEE" : "SOLDEE";
 
+    if($request->submit =="DEVIS")
+    {       
+            $iddevis = Devis::create([
+                    'client_id' => $client->id,
+                    'agence_id' => $agenceid,
+                    'montant_brut' => $request->totalht,
+                    'remise' => $request->remise,
+                    'montant_hors_taxe' => $tthorstax,
+                    'tva' => $request->tva,
+                    'montant_ttc' => $request->totalttc,
+                    // 'statut' => $etat,
+                    'date_devis' => Carbon::now(),
+                    'user_id' => Auth::user()->id,
+                ]);
+
+                foreach ($request->ind as $i => $idproduit) {
+                    DetailDevis::create([
+                        'devis_id' => $iddevis->id,
+                        'stock_entreprise_id' => $idproduit,
+                        'agence_id' => $agenceid,
+                        'quantite' => $request->nqte[$i],
+                        'prix_unitaire' => $request->myDataPrix[$i],
+                        'montant' => $request->total[$i],
+                    ]);
+                }
+            return back()->with('success', 'Le Devis a été enregistré avec succès');
+    }
+    elseif($request->submit =="ENREGISTRER")
+        {
+            
+            
+       
     $idvent = Vente::create([
         'client_id' => $client->id,
-        'agence_id' => $request->agence,
+        'agence_id' => $agenceid,
         'montant_brut' => $request->totalht,
         'remise' => $request->remise,
-        'montant_hors_taxe' => $request->totalht,
+        'montant_hors_taxe' => $tthorstax,
         'tva' => $request->tva,
         'montant_ttc' => $request->totalttc,
         'avance' => $request->avance,
@@ -526,7 +581,7 @@ public function savevente(Request $request)
         DetailVente::create([
             'vente_id' => $idvent->id,
             'stock_entreprise_id' => $idproduit,
-            'agence_id' => $request->agence,
+            'agence_id' => $agenceid,
             'quantite' => $request->nqte[$i],
             'prix_unitaire' => $request->myDataPrix[$i],
             'montant' => $request->total[$i],
@@ -541,7 +596,7 @@ public function savevente(Request $request)
 
     Versement::create([
         'vente_id' => $idvent->id,
-        'agence_id' => $request->agence,
+        'agence_id' => $agenceid,
         'caisse_id' => $request->caisse,
         'montant' => $request->avance,
         'mode_paiement' => $request->paiement,
@@ -549,13 +604,24 @@ public function savevente(Request $request)
         'user_id' => Auth::user()->id,
     ]);
 
-    return back()->with('success', 'Vente enregistrée avec succès');
+    return back()->with('success', 'La Vente a été enregistrée avec succès');
+    }
 } catch (\Exception $e) {
     return back()->with('error', 'Erreur : ' . $e->getMessage());
 }
 
 
     //dd($request->ind , $request->nqte);
+}
+
+public function recuperations()
+{
+
+    $tockagence =StockAgence::with(['stockEntreprise', 'agence'])
+                            ->where('agence_id', Auth::user()->employe->agence_id)
+                            ->get();
+//    $entre = \App\Models\StockEntreprise::whereIn('id', $tockagence->pluck('stock_entreprise_id'))->get();
+  return $tockagence;
 }
 
 }

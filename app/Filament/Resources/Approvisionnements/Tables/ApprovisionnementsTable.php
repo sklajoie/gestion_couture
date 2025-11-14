@@ -14,16 +14,19 @@ class ApprovisionnementsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('date_operation', 'desc')
             ->columns([
+                TextColumn::make('date_operation')
+                    ->sortable()
+                    ->label('Date Opération')
+                    ->dateTime('j M, Y H:i'),
                 TextColumn::make('reference')
                     ->searchable(),
                 TextColumn::make('bonCommande.reference')
                     ->label('Bon de commande')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('date_operation')
-                    ->dateTime()
-                    ->sortable(),
+                
                 TextColumn::make('user.name')
                     ->label('Opérateur')
                     ->sortable(),

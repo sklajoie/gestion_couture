@@ -32,8 +32,9 @@ Route::get('/imprimer-robe', [DevisController::class, 'imprimerrobe'])->name('im
 Route::get('/imprimer-autre-mesure', [DevisController::class, 'imprimerautremesure'])->name('imprimer.autre-mesure');
 Route::get('/espace-vente', [DevisController::class, 'espacevente'])->name('espace-vente');
 Route::post('/save-vente', [DevisController::class, 'savevente'])->name('save-vente');
+Route::get('/recuperations', [DevisController::class, 'recuperations'])->name('recuperations');
 
 Route::match(['get', 'post'], '/recuperations-produit', [DevisController::class, 'recuperationsproduit'])->name('recuperations-produit');
-Route::get('/recuperations', function () {
-    return \App\Models\StockEntreprise::get();
-});
+// Route::get('/recuperations', function () {
+//     return \App\Models\StockEntreprise::get();
+// });

@@ -15,12 +15,13 @@ class ClotureCaissesTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('date', 'desc')
             ->columns([
+                TextColumn::make('date')
+                    ->date('j M, Y')
+                    ->sortable(),
                 TextColumn::make('reference')
                     ->searchable(),
-                TextColumn::make('date')
-                    ->date()
-                    ->sortable(),
                 TextColumn::make('montant_devis')
                     ->numeric()
                     ->sortable(),

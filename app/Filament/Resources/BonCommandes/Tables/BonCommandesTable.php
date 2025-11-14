@@ -14,12 +14,14 @@ class BonCommandesTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('date_commande', 'desc')
             ->columns([
+                TextColumn::make('date_commande')
+                    ->label('Date Opération')
+                    ->date('j M, Y')
+                    ->sortable(),
                 TextColumn::make('reference')
                     ->searchable(),
-                TextColumn::make('date_commande')
-                    ->date()
-                    ->sortable(),
                 TextColumn::make('fournisseur.nom')
                     ->searchable()
                     ->sortable(),

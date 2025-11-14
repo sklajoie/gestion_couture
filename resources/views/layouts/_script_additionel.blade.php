@@ -1,6 +1,4 @@
 
-
-
 <script>
   $(document).ready(function() {
 
@@ -33,13 +31,13 @@
           console.log("tablesglobe", tables);
 
           for (var i = 0; i < tables.length; i++) {
-
-              var noms = tables[i]["designation"];
-              var prixs = tables[i]["prix"];
-              var idproduit = tables[i]["id"];
+             var item = tables[i];
+              var noms = item.stock_entreprise?.designation ?? 'Non défini';
+              var prixs = tables[i].stock_entreprise?.prix;
+              var idproduit = tables[i]["stock_entreprise_id"];
               var qtess = tables[i]["stock"];
-              var reference = tables[i]["reference"];
-              const imageUrl =tables[i]["image"] ? tables[i]["image"] : '/logo/logo.jpg';
+              var reference = tables[i].stock_entreprise?.reference;
+              const imageUrl =tables[i].stock_entreprise?.image ?  `/storage/${tables[i].stock_entreprise?.image}` : '/logo/logo.jpg';
               console.log("nom", noms);
 
               content0 += `
@@ -75,14 +73,16 @@ $("#rechercheproduit").keyup(function () {
 
     $.post("/recuperations-produit", { designation }, function (tables) {
         let content2 = "";
+        console.log(tables);
         tables.forEach(p => {
-            const noms = p.designation.replace(/"/g, " ");
-            const prixs = p.prix;
+            const noms = p.stock_entreprise.designation.replace(/"/g, " ");
+            const prixs = p.stock_entreprise.prix;
             const idproduit = p.id;
             const qtess = p.stock;
-            const reference = p.reference;
+            const reference = p.stock_entreprise.reference;
 
-           const imageUrl = p.image ? p.image : '/logo/logo.jpg';
+           const imageUrl = p.stock_entreprise.image ? `/storage/${p.stock_entreprise.image}` : '/logo/logo.jpg';
+          
 
 content2 += `
             <div class="col-md-4">
@@ -175,16 +175,15 @@ content0 = " ";
 
           for (var i = 0; i < tables.length; i++) {
 
-              var noms = tables[i]["designation"];
-              var prixs = tables[i]["prix"];
-              var idproduit = tables[i]["id"];
+              var item = tables[i];
+              var noms = item.stock_entreprise?.designation ?? 'Non défini';
+              var prixs = tables[i].stock_entreprise?.prix;
+              var idproduit = tables[i]["stock_entreprise_id"];
               var qtess = tables[i]["stock"];
-              var reference = tables[i]["reference"];
+              var reference = tables[i].stock_entreprise?.reference;
+              const imageUrl =tables[i].stock_entreprise?.image ?  `/storage/${tables[i].stock_entreprise?.image}` : '/logo/logo.jpg';
               console.log("nom", noms);
             
-              var imageUrl =tables[i]["image"] ? tables[i]["image"] : '/logo/logo.jpg';
-
-             
 
               content0 += 
               ` <div class="col-md-4">
@@ -240,19 +239,17 @@ $(".taxetva").change(function() {
 
         solde = parseFloat((document.getElementById('totalttc').value - (document.getElementById('avance')
             .value)));
-
+  avance = parseFloat((document.getElementById('avance').value));
         $("#vue_solde").val(Number(solde).toLocaleString());
         $("#solde").val(solde);
 
-        if (solde > 0) {
-            $("#direct").attr("disabled", "disabled");
-            $("#attente").removeAttr("disabled");
-            $("#devis").removeAttr("disabled");
-        } else if (solde <= 0) {
-            $("#direct").removeAttr("disabled");
-            $("#attente").attr("disabled", "disabled");
-            $("#devis").attr("disabled", "disabled");
-        }
+     if (avance < 0) {
+          $("#direct").attr("disabled", "disabled");
+          $("#devis").removeAttr("disabled");
+      } else if (avance > 0) {
+          $("#direct").removeAttr("disabled");
+          $("#devis").attr("disabled", "disabled");
+      }
 
     });
 
@@ -284,13 +281,13 @@ $(".taxetva").change(function() {
 
       $("#vue_solde").val(Number(solde).toLocaleString());
       $("#solde").val(solde);
-
-      if (solde > 0) {
+  avance = parseFloat((document.getElementById('avance').value));
+    if (avance < 0) {
           $("#direct").attr("disabled", "disabled");
-          $("#attente").removeAttr("disabled");
-      } else if (solde <= 0) {
+          $("#devis").removeAttr("disabled");
+      } else if (avance > 0) {
           $("#direct").removeAttr("disabled");
-          $("#attente").attr("disabled", "disabled");
+          $("#devis").attr("disabled", "disabled");
       }
   }
 
@@ -308,29 +305,30 @@ $(".taxetva").change(function() {
 
       $("#vue_solde").val(Number(solde).toLocaleString());
       $("#solde").val(solde);
-
-      if (solde > 0) {
+            avance = parseFloat((document.getElementById('avance').value));
+      if (avance < 0) {
           $("#direct").attr("disabled", "disabled");
-          $("#attente").removeAttr("disabled");
-      } else if (solde <= 0) {
+          $("#devis").removeAttr("disabled");
+      } else if (avance > 0) {
           $("#direct").removeAttr("disabled");
-          $("#attente").attr("disabled", "disabled");
+          $("#devis").attr("disabled", "disabled");
       }
   }
 
   function avances() {
 
       solde = parseFloat((document.getElementById('totalttc').value - (document.getElementById('avance').value)));
+      avance = parseFloat((document.getElementById('avance').value));
 
       $("#vue_solde").val(Number(solde).toLocaleString());
       $("#solde").val(solde);
 
-      if (solde > 0) {
+      if (!avance) {
           $("#direct").attr("disabled", "disabled");
-          $("#attente").removeAttr("disabled");
-      } else if (solde <= 0) {
+          $("#devis").removeAttr("disabled");
+      } else if (avance > 0) {
           $("#direct").removeAttr("disabled");
-          $("#attente").attr("disabled", "disabled");
+          $("#devis").attr("disabled", "disabled");
       }
   }
 
@@ -360,15 +358,14 @@ $(".taxetva").change(function() {
 
       $("#vue_solde").val(Number(solde).toLocaleString());
       $("#solde").val(solde);
-
-      if (solde > 0) {
+  avance = parseFloat((document.getElementById('avance').value));
+     if (avance < 0) {
           $("#direct").attr("disabled", "disabled");
-          $("#attente").removeAttr("disabled");
-      } else if (solde <= 0) {
+          $("#devis").removeAttr("disabled");
+      } else if (avance > 0) {
           $("#direct").removeAttr("disabled");
-          $("#attente").attr("disabled", "disabled");
+          $("#devis").attr("disabled", "disabled");
       }
-
       jQuery('#ind' + removeNum).remove();
       removeNum--;
 

@@ -72,10 +72,10 @@
     <table>
         @foreach ($vente->detailVentes as $item)
             <tr>
-                <td colspan="2">{{ $item->stockEntreprise->designation }}
-                     {{ $item->stockEntreprise->code_barre }}
-                     {{ $item->stockEntreprise->taille->nom}}
-                     {{ $item->stockEntreprise->couleur->nom}}
+                <td colspan="2">{{ $item->stockEntreprise->designation?? 'N/A' }}
+                     {{ $item->stockEntreprise->code_barre?? 'N/A' }}
+                     {{ $item->stockEntreprise->taille->nom?? 'N/A'}}
+                     {{ $item->stockEntreprise->couleur->nom?? 'N/A'}}
                     </td>
             </tr>
             <tr>

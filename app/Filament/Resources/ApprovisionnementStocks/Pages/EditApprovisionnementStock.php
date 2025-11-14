@@ -73,6 +73,8 @@ class EditApprovisionnementStock extends EditRecord
 
                         $designation = !empty($couture->Reference) ? $couture->Reference : $couture->nom;
                         $ref = !empty($couture->Reference) ? $couture->Reference : $couture->code_barre;
+                        $image = is_array($couture->Model_mesure) ? $couture->Model_mesure[0] ?? null : $couture->image;
+
                         $produit = StockEntreprise::where('reference', $ref)->first();
 
                     if ($produit) {
@@ -91,6 +93,7 @@ class EditApprovisionnementStock extends EditRecord
                             'stock_alerte' => 1,
                             'couleur_id' => $couture->couleur_id,
                             'taille_id' => $couture->taille_id,
+                            'image' =>  $image,
                             'user_id' => Auth::id(),
                         ]);
                     }

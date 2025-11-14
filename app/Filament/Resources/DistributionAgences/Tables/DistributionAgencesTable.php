@@ -24,7 +24,12 @@ class DistributionAgencesTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
+                TextColumn::make('created_at')
+                        ->dateTime('j M, Y H:i')
+                        ->sortable()
+                        ->label('Date'),
                 TextColumn::make('reference')->label('Référence')->searchable(),
                 TextColumn::make('date_operation')->label('Date d\'opération')->searchable(),
                 TextColumn::make('user.name')->label('Utilisateur')->searchable(),

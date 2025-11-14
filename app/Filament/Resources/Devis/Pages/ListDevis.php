@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Devis\Pages;
 
 use App\Filament\Resources\Devis\DevisResource;
+use App\Filament\Resources\Devis\Widgets\DevisStats;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Facades\Auth;
@@ -21,4 +22,11 @@ class ListDevis extends ListRecords
     // return [];
            
     }
+
+    protected function getHeaderWidgets(): array
+{
+    return [
+        DevisStats::class,
+    ];
+}
 }

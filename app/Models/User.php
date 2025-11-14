@@ -23,13 +23,13 @@ class User extends Authenticatable
         'password',
         'role',
         'employe_id',
-        'agence_id',
+        // 'agence_id',
         'active',
     ];
 
     public function employe()
     {
-        return $this->belongsTo(Employe::class);
+         return $this->hasOne(Employe::class);
     }
 
     /**
