@@ -26,7 +26,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 use App\Http\Controllers\Controller;
 use App\Models\DetailDevis;
@@ -221,12 +221,12 @@ public function imprimerPlusieursVersementFacture(Request $request)
         //                 ->distinct()
         //                 ->get();
         $encaisse_jour = Versement::where('cloture', $reference)
-            ->select('mode_paiement', \DB::raw('SUM(montant) as total'))
+            ->select('mode_paiement', DB::raw('SUM(montant) as total'))
             ->groupBy('mode_paiement')
             ->get('total', 'mode_paiement'); // retourne une collection [mode => total]
 
         $montant_encaisse = Versement::where('cloture', $reference)
-            ->select('caisse_id', \DB::raw('SUM(montant) as total'))
+            ->select('caisse_id', DB::raw('SUM(montant) as total'))
             ->groupBy('caisse_id')
             ->get('total', 'caisse_id'); // retourne une collection [mode => total]
          // dd( $encaisse_jour);

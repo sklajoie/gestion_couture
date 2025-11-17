@@ -15,12 +15,15 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -60,6 +63,23 @@ class DevisTable
                    ->options(fn (): array => Agence::query()->pluck('nom', 'id')->all())
                    ->multiple()
                    ->label('AGENCE'),
+
+                  Filter::make('date_devis')
+                ->schema([
+                    DatePicker::make('created_from')->label('Debut'),
+                    DatePicker::make('created_until')->label('Fin'),
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                    return $query
+                        ->when(
+                            $data['created_from'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('date_devis', '>=', $date),
+                        )
+                        ->when(
+                            $data['created_until'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('date_devis', '<=', $date),
+                        );
+                })
             ])
             ->recordActions([
                 ViewAction::make(),

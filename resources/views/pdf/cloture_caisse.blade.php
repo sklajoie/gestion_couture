@@ -98,8 +98,8 @@
                         <img src="data:image/jpg;base64,{{ base64_encode(file_get_contents(public_path('logo/logo.jpg'))) }}" width="80" alt="Logo de l'entreprise">
                     @endif
                     <br><br>
-                      <strong>{{ $cloture->agence->nom }}</strong><br>
-                    {{ $cloture->agence->adresse }}<br>
+                      <strong>{{ $cloture->agence->nom?? 'N/A' }}</strong><br>
+                    {{ $cloture->agence->adresse ?? 'N/A'}}<br>
                 </td>
                 <td width="33%" style="text-align: center;">
                   
@@ -406,7 +406,7 @@
                          $totalcassie += $montantencaisse->total;
                         @endphp
                             <tr>
-                                <td>{{$montantencaisse->caisse->nom}}</td>
+                                <td>{{$montantencaisse->caisse->nom?? 'N/A'}}</td>
                                 <td>{{$montantencaisse->total}}</td>
                             </tr>
                         @endforeach
