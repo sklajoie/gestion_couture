@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Approvisionnements\Schemas;
 
 use Filament\Forms\Components\Repeater;
 use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\RepeatableEntry\TableColumn;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -34,6 +35,14 @@ class ApprovisionnementInfolist
 
                 RepeatableEntry::make('details')
                     ->label("Détails de l'approvisionnement")
+                     ->columnSpanFull()
+                     ->table([
+                            TableColumn::make('PRODUIT'),
+                            TableColumn::make('QTE'),
+                            // TableColumn::make('QTE APPROV.'),
+                            TableColumn::make('PRIX'),
+                            TableColumn::make('TOTAL'),
+                        ])
                     ->schema([
                         TextEntry::make('produit.nom')->label('Produit'),
                         TextEntry::make('quantite')->label('Quantité'),

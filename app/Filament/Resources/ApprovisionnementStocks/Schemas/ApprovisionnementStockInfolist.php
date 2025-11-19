@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ApprovisionnementStocks\Schemas;
 
 use Filament\Forms\Components\Repeater;
 use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\RepeatableEntry\TableColumn;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -20,6 +21,14 @@ class ApprovisionnementStockInfolist
                 TextEntry::make('total_appro')
                     ->label('Montant Total'),
                 RepeatableEntry::make('detailApproStocks')
+                 ->columnSpanFull()
+                     ->table([
+                            TableColumn::make('TYPE'),
+                            TableColumn::make('REFERENCE'),
+                            TableColumn::make('QTE'),
+                            TableColumn::make('PRIX'),
+                            TableColumn::make('TOTAL'),
+                        ])
                     ->schema([
                         TextEntry::make('mesure_type')
                             ->label('Type'),

@@ -84,7 +84,7 @@ class ApprovisionnementStockForm
 
                         $produit = $modelClass ? $modelClass::find($state) : null;
 
-                        $prix = ($produit?->main_oeuvre) ?? ($produit?->prix_vente) ?? 0;
+                        $prix =  ($produit?->prix_vente)??  ($produit?->prix_couture)?? 0;
                         $reference = ($produit?->Reference) ?? ($produit?->code_barre )?? 0;
                         $set('prix_unitaire', $prix);
                         $set('reference', $reference);

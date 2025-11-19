@@ -47,7 +47,13 @@ class BonCommandesTable
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('statut')
-                    ->searchable(),
+                    ->searchable()
+                    ->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    'Approvisionné' => 'success',
+                    'Partiellement Approvisionné' => 'primary',
+                    'en attente' => 'danger',
+                }),
                 TextColumn::make('user.name')
                     ->sortable(),
                 TextColumn::make('created_at')

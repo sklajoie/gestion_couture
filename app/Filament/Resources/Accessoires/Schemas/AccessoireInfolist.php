@@ -14,38 +14,58 @@ class AccessoireInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('nom'),
-                TextEntry::make('code_barre'),
+               TextEntry::make('nom')
+                    ->placeholder('-')
+                    ->label('Nom du produit'),
+                TextEntry::make('code_barre')
+                    ->placeholder('-')
+                    ->label('Code barre'),
                 TextEntry::make('description')
                     ->placeholder('-')
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->label('Description'),
                 TextEntry::make('prix_achat')
                     ->numeric()
-                    ->placeholder('-'),
+                    ->placeholder('-')
+                    ->label('Prix d\'achat'),
                 TextEntry::make('prix_vente')
                     ->numeric()
-                    ->placeholder('-'),
+                    ->placeholder('-')
+                    ->label('Prix de vente'),
                 TextEntry::make('stock_minimum')
-                    ->numeric(),
+                    ->numeric()
+                    ->placeholder('-')
+                    ->label('Stock minimum'),
                 TextEntry::make('stock')
-                    ->numeric(),
-                TextEntry::make('unite'),
-                TextEntry::make('categorieProduit.nom')
-                    ->placeholder('-'),
+                    ->numeric()
+                    ->placeholder('-')
+                    ->label('Stock'),
                 TextEntry::make('marque.nom')
+                    ->label('Marque')
                     ->placeholder('-'),
                 TextEntry::make('taille.nom')
+                    ->label('Taille')
                     ->placeholder('-'),
                 TextEntry::make('couleur.nom')
+                    ->label('Couleur')
                     ->placeholder('-'),
+                TextEntry::make('unite')
+                    ->placeholder('-')
+                    ->label('Unité'),
+                TextEntry::make('categorieProduit.nom')
+                    ->placeholder('-')
+                    ->label('Catégorie'),
                 TextEntry::make('user.name')
-                    ->placeholder('-'),
+                    ->placeholder('-')
+                    ->label('Utilisateur'),
                 TextEntry::make('created_at')
                     ->dateTime()
-                    ->placeholder('-'),
+                    ->placeholder('-')
+                    ->label('Créé le'),
                 TextEntry::make('updated_at')
                     ->dateTime()
-                    ->placeholder('-'),
+                    ->placeholder('-')
+                    ->label('Mis à jour le'),
                 ImageEntry::make('image') 
                     ->disk('public')
                     ->imageWidth(200)

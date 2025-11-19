@@ -20,6 +20,7 @@ class BonCommandeForm
                
                 Select::make('fournisseur_id')
                     ->label('fournisseur')
+                    ->relationship('fournisseur', 'nom')
                     ->searchable()
                     ->required()
                       ->preload()
@@ -55,7 +56,7 @@ class BonCommandeForm
                                 ->required()
                                 ->searchable()
                                 ->preload()
-                                ->getOptionLabelFromRecordUsing(fn (Produit $record) => "{$record->nom} ({$record->code_barre})"),
+                                ->getOptionLabelFromRecordUsing(fn (Produit $record) => "{$record->nom}-{$record->code_barre}-{$record->marque?->nom}-{$record->taille?->nom}-{$record->couleur?->nom} ({$record->prix_vente})"),
                             TextInput::make('quantite')
                                 ->label('Quantité')
                                 ->numeric()

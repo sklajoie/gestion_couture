@@ -12,6 +12,7 @@ class StockEntreprise extends Model
         'reference',
         'stock',
         'prix',
+        'prix_achat',
         'stock_alerte',
         'couleur_id',
         'taille_id',

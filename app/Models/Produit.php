@@ -18,6 +18,12 @@ class Produit extends Model
         'stockable',
         'user_id',
         'categorie_produit_id',
+        'couleur_id',
+        'taille_id',
+        'marque_id',
+        'image',
+        'archived',
+        'type',
     ];
 
     public function categorieProduit()
@@ -29,4 +35,34 @@ class Produit extends Model
     {
         return $this->belongsTo(\App\Models\User::class);
     }   
+
+        public function marque()
+    {
+        return $this->belongsTo(Marque::class);
+    }
+    public function taille()
+    {
+        return $this->belongsTo(Taille::class);
+    }
+    public function couleur()
+    {
+        return $this->belongsTo(Couleur::class);
+    }
+
+
+         protected static function booted()
+    {
+        static::creating(function ($model) {
+            $now = \Carbon\Carbon::now();
+            $prefix = $now->format('ym');
+
+            do {
+                $suffix = str_pad(random_int(1, 99999), 5, '0', STR_PAD_LEFT);
+                $numero = "P{$prefix}{$suffix}";
+            } while (self::where('code_barre', $numero)->exists());
+
+            $model->code_barre = $numero;
+        });
+
+    }
 }

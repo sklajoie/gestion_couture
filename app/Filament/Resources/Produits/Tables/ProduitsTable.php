@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -33,9 +34,37 @@ class ProduitsTable
                     ->sortable(),
                 TextColumn::make('unite')
                     ->searchable(),
+                  TextColumn::make('marque.nom')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                     TextColumn::make('categorieProduit.nom')
+                    ->sortable()
+                    ->searchable()
+                    ->label('Catégorie')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                  TextColumn::make('type')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('user.name')
                     ->label('Utilisateur')
-                    ->sortable(),
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('taille.nom')
+                    ->label('Taille')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('couleur.nom')
+                    ->label('Couleur')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                ImageColumn::make('image') 
+                    ->disk('public')
+                    ->label('Image')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -44,9 +73,7 @@ class ProduitsTable
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('categorieProduit.nom')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+               
             ])
             ->filters([
                 //

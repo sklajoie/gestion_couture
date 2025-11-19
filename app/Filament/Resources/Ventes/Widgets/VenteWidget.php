@@ -11,7 +11,9 @@ use Illuminate\Database\Eloquent\Builder;
 
 class VenteWidget extends StatsOverviewWidget
 {
+   
      use InteractsWithPageFilters;
+     
   public function getColumns(): int | array
 {
     return [
@@ -19,6 +21,11 @@ class VenteWidget extends StatsOverviewWidget
         'xl' => 3,
     ];
 }
+protected function getHeading(): string
+    {
+        return 'ETAT DES VENTES';
+    }
+    
     protected function getStats(): array
     {
         $startDate = $this->pageFilters['startDate'] ?? null;

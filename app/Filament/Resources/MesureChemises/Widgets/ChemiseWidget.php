@@ -13,6 +13,10 @@ class ChemiseWidget extends StatsOverviewWidget
 {
      use InteractsWithPageFilters;
 
+     protected function getHeading(): string
+    {
+        return 'ETAT COUTURE CHEMISE';
+    }
     protected function getStats(): array
     {
         $startDate = $this->pageFilters['startDate'] ?? null;

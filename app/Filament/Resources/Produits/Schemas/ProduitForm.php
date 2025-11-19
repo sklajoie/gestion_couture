@@ -3,11 +3,14 @@
 namespace App\Filament\Resources\Produits\Schemas;
 
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Auth;
 
 class ProduitForm
 {
@@ -15,12 +18,37 @@ class ProduitForm
     {
         return $schema
             ->components([
-
+                Hidden::make('user_id')
+                    ->default(fn () => Auth::id()),
                 Select::make('categorie_produit_id')
                     ->relationship('categorieProduit','nom')
                     ->label('Catégorie')
                     ->searchable(['type', 'nom'])
                      ->preload(),
+                Select::make('marque_id')
+                    ->relationship('marque','nom')
+                    ->label('Marque')
+                    ->searchable(['id', 'nom'])
+                     ->preload(),
+                Select::make('taille_id')
+                    ->relationship('taille','nom')
+                    ->label('Taille')
+                    ->searchable(['id', 'nom'])
+                     ->preload(),
+                Select::make('couleur_id')
+                    ->relationship('couleur','nom')
+                    ->label('Couleur')
+                    ->searchable(['id', 'nom'])
+                     ->preload(),
+                Select::make('type')
+                    ->label('Type')
+                    ->options([
+                        'tout' => 'Tout',
+                        'boutique' => 'Boutique',
+                        'atelier' => 'Atelier',
+                    ])
+                    ->default('tout')
+                    ->required(),
                 TextInput::make('nom')
                     ->label('Nom du produit')
                     ->required(),
@@ -44,6 +72,7 @@ class ProduitForm
                 Radio::make('stockable')
                 ->label('Produit Stockable?')
                 ->boolean()
+                ->default(true)
                 ->inline(),
                 Select::make('unite')
                     ->required()
@@ -58,7 +87,19 @@ class ProduitForm
                             'unite' => 'Unité',
                         ])
                     ->default('unite'),
-
+                FileUpload::make('image')
+                    ->label('Image')
+                    ->disk('public')
+                    ->directory('Model-Mesure')
+                    ->visibility('public')
+                    ->image()
+                    ->imagePreviewHeight('150')
+                    ->enableDownload()
+                    ->enableOpen()
+                    ->openable()
+                    ->previewable()
+                    ->reorderable()
+                    ->appendFiles(),
 
                 Textarea::make('description')
                     ->label('Description')

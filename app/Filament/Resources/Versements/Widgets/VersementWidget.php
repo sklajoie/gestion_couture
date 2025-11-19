@@ -14,6 +14,11 @@ class VersementWidget extends StatsOverviewWidget
 {
      use InteractsWithPageFilters;
      
+     protected function getHeading(): string
+    {
+        return 'ETAT DES VERSEMENTS';
+    }
+    
     public function getColumns(): int | array
 {
     return [
