@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('designation')->nullable();
             $table->string('code_barre')->unique()->nullable();
             $table->string('reference')->nullable();
+            $table->string('type')->nullable();
             $table->integer('stock')->default(0);
             $table->float('prix')->default(0);
             $table->float('prix_achat')->nullable()->default(0);
@@ -23,6 +24,8 @@ return new class extends Migration
             $table->integer('stock_alerte')->nullable()->default(0);
             $table->foreignId('couleur_id')->nullable()->constrained('couleurs')->onDelete('set null');
             $table->foreignId('taille_id')->nullable()->constrained('tailles')->onDelete('set null');
+            $table->foreignId('marque_id')->nullable()->constrained('marques')->onDelete('set null');
+            $table->foreignId('categorie_produit_id')->nullable()->constrained('categorie_produits')->onDelete('set null');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });

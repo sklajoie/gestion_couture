@@ -58,7 +58,7 @@ class EditApprovisionnementStock extends EditRecord
                     'pantalon' => \App\Models\MesurePantalon::class,
                     'ensemble' => \App\Models\MesureEnsemble::class,
                     'autre_mesure' => \App\Models\AutreMesure::class,
-                    'autre_produit' => \App\Models\Accessoire::class,
+                    'accessoire' => \App\Models\Accessoire::class,
                     default => null,
                 };
 
@@ -86,7 +86,7 @@ class EditApprovisionnementStock extends EditRecord
                     } else {
                         StockEntreprise::create([
                             'designation' => $designation,
-                            // 'code_barre' => $couture->Reference,
+                            'type' => $type,
                             'reference' =>  $ref,
                             'stock' => $quantiteapp,
                             'prix' => $couture->prix_vente,
@@ -95,6 +95,8 @@ class EditApprovisionnementStock extends EditRecord
                             'taille_id' => $couture->taille_id,
                             'image' =>  $image,
                             'user_id' => Auth::id(),
+                            'categorie_produit_id'     => $couture->categorie_produit_id,
+                            'marque_id'     => $couture->marque_id,
                         ]);
                     }
                 }

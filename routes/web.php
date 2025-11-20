@@ -34,7 +34,9 @@ Route::get('/espace-vente', [DevisController::class, 'espacevente'])->name('espa
 Route::post('/save-vente', [DevisController::class, 'savevente'])->name('save-vente');
 Route::get('/recuperations', [DevisController::class, 'recuperations'])->name('recuperations');
 
+Route::match(['get', 'post'],'/valider-inventaire', [DevisController::class, 'validerinventaire'])->name('valider-inventaire');
 Route::match(['get', 'post'], '/recuperations-produit', [DevisController::class, 'recuperationsproduit'])->name('recuperations-produit');
+Route::match(['get', 'post'], '/valider-inventaire-entreprise', [DevisController::class, 'validerinventaireentreprise'])->name('valider-inventaire-entreprise');
 // Route::get('/recuperations', function () {
 //     return \App\Models\StockEntreprise::get();
 // });

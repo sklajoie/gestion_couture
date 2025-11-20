@@ -11,6 +11,7 @@ use App\Filament\Resources\Users\Schemas\UserInfolist;
 use App\Filament\Resources\Users\Tables\UsersTable;
 use App\Models\User;
 use BackedEnum;
+use Filament\Panel;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -23,9 +24,14 @@ class UserResource extends Resource
 
     protected static string | UnitEnum | null $navigationGroup = 'RESSOURCES HUMAINES';
     protected static ?int $navigationSort = 8;
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = "heroicon-o-user-group";
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public function canAccessPanel(Panel $panel): bool
+{
+    return $this->hasRole('admin');
+}
 
     public static function form(Schema $schema): Schema
     {

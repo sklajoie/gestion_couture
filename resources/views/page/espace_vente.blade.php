@@ -41,8 +41,10 @@
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="{{route('filament.admin.resources.ventes.index')}}">LISTE VENTE</a></li>
               <li class="breadcrumb-item"><a href="{{route('filament.admin.resources.devis.index')}}">LISTE DEVIS</a></li>
+              {{-- <li class="breadcrumb-item"></li> --}}
               <li class="breadcrumb-item active">VENTES</li>
             </ol>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">INVENTAIRE </button>
           </div>
         </div>
       </div><!-- /.container-fluid -->
@@ -272,5 +274,40 @@
     <!-- /.content -->
   {{-- </div> --}}
   
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">PERIODE INVENTAIRE</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="POST"  action="/valider-inventaire" target="_blank" enctype="multipart/form-data">
+          {!! csrf_field() !!}
+          <div class="row">
+          <div class="form-group col-6">
+            <label for="recipient-name" class="col-form-label">DEBUT:</label>
+            <input type="date" class="form-control" required name="date_debut" id="recipient-name">
+          </div>
+          <div class="form-group col-6">
+            <label for="message-text" class="col-form-label">DATE FIN:</label>
+            <input type="date" required class="form-control" name="date_fin" id="message-text">
+            <input type="hidden"  class="form-control" value="{{ Auth::user()->employe->agence_id }}" name="agence_id" id="message-text">
+          </div>
+        </div>
+        <div class="" style="text-align: center">
+          <button type="submit" class="btn btn-primary">VALIDER</button>
+          </div>
+        </form>
+      </div>
+      {{-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">FERMER</button>
+      </div> --}}
+    </div>
+  </div>
+</div>
+
 
 @endsection

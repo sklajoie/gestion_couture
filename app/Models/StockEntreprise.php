@@ -18,7 +18,29 @@ class StockEntreprise extends Model
         'taille_id',
         'image',
         'user_id',
+        'marque_id',
+        'categorie_produit_id',
+        'type',
     ];
+
+        public function marque()
+    {
+        return $this->belongsTo(Marque::class);
+    }
+
+     public function categorieProduit()
+    {
+        return $this->belongsTo(CategorieProduit::class);
+    }
+
+    public function detailVente()
+    {
+        return $this->hasMany(StockEntreprise::class);
+    }
+    public function detailDistribution()
+    {
+        return $this->hasMany(StockEntreprise::class);
+    }
 
     public function couleur()
     {

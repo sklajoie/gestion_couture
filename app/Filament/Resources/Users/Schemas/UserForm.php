@@ -4,11 +4,14 @@ namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserForm
@@ -17,18 +20,20 @@ class UserForm
     {
         return $schema
             ->components([
+                Grid::make(2)
+                ->schema([
                 TextInput::make('name')
                     ->required(),
-                Select::make('role')
-                    ->options([
-                        'admin' => 'Admin',
-                        'user agence' => 'Utilisateur Agence',
-                        'user atelier' => 'Utilisateur Atelier',
-                        'Responsable Atelier' => 'Responsable Atelier',
-                        'Responsable Agence' => 'Responsable Agence',
-                    ])
-                    ->required()
-                    ->default('user agence'),
+                // Select::make('role')
+                //     ->options([
+                //         'admin' => 'Admin',
+                //         'user agence' => 'Utilisateur Agence',
+                //         'user atelier' => 'Utilisateur Atelier',
+                //         'Responsable Atelier' => 'Responsable Atelier',
+                //         'Responsable Agence' => 'Responsable Agence',
+                //     ])
+                //     ->required()
+                //     ->default('user agence'),
                 TextInput::make('email')
                     ->label('Email address')
                     ->email(),
@@ -50,6 +55,14 @@ class UserForm
                     ->offIcon(Heroicon::Bolt)
                     ->onColor('success')
                     ->offColor('danger'),
+                Select::make('roles')
+                    ->multiple()
+                    ->relationship('roles', 'name')
+                    ->preload(),
+
+                    Hidden::make('user_id')
+                        ->default(Auth::id()),
+                    ])->columnSpanFull(),
             ]);
     }
 }

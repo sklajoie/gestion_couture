@@ -81,8 +81,11 @@ static::creating(function ($model) {
                     'stock_alerte'  => 1,
                     'couleur_id'    => $produit->couleur_id,
                     'taille_id'     => $produit->taille_id,
+                    'categorie_produit_id'     => $produit->categorie_produit_id,
+                    'marque_id'     => $produit->marque_id,
                     'image'         => $produit->image,
                     'user_id'       => Auth::id(),
+                    'type'           => "produit",
                 ]);
             }
         }

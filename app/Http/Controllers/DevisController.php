@@ -30,6 +30,8 @@ use Illuminate\Support\Facades\DB;
 
 use App\Http\Controllers\Controller;
 use App\Models\DetailDevis;
+use App\Models\DetailDistributionAgence;
+use App\Models\DistributionAgence;
 
 class DevisController extends Controller
 {
@@ -623,5 +625,196 @@ public function recuperations()
 //    $entre = \App\Models\StockEntreprise::whereIn('id', $tockagence->pluck('stock_entreprise_id'))->get();
   return $tockagence;
 }
+
+public function validerinventaire(Request $request)
+{
+    $request->validate([
+        'date_debut' => 'required|date',
+        'date_fin' => 'required',
+    ]);
+
+   $dateDebut = Carbon::parse($request->date_debut)->startOfDay();
+    $dateFin   = Carbon::parse($request->date_fin)->endOfDay();
+    $agenceId  = $request->agence_id;
+    $agence = Agence::where('id', $agenceId)->first();
+
+    // Stock actuel par produit
+    $stocks = StockAgence::where('agence_id', $agenceId)
+                        ->select('stock_entreprise_id', DB::raw('SUM(stock) as stock'))
+                        ->groupBy('stock_entreprise_id')
+                        ->get();
+    //dd($stocks);
+    // Quantité distribuée par produit sur la période
+    $distributions = DistributionAgence::where('agence_id', $agenceId)
+                                ->whereBetween('date_operation', [$dateDebut, $dateFin])
+                                ->get();
+  
+    $detaildistributions = DetailDistributionAgence::whereIn('distribution_agence_id', $distributions->pluck('id'))                            
+                                ->select('stock_entreprise_id', DB::raw('SUM(quantite) as distribue'))
+                                ->groupBy('stock_entreprise_id')
+                                ->get();
+  ///dd($detaildistributions);
+    // Quantité vendue par produit sur la période
+    $ventes = Vente::where('agence_id', $agenceId)
+                    ->whereBetween('date_vente', [$dateDebut, $dateFin])
+                    ->get();
+    $detailventes = DetailVente::whereIn('vente_id', $ventes->pluck('id'))
+                    ->select('stock_entreprise_id', DB::raw('SUM(quantite) as vendu'))
+                    ->groupBy('stock_entreprise_id')
+                    ->get();
+
+    // Fusionner les résultats
+  $etatProduits = [];
+
+// 1. Initialisation des stocks
+foreach ($stocks as $stock) {
+    $produitId = $stock->stock_entreprise_id;
+
+    $etatProduits[$produitId] = [
+        'stock'     => $stock->stock,
+        'distribue' => 0,
+        'vendu'     => 0,
+    ];
+}
+
+// 2. Ajouter la quantité distribuée
+foreach ($detaildistributions as $dist) {
+    $produitId = $dist->stock_entreprise_id;
+
+    if (!isset($etatProduits[$produitId])) {
+        $etatProduits[$produitId] = [
+            'stock'     => 0,
+            'distribue' => 0,
+            'vendu'     => 0,
+        ];
+    }
+
+    $etatProduits[$produitId]['distribue'] = $dist->distribue;
+}
+
+// 3. Ajouter la quantité vendue
+foreach ($detailventes as $vente) {
+    $produitId = $vente->stock_entreprise_id;
+
+    if (!isset($etatProduits[$produitId])) {
+        $etatProduits[$produitId] = [
+            'stock'     => 0,
+            'distribue' => 0,
+            'vendu'     => 0,
+        ];
+    }
+
+    $etatProduits[$produitId]['vendu'] = $vente->vendu;
+}
+
+    //dd($etatProduits);
+        
+    $pdf = Pdf::loadView('pdf.inventaire_agence', compact('etatProduits','agence','dateDebut','dateFin'))
+                    ->setPaper('A4', 'landscape')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);;
+    return $pdf->stream('inventaire_agence.pdf');
+}
+public function validerinventaireentreprise(Request $request)
+{
+    $request->validate([
+        'date_debut' => 'required|date',
+        'date_fin' => 'required',
+    ]);
+
+   $dateDebut = Carbon::parse($request->date_debut)->startOfDay();
+    $dateFin   = Carbon::parse($request->date_fin)->endOfDay();
+    $agenceId  = $request->agence_id;
+    $agence = Agence::where('id', $agenceId)->first();
+
+    // Stock actuel par produit
+    $stocks = StockAgence::where('agence_id', $agenceId)
+                        ->select('stock_entreprise_id', DB::raw('SUM(stock) as stock'))
+                        ->groupBy('stock_entreprise_id')
+                        ->get();
+    //dd($stocks);
+    // Quantité distribuée par produit sur la période
+    $distributions = DistributionAgence::where('agence_id', $agenceId)
+                                ->whereBetween('date_operation', [$dateDebut, $dateFin])
+                                ->get();
+  
+    $detaildistributions = DetailDistributionAgence::whereIn('distribution_agence_id', $distributions->pluck('id'))                            
+                                ->select('stock_entreprise_id', DB::raw('SUM(quantite) as distribue'))
+                                ->groupBy('stock_entreprise_id')
+                                ->get();
+  ///dd($detaildistributions);
+    // Quantité vendue par produit sur la période
+    $ventes = Vente::where('agence_id', $agenceId)
+                    ->whereBetween('date_vente', [$dateDebut, $dateFin])
+                    ->get();
+    $detailventes = DetailVente::whereIn('vente_id', $ventes->pluck('id'))
+                    ->select('stock_entreprise_id', DB::raw('SUM(quantite) as vendu'))
+                    ->groupBy('stock_entreprise_id')
+                    ->get();
+
+    // Fusionner les résultats
+  $etatProduits = [];
+
+// 1. Initialisation des stocks
+foreach ($stocks as $stock) {
+    $produitId = $stock->stock_entreprise_id;
+
+    $etatProduits[$produitId] = [
+        'stock'     => $stock->stock,
+        'distribue' => 0,
+        'vendu'     => 0,
+    ];
+}
+
+// 2. Ajouter la quantité distribuée
+foreach ($detaildistributions as $dist) {
+    $produitId = $dist->stock_entreprise_id;
+
+    if (!isset($etatProduits[$produitId])) {
+        $etatProduits[$produitId] = [
+            'stock'     => 0,
+            'distribue' => 0,
+            'vendu'     => 0,
+        ];
+    }
+
+    $etatProduits[$produitId]['distribue'] = $dist->distribue;
+}
+
+// 3. Ajouter la quantité vendue
+foreach ($detailventes as $vente) {
+    $produitId = $vente->stock_entreprise_id;
+
+    if (!isset($etatProduits[$produitId])) {
+        $etatProduits[$produitId] = [
+            'stock'     => 0,
+            'distribue' => 0,
+            'vendu'     => 0,
+        ];
+    }
+
+    $etatProduits[$produitId]['vendu'] = $vente->vendu;
+}
+
+    //dd($etatProduits);
+        
+    $pdf = Pdf::loadView('pdf.inventaire_entreprise', compact('etatProduits','agence','dateDebut','dateFin'))
+                    ->setPaper('A4', 'landscape')
+                    ->setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => true,
+                        'defaultFont' => 'sans-serif',
+                        'enable_php' => true,
+                    ])
+                    ->setWarnings(false);;
+    return $pdf->stream('inventaire_entreprise.pdf');
+}
+
+
 
 }
