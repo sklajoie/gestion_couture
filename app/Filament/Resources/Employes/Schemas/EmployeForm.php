@@ -33,9 +33,11 @@ class EmployeForm
                     ->label('Prénom')
                     ->required()
                     ->maxLength(255),
+                TextInput::make('contact')
+                    ->label('Contact')    
+                    ->required(),       
                 TextInput::make('email')
-                    ->label('Email')    
-                    ->required()
+                    ->label('Email') 
                     ->maxLength(255),       
                 TextInput::make('adresse')
                     ->label('Adresse')

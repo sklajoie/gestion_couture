@@ -3,16 +3,22 @@
 namespace App\Filament\Resources\MesureChemises\Widgets;
 
 use App\Models\MesureChemise;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
-use Filament\Widgets\StatsOverviewWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Filament\Widgets\StatsOverviewWidget;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class ChemiseWidget extends StatsOverviewWidget
 {
      use InteractsWithPageFilters;
 
+         public static function canView(): bool
+{
+  
+    return Auth::user()->hasRole(['SuperAdmin','AdminAtelier']);
+}
      protected function getHeading(): string
     {
         return 'ETAT COUTURE CHEMISE';

@@ -22,7 +22,7 @@ class ClotureCaisseResource extends Resource
 
     protected static string | UnitEnum | null $navigationGroup = 'GESTION CAISSE';
     protected static ?int $navigationSort = 2;
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = "heroicon-o-archive-box-arrow-down";
 
     protected static ?string $recordTitleAttribute = 'reference';
 

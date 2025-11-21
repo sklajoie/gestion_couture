@@ -55,7 +55,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
-                FilamentInfoWidget::class,
+                // FilamentInfoWidget::class,
                 VenteWidget::class,
                 VersementWidget::class,
                 ChemiseWidget::class,
@@ -79,10 +79,12 @@ class AdminPanelProvider extends PanelProvider
                 ->url('/espace-vente')
                 ->icon('heroicon-o-shopping-cart')
                 ->group('GESTION VENTES')
-                ->visible(fn() => Auth::user()?->employe?->agence_id)
+                ->visible(fn() => Auth::user()?->employe?->agence_id || Auth::user()->hasRole('SuperAdmin'))
                 ->sort(10)
             ]);
                 //  ->topNavigation();
     }
+
+
     
 }

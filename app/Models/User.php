@@ -23,10 +23,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
         'employe_id',
         // 'agence_id',
         'active',
+        // 'is_sk',
     ];
 
 

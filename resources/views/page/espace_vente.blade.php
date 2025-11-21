@@ -44,7 +44,9 @@
               {{-- <li class="breadcrumb-item"></li> --}}
               <li class="breadcrumb-item active">VENTES</li>
             </ol>
+            @if(Auth::user()->employe?->agence_id )
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">INVENTAIRE </button>
+          @endif
           </div>
         </div>
       </div><!-- /.container-fluid -->
@@ -294,7 +296,7 @@
           <div class="form-group col-6">
             <label for="message-text" class="col-form-label">DATE FIN:</label>
             <input type="date" required class="form-control" name="date_fin" id="message-text">
-            <input type="hidden"  class="form-control" value="{{ Auth::user()->employe->agence_id }}" name="agence_id" id="message-text">
+            <input type="hidden"  class="form-control" value="{{ Auth::user()->employe?->agence_id }}" name="agence_id" id="message-text">
           </div>
         </div>
         <div class="" style="text-align: center">

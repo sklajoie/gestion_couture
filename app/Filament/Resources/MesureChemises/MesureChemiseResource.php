@@ -25,7 +25,7 @@ class MesureChemiseResource extends Resource
 
     protected static string | UnitEnum | null $navigationGroup = 'GESTION MESURES';
     protected static ?int $navigationSort = 1;
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = "heroicon-o-cube-transparent";
 
     protected static ?string $recordTitleAttribute = 'Type';
 

@@ -2,12 +2,13 @@
 
 namespace App\Filament\Resources\Ventes\Widgets;
 
-use App\Models\Agence;
 use App\Models\Vente;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use App\Models\Agence;
+use Illuminate\Support\Facades\Auth;
 use Filament\Widgets\StatsOverviewWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class VenteWidget extends StatsOverviewWidget
 {
@@ -21,6 +22,13 @@ class VenteWidget extends StatsOverviewWidget
         'xl' => 3,
     ];
 }
+
+    public static function canView(): bool
+{
+  
+    return Auth::user()->hasRole(['AdminAgence', 'SuperAdmin']);
+}
+
 protected function getHeading(): string
     {
         return 'ETAT DES VENTES';

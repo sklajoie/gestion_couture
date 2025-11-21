@@ -8,12 +8,18 @@ use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class VersementWidget extends StatsOverviewWidget
 {
      use InteractsWithPageFilters;
      
+         public static function canView(): bool
+{
+  
+    return Auth::user()->hasRole(['AdminAgence', 'SuperAdmin']);
+}
      protected function getHeading(): string
     {
         return 'ETAT DES VERSEMENTS';

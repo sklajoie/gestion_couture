@@ -18,8 +18,6 @@ class UsersTable
             ->columns([
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('role')
-                    ->searchable(),
                 TextColumn::make('email')
                     ->label('Email address')
                     ->searchable(),
@@ -45,5 +43,7 @@ class UsersTable
                     DeleteBulkAction::make(),
                 ]),
             ]);
+
+            
     }
 }

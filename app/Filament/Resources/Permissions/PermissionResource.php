@@ -18,12 +18,13 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Spatie\Permission\Models\Permission as ModelsPermission;
-
+use UnitEnum;
 class PermissionResource extends Resource
 {
     protected static ?string $model = ModelsPermission::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string | UnitEnum | null $navigationGroup = "ROLES & PERMISSIONS";
+    protected static string|BackedEnum|null $navigationIcon = "heroicon-o-key";
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -34,7 +35,8 @@ class PermissionResource extends Resource
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255)
-                    ->unique(ignoreRecord: true),
+                    ->unique(ignoreRecord: true)
+                    ->label('Nom'),
             ]);
     }
 
@@ -42,7 +44,8 @@ class PermissionResource extends Resource
     {
         return $schema
             ->components([
-                TextEntry::make('name'),
+                TextEntry::make('name')
+                ->label('Nom'),
             ]);
     }
 
@@ -52,7 +55,9 @@ class PermissionResource extends Resource
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable()
+                    ->label('Nom'),
                 TextColumn::make('created_at')
                     ->dateTime('d-M-Y H:i')
                     ->label('Créé le'),

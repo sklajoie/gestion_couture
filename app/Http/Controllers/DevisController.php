@@ -474,9 +474,11 @@ public function clotureateliergroup(Request $request)
 
 public function espacevente()
 {
+    // dd(Auth::user()->hasPermissionTo('Voir Vente'));
     // dd(Auth::user()->employe->agence_id);
     $produits = StockAgence::with(['stockEntreprise', 'agence'])->get();
-    $caisse = Caisse::where('agence_id', Auth::user()->employe->agence_id)->get();
+    $caisse = Caisse::where('agence_id', Auth::user()->employe?->agence_id)->get();
+   
     $agences = Agence::all();
 
     return view('page/espace_vente', compact('produits','caisse','agences'));

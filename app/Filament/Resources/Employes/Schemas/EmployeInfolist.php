@@ -18,6 +18,8 @@ class EmployeInfolist
                     ->label('Prénom'),
                 TextEntry::make('email')
                     ->label('Email'),       
+                TextEntry::make('contact')
+                    ->label('Contact'),       
                 TextEntry::make('adresse')
                     ->label('Adresse'),   
                 TextEntry::make('poste')

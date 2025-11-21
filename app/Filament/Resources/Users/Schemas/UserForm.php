@@ -44,22 +44,30 @@ class UserForm
                     ->dehydrated(fn (?string $state): bool => filled($state))
                     ->required(fn (string $operation): bool => $operation === 'create'),
                 Select::make('employe_id')
-                    ->relationship('employe', 'nom')
+                    // ->relationship('employe', 'nom')
+                    ->options(function () {
+                        return \App\Models\Employe::all()
+                        ->mapWithKeys(fn ($e) => [$e->id => $e->nom . ' ' . $e->prenom])
+                        ->toArray();})
                     ->label('Employé')
                     ->searchable()
                     ->preload(),
-                Toggle::make('active')
+                
+                Select::make('roles')
+                    ->multiple()
+                    ->relationship('roles', 'name')
+                    ->preload(),
+                Select::make('permissions')
+                    ->multiple()
+                    ->relationship('permissions', 'name')
+                    ->preload(),
+                  Toggle::make('active')
                     ->label('Actif')
                     ->default(true)
                     ->onIcon(Heroicon::User)
                     ->offIcon(Heroicon::Bolt)
                     ->onColor('success')
                     ->offColor('danger'),
-                Select::make('roles')
-                    ->multiple()
-                    ->relationship('roles', 'name')
-                    ->preload(),
-
                     Hidden::make('user_id')
                         ->default(Auth::id()),
                     ])->columnSpanFull(),

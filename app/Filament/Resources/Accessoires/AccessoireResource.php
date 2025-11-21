@@ -22,7 +22,7 @@ class AccessoireResource extends Resource
 
         protected static string | UnitEnum | null $navigationGroup = 'GESTION STOCK';
     protected static ?int $navigationSort = 9;
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = "heroicon-o-square-3-stack-3d";
 
     protected static ?string $recordTitleAttribute = 'nom';
 

@@ -27,6 +27,10 @@ class EmployesTable
                     ->label('Email')
                      ->searchable()
                       ->sortable(),       
+                TextColumn::make('contact')
+                    ->label('Contact')
+                     ->searchable()
+                      ->sortable(),       
                 TextColumn::make('adresse')
                     ->label('Adresse')
                      ->searchable()

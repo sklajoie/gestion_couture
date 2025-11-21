@@ -24,7 +24,7 @@ class ApprovisionnementResource extends Resource
     protected static string | UnitEnum | null $navigationGroup = 'GESTION STOCK';
     protected static ?int $navigationSort = 5;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = "heroicon-o-arrow-path-rounded-square";
 
     protected static ?string $recordTitleAttribute = 'reference';
 

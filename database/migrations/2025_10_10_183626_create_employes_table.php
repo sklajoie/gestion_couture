@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nom');
             $table->string('prenom');
             $table->string('email')->unique();
+            $table->string('contact')->nullable();
             $table->string('adresse')->nullable();
             $table->string('poste')->nullable();
             $table->date('date_embauche');
