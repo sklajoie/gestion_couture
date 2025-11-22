@@ -24,6 +24,7 @@ return new class extends Migration
             $table->text('pied_page')->nullable();
             $table->boolean('status')->default(1);
             $table->foreignId('user_id')->constrained('users')->onDelete('set null');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

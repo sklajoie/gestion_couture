@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('prix_unitaire', 10, 2);
             $table->decimal('total', 10, 2);
             $table->boolean('is_approvisionne')->default(false);
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

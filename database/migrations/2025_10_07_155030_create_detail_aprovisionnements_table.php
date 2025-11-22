@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('quantite')->default(0);
             $table->decimal('prix_unitaire', 10, 2);
             $table->decimal('total', 10, 2);
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

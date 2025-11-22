@@ -11,6 +11,7 @@ class ApprovisionnementStock extends Model
         'date_operation',
         'total_appro',
         'user_id',
+        'entreprise_id',
     ];
     public function user()
     {

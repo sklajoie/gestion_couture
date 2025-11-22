@@ -20,6 +20,7 @@ return new class extends Migration
             $table->dateTime('date');
             $table->foreignId('atelier_id')->nullable()->constrained('ateliers')->onDelete('set null');
             $table->foreignId('user_id')->constrained('users')->onDelete('set null');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

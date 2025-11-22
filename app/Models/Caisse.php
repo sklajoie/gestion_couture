@@ -10,7 +10,8 @@ class Caisse extends Model
         'nom',
         'montant',
         'agence_id',
-        'user_id'
+        'user_id',
+        'entreprise_id',
     ];
 
         public function agence()

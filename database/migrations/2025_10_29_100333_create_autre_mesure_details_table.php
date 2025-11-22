@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('mesure');
             $table->text('detail')->nullable();
             $table->foreignId('autre_mesure_id')->nullable()->constrained('autre_mesures')->onDelete('set null');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -29,6 +29,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
@@ -156,6 +157,13 @@ class AgenceResource extends Resource
             StockAgenceRelationManager::class,
         ];
     }
+
+     public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->where('id', Auth::user()->employe->agence_id); // ou ->whereNot('id', 1)
+    }
+
     public static function getPages(): array
     {
         return [

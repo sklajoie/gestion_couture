@@ -17,6 +17,7 @@ class ProduitCouture extends Model
         'mesure_pantalon_id',
         'mesure_ensemble_id',
         'autre_mesure_id',
+        'entreprise_id',
     ];
 
      public function produit()

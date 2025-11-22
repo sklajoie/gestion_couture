@@ -21,7 +21,8 @@ class AutreMesure extends Model
         'taille_id',
         'prix_couture',
         'prix_vente',
-        'etape_id'
+        'etape_id',
+        'entreprise_id',
     ];
 
 

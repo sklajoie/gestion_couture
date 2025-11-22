@@ -24,6 +24,7 @@ class Produit extends Model
         'image',
         'archived',
         'type',
+        'entreprise_id',
     ];
 
     public function categorieProduit()

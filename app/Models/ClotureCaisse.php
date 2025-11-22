@@ -15,7 +15,8 @@ class ClotureCaisse extends Model
         'montant_entre',
         'montant_solde',
         'agence_id',
-        'user_id'
+        'user_id',
+        'entreprise_id',
     ];
 
         public function agence()

@@ -11,6 +11,7 @@ class DetailDistributionAgence extends Model
         'distribution_agence_id',
         'stock_entreprise_id',
         'user_id',
+        'entreprise_id',
     ];
 
     public function distributionAgence()

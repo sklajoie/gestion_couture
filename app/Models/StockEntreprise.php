@@ -21,6 +21,7 @@ class StockEntreprise extends Model
         'marque_id',
         'categorie_produit_id',
         'type',
+        'entreprise_id',
     ];
 
         public function marque()

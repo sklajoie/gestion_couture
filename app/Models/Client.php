@@ -13,5 +13,6 @@ class Client extends Model
         'adresse',
         'ville',
         'user_id',
+        'entreprise_id',
     ];
 }

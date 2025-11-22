@@ -26,6 +26,7 @@ return new class extends Migration
             $table->dateTime('date_devis');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('vente_id')->nullable()->constrained('ventes')->onDelete('set null');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

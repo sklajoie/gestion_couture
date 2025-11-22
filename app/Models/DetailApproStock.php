@@ -14,6 +14,7 @@ class DetailApproStock extends Model
         'total',
         'mesure_type',
         'mesure_id',
+        'entreprise_id',
     ];
     public function approvisionnementstock()
     {

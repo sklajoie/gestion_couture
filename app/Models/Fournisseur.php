@@ -13,5 +13,6 @@ class Fournisseur extends Model
         'email',
         'contact',
         'user_id',
+        'entreprise_id',
     ];
 }

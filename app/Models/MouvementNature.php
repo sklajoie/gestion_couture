@@ -10,6 +10,7 @@ class MouvementNature extends Model
         'nom',
         'type_mouvement',
         'user_id',
+        'entreprise_id',
     ];
     
     public function user()

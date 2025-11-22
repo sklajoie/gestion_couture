@@ -13,6 +13,7 @@ class DetailAprovisionnement extends Model
         'quantite',
         'prix_unitaire',
         'total',
+        'entreprise_id',
     ];
 
     public function approvisionnement()

@@ -13,6 +13,7 @@ class DetailVente extends Model
         'quantite',
         'prix_unitaire',
         'montant',
+        'entreprise_id',
     ];
     public function vente()
     {

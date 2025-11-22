@@ -9,5 +9,6 @@ class Couleur extends Model
      protected $fillable = [
         'nom',
         'description',
+        'entreprise_id',
     ];
 }

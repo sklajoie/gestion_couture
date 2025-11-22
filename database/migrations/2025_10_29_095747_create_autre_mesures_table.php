@@ -27,6 +27,7 @@ return new class extends Migration
             $table->float('prix_vente')->nullable()->default(0);
             $table->foreignId('couleur_id')->nullable()->constrained('couleurs')->onDelete('set null');
             $table->foreignId('taille_id')->nullable()->constrained('tailles')->onDelete('set null');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -26,6 +26,7 @@ class Vente extends Model
         'code_avoir',
         'date_vente',
         'user_id',
+        'entreprise_id',
     ];
 
     public function detailVentes()

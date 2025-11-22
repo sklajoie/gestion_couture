@@ -20,6 +20,7 @@ class BonCommande extends Model
         'remarques',
         'statut',
         'user_id',
+        'entreprise_id',
     ];
 
     public function fournisseur()

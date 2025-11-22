@@ -17,6 +17,7 @@ return new class extends Migration
             $table->dateTime('date_operation')->nullable();
             $table->float('total_appro')->default(0);
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

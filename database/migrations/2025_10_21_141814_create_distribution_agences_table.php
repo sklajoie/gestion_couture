@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->boolean('is_valide')->default(false);
             $table->foreignId('validateur_id')->nullable()->constrained('agences')->onDelete('set null');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

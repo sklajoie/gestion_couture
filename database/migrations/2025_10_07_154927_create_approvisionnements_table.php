@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('bon_commande_id')->constrained('bon_commandes')->onDelete('cascade');
             $table->dateTime('date_operation')->nullable();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

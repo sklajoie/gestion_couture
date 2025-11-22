@@ -29,6 +29,7 @@ return new class extends Migration
             $table->dateTime('date_vente');
             $table->string('code_avoir')->nullable();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

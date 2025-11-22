@@ -13,6 +13,7 @@ class DistributionAgence extends Model
         'agence_id',
         'is_valide',
         'validateur_id',
+        'entreprise_id',
     ];
 
     public function agence()

@@ -26,7 +26,7 @@ class User extends Authenticatable
         'employe_id',
         // 'agence_id',
         'active',
-        // 'is_sk',
+        'entreprise_id',
     ];
 
 

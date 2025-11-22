@@ -10,6 +10,7 @@ class CategorieProduit extends Model
         'type',
         'nom',
         'user_id',
+        'entreprise_id',
     ];
     public function user()
     {

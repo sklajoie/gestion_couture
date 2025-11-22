@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('statut')->default('en attente');
             $table->text('remarques')->nullable();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

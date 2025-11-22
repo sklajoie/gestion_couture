@@ -11,6 +11,7 @@ class Approvisionnement extends Model
         'bon_commande_id',
         'date_operation',
         'user_id',
+        'entreprise_id',
     ];
 
     public function bonCommande()

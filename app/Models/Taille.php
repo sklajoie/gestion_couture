@@ -9,5 +9,6 @@ class Taille extends Model
     protected $fillable = [
         'nom',
         'description',
+        'entreprise_id',
     ];
 }

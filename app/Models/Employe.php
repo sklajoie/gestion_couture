@@ -17,6 +17,7 @@ class Employe extends Model
         'user_id',
         'atelier_id',
         'agence_id',
+        'entreprise_id',
     ];
 
     public function atelier()

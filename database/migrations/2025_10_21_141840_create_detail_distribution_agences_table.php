@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('distribution_agence_id')->constrained('distribution_agences')->onDelete('cascade');
             $table->foreignId('stock_entreprise_id')->constrained('stock_entreprises')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

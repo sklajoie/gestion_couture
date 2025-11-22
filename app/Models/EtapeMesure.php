@@ -24,6 +24,7 @@ class EtapeMesure extends Model
         'temp_mis',
         'montant',
         'cloture',
+        'entreprise_id',
     ];
     protected $casts = [
     'date_debut' => 'datetime',

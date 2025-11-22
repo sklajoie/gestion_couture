@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('quantite')->default(0);
             $table->float('prix_unitaire')->nullable();
             $table->float('total')->nullable();
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

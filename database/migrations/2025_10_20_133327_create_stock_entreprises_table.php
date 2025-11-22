@@ -27,6 +27,7 @@ return new class extends Migration
             $table->foreignId('marque_id')->nullable()->constrained('marques')->onDelete('set null');
             $table->foreignId('categorie_produit_id')->nullable()->constrained('categorie_produits')->onDelete('set null');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

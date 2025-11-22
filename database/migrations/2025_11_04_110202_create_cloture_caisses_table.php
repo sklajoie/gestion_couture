@@ -21,6 +21,7 @@ return new class extends Migration
             $table->float('montant_solde')->default(0)->nullable();
             $table->foreignId('agence_id')->constrained('agence')->onDelete('set null');
             $table->foreignId('user_id')->constrained('users')->onDelete('set null');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

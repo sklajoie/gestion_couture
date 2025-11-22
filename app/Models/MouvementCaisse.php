@@ -20,6 +20,7 @@ class MouvementCaisse extends Model
         'user_id',
         'cloture',
         'detail',
+        'entreprise_id',
     ];
 
     public function caisse()

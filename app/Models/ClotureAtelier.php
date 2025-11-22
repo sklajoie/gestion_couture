@@ -14,6 +14,7 @@ class ClotureAtelier extends Model
         'employe_id',
         'atelier_id',
         'user_id',
+        'entreprise_id',
     ];
 
     

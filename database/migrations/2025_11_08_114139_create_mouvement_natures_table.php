@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('type_mouvement');
             $table->string('nom');
             $table->foreignId('user_id')->constrained('users')->onDelete('set null');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -14,6 +14,7 @@ class DetailBonCommande extends Model
         'total',
         'is_approvisionne',
         'quantite_approvisionnee',
+        'entreprise_id',
     ];
 
     public function bonCommande()

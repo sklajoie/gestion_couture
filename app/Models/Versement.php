@@ -18,7 +18,8 @@ class Versement extends Model
         'mode_paiement',
         'detail',
         'cloture',
-        'user_id'
+        'user_id',
+        'entreprise_id',
     ];
 
     public function vente()

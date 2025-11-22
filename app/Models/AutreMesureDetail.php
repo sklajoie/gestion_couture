@@ -11,6 +11,7 @@ class AutreMesureDetail extends Model
         'mesure',
         'autre_mesure_id',
         'detail',
+        'entreprise_id',
     ];
 
       public function autreMesure()

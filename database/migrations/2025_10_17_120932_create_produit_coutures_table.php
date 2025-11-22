@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreignId('mesure_pantalon_id')->nullable()->constrained('mesure_pantalons')->onDelete('cascade');
             $table->foreignId('mesure_ensemble_id')->nullable()->constrained('mesure_ensembles')->onDelete('cascade');
             $table->foreignId('autre_mesure_id')->nullable()->constrained('autre_mesures')->onDelete('cascade');
+            $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -9,6 +9,7 @@ class Marque extends Model
         protected $fillable = [
         'nom',
         'user_id',
+        'entreprise_id',
     ];
     public function user()
     {

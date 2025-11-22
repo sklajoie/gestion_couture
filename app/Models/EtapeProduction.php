@@ -11,5 +11,6 @@ class EtapeProduction extends Model
         'ordre',
         'description',
         'user_id',
+        'entreprise_id',
     ];
 }

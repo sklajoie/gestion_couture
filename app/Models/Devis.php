@@ -21,6 +21,7 @@ class Devis extends Model
         'date_devis',
         'vente_id',
         'user_id',
+        'entreprise_id',
     ];
 
     public function detailDevis()

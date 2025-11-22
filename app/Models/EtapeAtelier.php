@@ -14,6 +14,7 @@ class EtapeAtelier extends Model
             'date',
             'atelier_id',
             'user_id',
+            'entreprise_id',
         ];
 
          public function mesure()

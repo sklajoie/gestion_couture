@@ -39,6 +39,7 @@ class MesureEnsemble extends Model
         'prix_couture',
         'prix_vente',
         'etape_id',
+        'entreprise_id',
     ];
         protected $casts = [
            'Model_mesure' => 'array',

@@ -12,6 +12,7 @@ class StockAgence extends Model
         'stock_entreprise_id',
         'agence_id',
         'user_id',
+        'entreprise_id',
     ];
 
     public function stockEntreprise()

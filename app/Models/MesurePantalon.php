@@ -30,6 +30,7 @@ class MesurePantalon extends Model
         'prix_couture',
         'prix_vente',
         'etape_id',
+        'entreprise_id',
     ];
 
         protected $casts = [
