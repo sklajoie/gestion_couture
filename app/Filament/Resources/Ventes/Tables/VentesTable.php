@@ -2,22 +2,33 @@
 
 namespace App\Filament\Resources\Ventes\Tables;
 
-use App\Models\Agence;
 use App\Models\User;
+use App\Models\Agence;
+use App\Models\RetourVente;
+use Livewire\Component;
+use Filament\Tables\Table;
+use App\Models\StockAgence;
 use Filament\Actions\Action;
+use App\Models\StockEntreprise;
+use App\Models\Vente;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Livewire\Component;
+use Filament\Tables\Filters\Filter;
+use Illuminate\Support\Facades\Auth;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Grid;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
 
 class VentesTable
 {
@@ -86,6 +97,98 @@ class VentesTable
                     ->icon('heroicon-o-printer')
                     ->url(fn ($record) => route('vente-ticket.imprimer', ['vente' => $record->id]))
                     ->openUrlInNewTab(),
+                
+Action::make('retournerProduits')
+    ->label('Retourner Produits')
+    ->icon('heroicon-m-arrow-uturn-left')
+    ->color('info')
+    ->modalHeading('Retourner des Produits')
+    ->form(function (Vente $record) {
+        return [
+            DatePicker::make('date_retour')
+                ->default(now())
+                ->required(),
+
+            Select::make('statut')
+                ->options([
+                    'Remboursé' => 'Remboursé',
+                    'Remplacé' => 'Remplacé',
+                    'Retour Atelier' => 'Retour Atelier',
+                ])
+                ->required(),
+           TextInput::make('montant_total')
+                    ->label('Montant total du retour')
+                    ->default($record->montant_ttc)
+                    ->readOnly()
+                    ->dehydrated(true), // pour que la valeur soit envoyée à l'action
+
+            Textarea::make('motif'),
+
+            Repeater::make('detailVentes')
+                ->schema([
+                    Hidden::make('detail_vente_id'),
+
+                    TextInput::make('designation')
+                        ->label('Produit')
+                        ->disabled(),
+
+                    TextInput::make('quantite')
+                        ->numeric()
+                        ->minValue(1)
+                        ->required(),
+
+                    TextInput::make('prix_unitaire')
+                        ->numeric()
+                        ->readOnly(),
+                    Hidden::make('stock_entreprise_id'),
+
+                    TextInput::make('montant')
+                        ->numeric()
+                        ->readOnly()
+                        ->default(fn ($get) => floatval($get('quantite') ?? 0) * floatval($get('prix_unitaire') ?? 0)),
+                ])
+                ->columns(5)
+                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        // $state = valeur du repeater
+                        $details = $get('detailVentes') ?? [];
+
+                        $total = collect($details)->sum(fn ($item) =>
+                            floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0)
+                        );
+
+                        $set('montant_total', round($total, 2));
+                    })
+                ->default(
+                    $record->detailVentes->map(fn ($d) => [
+                        'detail_vente_id' => $d->id,
+                        'designation'     => $d->stockEntreprise->designation,
+                        'stock_entreprise_id'     => $d->stock_entreprise_id,
+                        'quantite'        => $d->quantite,
+                        'prix_unitaire'   => $d->prix_unitaire,
+                        'montant'         => $d->quantite * $d->prix_unitaire,
+                    ])->toArray()
+                ),
+        ];
+    })
+    ->action(function (array $data, Vente $record) {
+        $retour = $record->retourVente()->create([
+            'date_retour'   => $data['date_retour'],
+            'statut'        => $data['statut'],
+            'montant_total'        => $data['montant_total'],
+            'motif'         => $data['motif'] ?? null,
+            'user_id'       => Auth::id(),
+            'entreprise_id' => Auth::user()->entreprise_id,
+            'agence_id'     => $record->agence_id,
+        ]);
+
+        foreach ($data['detailVentes'] as $detail) {
+            $retour->detailsRetourVente()->create($detail);
+        }
+    }),
+
+
+
+
 
             ])
             ->toolbarActions([
@@ -112,7 +215,19 @@ class VentesTable
                     
                     $livewire->js('window.open(\'' . $url . '\', \'_blank\');');
                 }),
+
+
+
                  DeleteBulkAction::make(),
             ]);
     }
+
+    public static function calculTotaux($state, callable $set, callable $get)
+{
+    // Total brut = somme des montants des lignes de vente
+     $details = $get('detailsRetourVente') ?? [];
+    $totalBrut = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
+    $set('montant_total', round($totalBrut, 2));
+    
+}
 }

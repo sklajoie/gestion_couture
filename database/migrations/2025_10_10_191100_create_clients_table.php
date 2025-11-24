@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('telephone')->nullable();
             $table->string('ville')->nullable();
             $table->string('adresse')->nullable();
+            $table->string('code_client')->nullable()->unique();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('entreprise_id')->constrained('entreprises')->onDelete('cascade');
             $table->timestamps();

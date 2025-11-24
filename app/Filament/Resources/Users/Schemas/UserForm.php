@@ -70,6 +70,8 @@ class UserForm
                     ->offColor('danger'),
                     Hidden::make('user_id')
                         ->default(Auth::id()),
+                    Hidden::make('entreprise_id')
+                     ->default(fn () => Auth::user()->entreprise_id),
                     ])->columnSpanFull(),
             ]);
     }

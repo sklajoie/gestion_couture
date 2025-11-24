@@ -26,6 +26,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
@@ -150,6 +151,17 @@ class AtelierResource extends Resource
         return [
             EtapeMesuresRelationManager::class,
         ];
+    }
+
+         public static function getEloquentQuery(): Builder
+    {
+        if(!Auth::user()->hasRole(['Admin', 'SuperAdmin']))
+        {
+        return parent::getEloquentQuery()
+            ->where('id', Auth::user()->employe?->agence_id); // ou ->whereNot('id', 1)
+        }else{
+           return parent::getEloquentQuery(); 
+        }
     }
 
     public static function getPages(): array

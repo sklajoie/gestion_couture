@@ -160,8 +160,13 @@ class AgenceResource extends Resource
 
      public static function getEloquentQuery(): Builder
     {
+        if(!Auth::user()->hasRole(['Admin', 'SuperAdmin']))
+        {
         return parent::getEloquentQuery()
-            ->where('id', Auth::user()->employe->agence_id); // ou ->whereNot('id', 1)
+            ->where('id', Auth::user()->employe?->agence_id); // ou ->whereNot('id', 1)
+        }else{
+           return parent::getEloquentQuery(); 
+        }
     }
 
     public static function getPages(): array

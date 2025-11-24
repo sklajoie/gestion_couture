@@ -37,21 +37,33 @@ class VersementWidget extends StatsOverviewWidget
     {
         $startDate = $this->pageFilters['startDate'] ?? null;
         $endDate = $this->pageFilters['endDate'] ?? null;
+         if(!Auth::user()->hasRole(['Admin', 'SuperAdmin']))
+        {
         $stats =  [
-       // Stat::make('Montant Total', number_format(Versement::sum('montant'), 0, ',', ' ') . ' FCFA'),
         Stat::make(
                 label: 'MONTANT TOTAL',
                 value: number_format(
                     Versement::query()
                         ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
                         ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate))
+                        ->where('agence_id', Auth::user()->employe?->agence_id)
                         ->sum('montant'), 0, ',', ' ' ) . ' Fcfa'
                 )
-
-        //  ->color('success'),
-        // Stat::make('Montant à Encaissé', number_format(Vente::sum('solde'), 0, ',', ' ') . ' FCFA')
-        //  ->color('danger'),
         ];
+    }else{
+        $stats =  [
+        Stat::make(
+                label: 'MONTANT TOTAL',
+                value: number_format(
+                    Versement::query()
+                        ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
+                        ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate))
+                        
+                        ->sum('montant'), 0, ',', ' ' ) . ' Fcfa'
+                )
+        ];
+
+    }
 
             $agences = Agence::query()
                         ->withCount(['versement' => function ($q) use ($startDate, $endDate) {

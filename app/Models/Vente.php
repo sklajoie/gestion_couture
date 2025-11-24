@@ -37,6 +37,10 @@ class Vente extends Model
     {
         return $this->hasMany(Versement::class);
     }
+    public function retourVente()
+    {
+        return $this->hasMany(RetourVente::class);
+    }
 
     public function client()
     {
