@@ -47,8 +47,11 @@ class CreateApprovisionnementStock extends CreateRecord
                     $couture->update(['status' => 1]);
 
                         $quantiteapp = $detail->quantite;
-                        $designation = !empty($couture->Reference) ? $couture->Reference : $couture->nom;
+                        $designation = !empty($couture->designation) ? $couture->designation : $couture->nom;
                         $ref = !empty($couture->Reference) ? $couture->Reference : $couture->code_barre;
+                        $prix_vente = $couture->prix_vente ? $couture->prix_vente : $detail->prix_unitaire;
+                        $prix_achat = $detail->prix_unitaire;
+                        //dd($prix_vente);
                         // $image = $couture->Model_mesure[0];
                         $image = is_array($couture->Model_mesure) ? $couture->Model_mesure[0] ?? null : $couture->image;
 
@@ -63,14 +66,15 @@ class CreateApprovisionnementStock extends CreateRecord
                             'type' => $type,
                             'reference' => $ref,
                             'stock' => $quantiteapp,
-                            'prix' => $couture->prix_vente,
+                            'prix' => $prix_vente,
+                            'prix_achat' => $prix_achat,
                             'stock_alerte' => 1,
                             'couleur_id' => $couture->couleur_id,
                             'taille_id' => $couture->taille_id,
                             'image' => $image,
                             'user_id' => Auth::id(),
-                            'categorie_produit_id'     => $couture->categorie_produit_id,
-                            'marque_id'     => $couture->marque_id,
+                            'categorie_produit_id' => $couture->categorie_produit_id,
+                            'marque_id' => $couture->marque_id,
                         ]);
                     }
                 }

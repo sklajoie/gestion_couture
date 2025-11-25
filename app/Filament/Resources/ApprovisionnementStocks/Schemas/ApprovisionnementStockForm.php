@@ -50,20 +50,35 @@ class ApprovisionnementStockForm
                     ->options(function (callable $get) {
                         $type = $get('mesure_type');
 
-                        return match ($type) {
-                            'chemise' => \App\Models\MesureChemise::pluck('reference', 'id'),
-                            'robe' => \App\Models\MesureRobe::pluck('reference', 'id'),
-                            'pantalon' => \App\Models\MesurePantalon::pluck('reference', 'id'),
-                            'ensemble' => \App\Models\MesureEnsemble::pluck('reference', 'id'),
-                            'autre_mesure' => \App\Models\AutreMesure::pluck('reference', 'id'),
-                            'accessoire' => \App\Models\Accessoire::all()->mapWithKeys(function ($item) {
-                                        return [
-                                            $item->id => "{$item->code_barre} - {$item->nom} - {$item->prix_vente} FCFA - {$item->taille?->nom} - {$item->couleur?->nom} -  {$item->marque?->nom}"
-                                        ];
-                                    }),
+                       $models = [
+                                'chemise'       => \App\Models\MesureChemise::class,
+                                'robe'          => \App\Models\MesureRobe::class,
+                                'pantalon'      => \App\Models\MesurePantalon::class,
+                                'ensemble'      => \App\Models\MesureEnsemble::class,
+                                'autre_mesure'  => \App\Models\AutreMesure::class,
+                            ];
+                             if (! isset($models[$type])) {
+                                    return [];
+                                }
+                            if ($type === 'accessoire') {
+                                return \App\Models\Accessoire::query()
+                                    ->get()
+                                    ->mapWithKeys(fn ($item) => [
+                                        $item->id => "{$item->code_barre} - {$item->nom} - {$item->prix_vente} FCFA - {$item->taille?->nom} - {$item->couleur?->nom} - {$item->marque?->nom}"
+                                    ])
+                                    ->toArray();
+                                       }       // Si le type n'existe pas
+                               
 
-                            default => [],
-                        };
+                                // Modèle dynamique
+                                $model = $models[$type];
+
+                                return $model::query()
+                                    ->get()
+                                    ->mapWithKeys(fn ($e) => [
+                                        $e->id => "{$e->designation}-{$e->Reference}"
+                                    ])
+                                    ->toArray();
                     })
                     ->searchable()
                     ->preload()
@@ -96,6 +111,7 @@ class ApprovisionnementStockForm
                 Hidden::make('reference'),
                 TextInput::make('prix_unitaire')->label('Prix')->numeric()->default(0)
                         ->live(onBlur: true)
+                        ->required()
                         ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         $qte = floatval($get('quantite') ?? 0);
                                         $set('total', $state * $qte);

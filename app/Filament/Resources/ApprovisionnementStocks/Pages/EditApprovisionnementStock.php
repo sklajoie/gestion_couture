@@ -47,7 +47,8 @@ class EditApprovisionnementStock extends EditRecord
             }
 
             //dd($record);
-              $record = $this->record;
+            $record = $this->record;
+            
             foreach ($record->detailApproStocks as $detail) {
                 $type = $detail->mesure_type;
                 $mesureId = $detail->mesure_id;
@@ -71,12 +72,12 @@ class EditApprovisionnementStock extends EditRecord
                    $ancienneQuantite = $this->ancienstock[$mesureId]->quantite ?? 0;
                      $delta = $quantiteapp - $ancienneQuantite;
 
-                        $designation = !empty($couture->Reference) ? $couture->Reference : $couture->nom;
+                        $designation = !empty($couture->designation) ? $couture->designation : $couture->nom;
                         $ref = !empty($couture->Reference) ? $couture->Reference : $couture->code_barre;
                         $image = is_array($couture->Model_mesure) ? $couture->Model_mesure[0] ?? null : $couture->image;
-
+                         $prix_vente = $couture->prix_vente ? $couture->prix_vente : $detail->prix_unitaire;
                         $produit = StockEntreprise::where('reference', $ref)->first();
-
+                        $prix_achat = $detail->prix_unitaire;
                     if ($produit) {
                         if ($delta > 0) {
                             $produit->increment('stock', $delta);
@@ -89,10 +90,11 @@ class EditApprovisionnementStock extends EditRecord
                             'type' => $type,
                             'reference' =>  $ref,
                             'stock' => $quantiteapp,
-                            'prix' => $couture->prix_vente,
+                            'prix' => $prix_vente,
                             'stock_alerte' => 1,
                             'couleur_id' => $couture->couleur_id,
                             'taille_id' => $couture->taille_id,
+                            'prix_achat' => $prix_achat,
                             'image' =>  $image,
                             'user_id' => Auth::id(),
                             'categorie_produit_id'     => $couture->categorie_produit_id,

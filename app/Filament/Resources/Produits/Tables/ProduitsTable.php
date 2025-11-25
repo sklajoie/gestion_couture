@@ -28,12 +28,14 @@ class ProduitsTable
                     ->sortable(),
                 TextColumn::make('stock_minimum')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('stock')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('unite')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                   TextColumn::make('marque.nom')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),

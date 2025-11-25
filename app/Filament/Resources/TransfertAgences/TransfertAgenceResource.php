@@ -1,18 +1,20 @@
 <?php
 
-namespace App\Filament\Resources\RetourVentes;
+namespace App\Filament\Resources\TransfertAgences;
 
 use BackedEnum;
+use App\Models\Agence;
 use Filament\Tables\Table;
-use App\Models\RetourVente;
 use App\Models\StockAgence;
 use Filament\Schemas\Schema;
 use App\Models\StockEntreprise;
+use App\Models\TransfertAgence;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Actions\DeleteAction;
 use Filament\Support\Icons\Heroicon;
+use function Laravel\Prompts\select;
 use Illuminate\Support\Facades\Auth;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\Hidden;
@@ -23,6 +25,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\IconColumn;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -30,11 +33,13 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
-use App\Filament\Resources\RetourVentes\Pages\ManageRetourVentes;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\RepeatableEntry\TableColumn;
+use App\Filament\Resources\TransfertAgences\Pages\ManageTransfertAgences;
 
-class RetourVenteResource extends Resource
+class TransfertAgenceResource extends Resource
 {
-    protected static ?string $model = RetourVente::class;
+    protected static ?string $model = TransfertAgence::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
@@ -44,45 +49,44 @@ class RetourVenteResource extends Resource
     {
         return $schema
             ->components([
-                Select::make('vente_id')
-                    ->label('Référence Vente')
-                    ->relationship('vente', 'reference')
-                    ->searchable()
-                    ->required()
-                    ->preload(),
-                DatePicker::make('date_retour')
-                    ->default(now())
-                    ->required(),
-               
-                Select::make('statut')
-                    ->options([
-                        'Remboursé' => 'Remboursé',
-                        'Remplacé' => 'Remplacé',
-                        'Retour Atelier' => 'Retour Atelier',
-                    ])
-                    ->required(),
-                Hidden::make('user_id')
+            Grid::make()
+                ->schema([
+               Hidden::make('user_id')
                     ->default(fn () => Auth::id()),
                 Hidden::make('entreprise_id')
                      ->default(fn () => Auth::user()->entreprise_id),
+                Hidden::make('agence_id')
+                     ->default(fn () => Auth::user()->employe?->agence_id),
                      
-                Select::make('agence_id')
-                      ->relationship('agence', 'nom')
-                        ->required()
-                        ->searchable()
-                        ->reactive()
-                        ->preload()
-                        ->default(fn () => Auth::user()->agence_id)
-                        ->hidden(fn () => Auth::user()->agence_id !== null),
-                TextInput::make('montant_total')
-                    ->readOnly(),
-                Textarea::make('motif')
-                ->label('Motif du Retour'),
-                // Toggle::make('etat')
-                //     ->required(),
-                 Grid::make()
-                ->schema([
-                    Repeater::make('detailsRetourVente')
+               Select::make('agence_destination_id')
+                    ->label('Agence de destination')
+                    ->options(
+                        Agence::query()
+                    ->where('id', '!=', Auth::user()->employe?->agence_id)
+                    ->pluck('nom', 'id'))
+                    ->required()
+                    ->searchable()
+                    ->reactive()
+                    ->preload(),
+                DatePicker::make('date_transfert')
+                    ->required()
+                    ->default(now()),
+                Select::make('statut')
+                    ->options([
+                        'En cours' => 'En cours',
+                        'Transféré' => 'Transféré',
+                    ])->default('Transféré'),
+                Textarea::make('detail')
+                    ->label('Détails'),
+            ])
+            ->columns(2)
+            ->columnSpanFull(),
+        Grid::make()
+             ->schema([
+
+                
+                    Repeater::make('transfertAgenceDetails')
+                         ->label('Produits à transférer')
                         ->relationship()
                         ->schema([
                             Select::make('stock_entreprise_id')
@@ -125,24 +129,10 @@ class RetourVenteResource extends Resource
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                               $produit = StockAgence::where('stock_entreprise_id', $state)->first();
                                                 $stock = $produit?->stock ?? 0;
-                                                $prix = $produit?->stockEntreprise?->prix ?? 0;
-                                                $qte = floatval($get('quantite') ?? 0);
-                                                $total = $qte * $prix;
                                                 $set('stock', $stock);
-                                                $set('prix_unitaire', $prix);
-                                                $set('montant', $total);
-
-                                                  self::calculTotaux($state, $set, $get);
 
                                             }),
                             Hidden::make('stock'),
-
-                            // Hidden::make('agence_id')
-                            //     ->default(fn () => Auth::user()->agence_id),
-
-                            Hidden::make('user_id')
-                                ->default(fn () => Auth::id()),
-
                             TextInput::make('quantite')
                                     ->numeric()
                                     ->default(0)
@@ -150,93 +140,61 @@ class RetourVenteResource extends Resource
                                     // ->reactive()
                                     ->minValue(1)
                                     ->maxValue(fn (callable $get) => $get('stock')) 
-                                    ->required()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        $prix = floatval($get('prix_unitaire') ?? 0);
-                                        $set('montant', $state * $prix);
-                                          self::calculTotaux($state, $set, $get);
-                                    }),
-
-
-                           TextInput::make('prix_unitaire')
-                                ->numeric()
-                                ->live()
-                                ->reactive()
-                                ->readOnly()
-                                ->required()
-                                ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                    $qte = floatval($get('quantite') ?? 0);
-                                    $set('montant', $qte * $state);
-                                      self::calculTotaux($state, $set, $get);
-                                }),
-
-
-                            TextInput::make('montant')
-                                ->numeric()
-                                ->required()
-                                ->readOnly()
-                                ->reactive()
-                                 ->live(),
+                                    ->required(),
                         ])
-                        ->columns(4)
+                        ->columns(2)
                         ->columnSpanFull()
+                        
                         ->live()
                         ->reactive()
-                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                             $details = $get('detailsRetourVente') ?? [];
-
-                            $totalBrut = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
-                            $set('montant_brut', round($totalBrut, 2));
-
-
-                            self::calculTotaux($state, $set, $get);
-                        }),
-                 ])->columnSpanFull(),
+                    ])->columnSpanFull(),
             ]);
     }
-    
-public static function calculTotaux($state, callable $set, callable $get)
-{
-    // Total brut = somme des montants des lignes de vente
-     $details = $get('detailsRetourVente') ?? [];
-    $totalBrut = collect($details)->sum(fn ($item) => floatval($item['quantite'] ?? 0) * floatval($item['prix_unitaire'] ?? 0));
-    $set('montant_total', round($totalBrut, 2));
-    
-}
 
     public static function infolist(Schema $schema): Schema
     {
         return $schema
             ->components([
-                TextEntry::make('vente.reference')
-                    ->label('Référence Vente')
-                    ->placeholder('-'),
-                TextEntry::make('date_retour')
-                    ->label('Date de Retour')
-                    ->date('d M Y'),
-                TextEntry::make('motif')
-                    ->label('Motif')
-                    ->placeholder('-'),
-                TextEntry::make('statut')
-                    ->label('Statut')
-                    ->placeholder('-'),
-                TextEntry::make('user.name')
-                    ->label('Utilisateur')
-                    ->placeholder('-'),
+                TextEntry::make('reference')
+                    ->label('Référence'),
                 TextEntry::make('agence.nom')
-                    ->label('Agence')
-                    ->placeholder('-'),
-                TextEntry::make('montant_total')
-                    ->label('Montant Total')
-                    ->placeholder('-'),
+                    ->label('Agence'),
+                TextEntry::make('agence_destination.nom')
+                    ->label('Agence Destination'),
                 IconEntry::make('etat')
                     ->boolean(),
+                TextEntry::make('user.name')
+                    ->label('Utilisateur'),
+                TextEntry::make('validateur.name')
+                    ->label('Validateur')
+                    ->placeholder('-'),
+                TextEntry::make('date_transfert')
+                    ->date('d M Y'),
+                TextEntry::make('date_validation')
+                    ->date('d M Y')
+                    ->placeholder('-'),
+                TextEntry::make('statut')
+                    ->placeholder('-'),
+                TextEntry::make('detail')
+                    ->placeholder('-')
+                    ->columnSpanFull(),
                 TextEntry::make('created_at')
                     ->dateTime()
                     ->placeholder('-'),
                 TextEntry::make('updated_at')
                     ->dateTime()
                     ->placeholder('-'),
+
+                RepeatableEntry::make('transfertAgenceDetails')
+                        ->columnSpanFull()
+                        ->table([
+                    TableColumn::make('PRODUIT'),
+                    TableColumn::make('QTE'),
+                        ])
+                        ->schema([
+                    TextEntry::make('stockEntreprise.designation'),
+                    TextEntry::make('quantite'),
+                         ]),
             ]);
     }
 
@@ -245,49 +203,58 @@ public static function calculTotaux($state, callable $set, callable $get)
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                TextColumn::make('vente.reference')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('date_retour')
+                 TextColumn::make('date_transfert')
                     ->date('d M Y')
                     ->sortable(),
-                TextColumn::make('motif')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->searchable(),
-                TextColumn::make('statut')
-                    ->label('Statut')
-                    ->searchable(),
-                TextColumn::make('user.name')
-                    ->label('Utilisateur')
+                TextColumn::make('reference')
+                    ->label('Référence')
                     ->sortable(),
                 TextColumn::make('agence.nom')
                     ->label('Agence')
                     ->sortable(),
-                TextColumn::make('montant_total')
-                    ->numeric()
+                TextColumn::make('agenceDestination.nom')
+                    ->label('Agence Destination')
                     ->sortable(),
-               ToggleColumn::make('etat')
+                ToggleColumn::make('etat')
                     ->label('État')
                     ->sortable()
+                    ->disabled(fn ($record) => $record->agence_destination_id !== Auth::user()->employe?->agence_id || $record->etat )
                     ->afterStateUpdated(function ($state, $record) {
-                        $record->update(['etat' => $state, 'statut' => $state ? 'Traité retourné en agence' : 'En attente']);
+                        $record->update(['etat' => $state, 'statut' => $state ? 'Receptionné' : 'En Cours']);
                         //dd( $record->detailsRetourVente);
-                        foreach ($record->detailsRetourVente as $detail) {
+                        foreach ($record->transfertAgenceDetails as $detail) {
                             $stockAgence = StockAgence::where('agence_id', $record->agence_id)
                                 ->where('stock_entreprise_id', $detail->stock_entreprise_id)
                                 ->first();
+                            $stockDestination = StockAgence::where('agence_id', $record->agence_destination_id)
+                                ->where('stock_entreprise_id', $detail->stock_entreprise_id)
+                                ->first();
 
-                            if ($stockAgence) {
+                            if ($stockAgence && $stockDestination) {
                                 // Met à jour le stock en ajoutant la quantité retournée
-                                $stockAgence->increment('stock', $detail->quantite);
+                                $stockAgence->decrement('stock', $detail->quantite);
+                                $stockDestination->increment('stock', $detail->quantite);
                             }
                         }
+                        $record->update(['date_validation' => $state ? now() : null, 'validateur_id' => $state ? Auth::id() : null]);
                         Notification::make()
-                            ->title('État mis à jour avec succès')
+                            ->title('Transfert Validé avec succès')
                             ->success()
                             ->send();
                     }),
-
+                TextColumn::make('user.name')
+                    ->label('Utilisateur')
+                    ->sortable(),
+                TextColumn::make('validateur.name')
+                    ->label('Validateur')
+                    ->sortable(),
+               
+                TextColumn::make('date_validation')
+                    ->date('d M Y')
+                    ->sortable(),
+                TextColumn::make('statut')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -315,7 +282,7 @@ public static function calculTotaux($state, callable $set, callable $get)
     public static function getPages(): array
     {
         return [
-            'index' => ManageRetourVentes::route('/'),
+            'index' => ManageTransfertAgences::route('/'),
         ];
     }
 }
