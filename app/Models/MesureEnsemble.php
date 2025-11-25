@@ -40,6 +40,7 @@ class MesureEnsemble extends Model
         'prix_vente',
         'etape_id',
         'entreprise_id',
+         'designation',
     ];
         protected $casts = [
            'Model_mesure' => 'array',

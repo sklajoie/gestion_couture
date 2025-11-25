@@ -49,6 +49,8 @@ class MesureEnsembleForm
                             ])
                             ->label('Type')
                             ->required(),
+                        TextInput::make('designation')
+                                ->label('Désignation'),
                         TextInput::make('Tour_cou')
                             ->label('Tour cou')
                             ->numeric()

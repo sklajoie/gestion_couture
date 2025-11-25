@@ -23,6 +23,8 @@ class MesureChemiseInfolist
                     
                 TextEntry::make('Type')
                     ->label('Type'),
+                TextEntry::make('designation')
+                    ->label('Désignation'),
                    
                 TextEntry::make('Tour_cou')
                     ->label('Tour du cou'),

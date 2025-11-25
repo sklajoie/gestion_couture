@@ -46,6 +46,8 @@ class MesurePantalonForm
                     ])
                     ->label('Type')
                     ->required(),
+                 TextInput::make('designation')
+                    ->label('Désignation'),
                 TextInput::make('Tour_taille')
                     ->label('Tour de taille')
                     ->numeric()

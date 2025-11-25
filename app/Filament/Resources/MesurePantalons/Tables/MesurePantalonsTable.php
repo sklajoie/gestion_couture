@@ -40,6 +40,8 @@ class MesurePantalonsTable
                          ->searchable(),
                 TextColumn::make('Type')
                     ->label('Type'),
+                TextColumn::make('designation')
+                    ->label('Désignation'),
                 TextColumn::make('Tour_taille')
                     ->label('Tour taille'),
                 TextColumn::make('Tour_bassin')

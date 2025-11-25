@@ -66,9 +66,9 @@ static::creating(function ($model) {
 
     $produit = Produit::find($detail->produit_id);
     if ($produit) {
-        if ($produit->type === 'tout' || $produit->type === 'atelier') {
+        if ($produit->emplacement === 'tout' || $produit->emplacement === 'atelier') {
             $produit->increment('stock', $quantiteAjoutee);
-        } elseif ($produit->type === 'tout' || $produit->type === 'boutique') {
+        } elseif ($produit->emplacement === 'tout' || $produit->emplacement === 'boutique') {
             $checkStock = StockEntreprise::where('reference', $produit->code_barre)->first();
             if ($checkStock) {
                 $checkStock->increment('stock', $quantiteAjoutee);
@@ -145,14 +145,14 @@ static::updating(function ($model) {
     if ($deltaQuantite !== 0) {
         $produit = Produit::find($ancienproduit_id);
         if ($produit) {
-            if ( $produit->type === 'atelier') {
+            if ( $produit->emplacement === 'atelier') {
                 $produit->increment('stock', $deltaQuantite);
-            } elseif ( $produit->type === 'boutique') {
+            } elseif ( $produit->emplacement === 'boutique') {
                 $checkStock = StockEntreprise::where('reference', $produit->code_barre)->first();
                 if ($checkStock) {
                     $checkStock->increment('stock', $deltaQuantite);
                 }
-            } elseif ( $produit->type === 'tout') {
+            } elseif ( $produit->emplacement === 'tout') {
                 $produit->increment('stock', $deltaQuantite);
                 $checkStock = StockEntreprise::where('reference', $produit->code_barre)->first();
                 if ($checkStock) {

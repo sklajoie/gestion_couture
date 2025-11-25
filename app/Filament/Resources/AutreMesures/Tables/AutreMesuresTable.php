@@ -44,6 +44,9 @@ class AutreMesuresTable
                 TextColumn::make('Type')
                     ->label('Type')
                        ->searchable(),
+                TextColumn::make('designation')
+                    ->label('Désignation')
+                       ->searchable(),
                 IconColumn::make('status')
                   ->icon(fn (string $state): Heroicon => match ($state) {
                     '0' => Heroicon::OutlinedPencil,

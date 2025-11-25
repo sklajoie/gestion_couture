@@ -40,14 +40,21 @@ class ProduitForm
                     ->label('Couleur')
                     ->searchable(['id', 'nom'])
                      ->preload(),
-                Select::make('type')
-                    ->label('Type')
+                Select::make('emplacement')
+                    ->label('Emplacement')
                     ->options([
                         'tout' => 'Tout',
                         'boutique' => 'Boutique',
                         'atelier' => 'Atelier',
                     ])
                     ->default('tout')
+                    ->required(),
+                Select::make('type')
+                    ->label('Type')
+                    ->options([
+                        'matières' => 'Matières ',
+                        'consommables' => 'Consommables',
+                    ])
                     ->required(),
                 TextInput::make('nom')
                     ->label('Nom du produit')

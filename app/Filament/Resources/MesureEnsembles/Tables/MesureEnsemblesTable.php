@@ -40,6 +40,8 @@ class MesureEnsemblesTable
                     ->label('Date'),
                 TextColumn::make('Type')
                     ->label('Type'),
+                TextColumn::make('designation')
+                    ->label('Désignation'),
                    
                 TextColumn::make('Tour_cou')
                     ->label('Tourm cou'),

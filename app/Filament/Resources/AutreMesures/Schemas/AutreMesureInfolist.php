@@ -19,6 +19,8 @@ class AutreMesureInfolist
             ->components([
                 TextEntry::make('Type')
                     ->label('Type'),
+                TextEntry::make('designation')
+                    ->label('Désignation'),
                 
                 TextEntry::make('Description')
                     ->label('Description'), 

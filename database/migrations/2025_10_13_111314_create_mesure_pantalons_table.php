@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('mesure_pantalons', function (Blueprint $table) {
             $table->id();
             $table->string('Reference')->nullable();
+            $table->string('designation')->nullable();
             $table->string('Tour_taille')->nullable();
             $table->string('Tour_bassin')->nullable();
             $table->string('Tour_cuisse')->nullable();

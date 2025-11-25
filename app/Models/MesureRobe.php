@@ -33,6 +33,7 @@ class MesureRobe extends Model
         'prix_vente',
         'etape_id',
         'entreprise_id',
+         'designation',
         
     ];
 

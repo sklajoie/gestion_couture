@@ -46,6 +46,10 @@ class ProduitsTable
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                  TextColumn::make('emplacement')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('user.name')
                     ->label('Utilisateur')
                     ->searchable()

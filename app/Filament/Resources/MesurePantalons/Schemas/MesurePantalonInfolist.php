@@ -19,6 +19,8 @@ class MesurePantalonInfolist
             ->components([
                  TextEntry::make('Type')
                     ->label('Type'),
+                 TextEntry::make('designation')
+                    ->label('Désignation'),
                 TextEntry::make('Tour_taille')
                     ->label('Tour de taille'),
                 TextEntry::make('Tour_bassin')

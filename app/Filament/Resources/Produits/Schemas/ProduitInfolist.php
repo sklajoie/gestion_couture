@@ -48,6 +48,9 @@ class ProduitInfolist
                 TextEntry::make('couleur.nom')
                     ->label('Couleur')
                     ->placeholder('-'),
+                TextEntry::make('emplacement')
+                    ->label('Emplacement')
+                    ->placeholder('-'),
                 TextEntry::make('type')
                     ->label('Type')
                     ->placeholder('-'),

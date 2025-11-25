@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('mesure_ensembles', function (Blueprint $table) {
             $table->id();
             $table->string('Reference')->nullable();
+            $table->string('designation')->nullable();
             $table->string('Tour_cou')->nullable();
             $table->string('Tour_poitrine')->nullable();
             $table->string('Tour_taille')->nullable();

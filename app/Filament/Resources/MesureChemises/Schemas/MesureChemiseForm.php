@@ -49,6 +49,8 @@ return $schema
                                 ])
                                 ->label('Type')
                                 ->required(),
+                             TextInput::make('designation')
+                                ->label('Désignation'),
                             TextInput::make('Tour_cou')->label('Tour cou')->numeric()->nullable(),
                             TextInput::make('Tour_poitrine')->label('Tour poitrine')->numeric()->nullable(),
                             TextInput::make('Tour_taille')->label('Tour taille')->numeric()->nullable(),

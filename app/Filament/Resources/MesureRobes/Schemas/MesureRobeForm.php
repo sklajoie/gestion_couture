@@ -46,6 +46,8 @@ class MesureRobeForm
                     ])
                     ->label('Type')
                     ->required(),
+                 TextInput::make('designation')
+                    ->label('Désignation'),
                 TextInput::make('Epaule')
                     ->label('Épaule')
                      ->numeric()

@@ -20,6 +20,8 @@ class MesureRobeInfolist
             ->components([
                 TextEntry::make('Type')
                     ->label('Type'),
+                TextEntry::make('designation')
+                    ->label('Désignation'),
                 TextEntry::make('Epaule')
                     ->label('Épaule'),
                 TextEntry::make('Tour_poitrine')

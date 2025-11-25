@@ -50,6 +50,9 @@ class MesureChemisesTable
                 TextColumn::make('Type')
                     ->label('Type')
                        ->searchable(),
+                TextColumn::make('designation')
+                    ->label('Désignation')
+                       ->searchable(),
                    
                 TextColumn::make('Tour_cou')
                     ->label('Tour cou'),

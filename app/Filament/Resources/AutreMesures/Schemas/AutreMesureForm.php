@@ -46,17 +46,19 @@ return $schema
                                 ])
                                 ->label('Type')
                                 ->required(),
+                            TextInput::make('designation')
+                                ->label('Désignation'),
                
                             Repeater::make('autreMesureDetail') 
-                              ->label('Mesures')
+                                ->label('Mesures')
                                 ->relationship('autreMesureDetail')
                                 ->schema([
                                     TextInput::make('nom')->required(),
                                     TextInput::make('mesure')->numeric()->required(),
                                     TextInput::make('detail')->nullable(),
                                 ])
-                             ->columns(3)
-                             ->createItemButtonLabel('Ajouter')
+                                ->columns(3)
+                                ->createItemButtonLabel('Ajouter')
                                 ->columnSpanFull()
                         ]),
 

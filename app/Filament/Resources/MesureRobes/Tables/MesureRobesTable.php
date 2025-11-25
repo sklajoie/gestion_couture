@@ -37,6 +37,8 @@ class MesureRobesTable
                     ->label('Date'),
                 TextColumn::make('Type')
                     ->label('Type'),
+                TextColumn::make('designation')
+                    ->label('Désignation'),
                 TextColumn::make('Epaule')
                     ->label('Épaule'),
                 TextColumn::make('Tour_poitrine')

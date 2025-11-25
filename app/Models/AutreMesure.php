@@ -23,6 +23,7 @@ class AutreMesure extends Model
         'prix_vente',
         'etape_id',
         'entreprise_id',
+        'designation',
     ];
 
 
