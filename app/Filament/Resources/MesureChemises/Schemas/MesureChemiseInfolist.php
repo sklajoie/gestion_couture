@@ -57,6 +57,8 @@ class MesureChemiseInfolist
                     ->label('Description'), 
                 TextEntry::make('user.name')
                     ->label('Utilisateur'),
+                TextEntry::make('nombre')
+                    ->label('Nombre'),
 
                 ImageEntry::make('Model_mesure') 
                     ->disk('public')

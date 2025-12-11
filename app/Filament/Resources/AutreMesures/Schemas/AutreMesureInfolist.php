@@ -23,7 +23,9 @@ class AutreMesureInfolist
                     ->label('Désignation'),
                 
                 TextEntry::make('Description')
-                    ->label('Description'), 
+                    ->label('Description'),
+                TextEntry::make('nombre')
+                    ->label('Nombre'),
                 TextEntry::make('user.name')
                     ->label('Utilisateur'),
                 RepeatableEntry::make('autreMesureDetail')

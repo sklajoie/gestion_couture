@@ -185,6 +185,10 @@ return $schema
                                         ->options(Taille::query()->pluck('nom', 'id'))
                                         ->searchable()
                                         ->label('Taille'),
+                                TextInput::make('nombre')
+                                        ->label('Nombre')
+                                        ->numeric()
+                                        ->required(),
                                 
                         ]),
                 ]),

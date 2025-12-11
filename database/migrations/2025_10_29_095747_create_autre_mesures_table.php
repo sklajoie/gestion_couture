@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('Reference')->nullable();
             $table->string('Type')->nullable();
             $table->string('designation')->nullable();
+            $table->float('nombre')->nullable();
             $table->text('Description')->nullable();
             $table->json('Model_mesure')->nullable();
             $table->foreignId('user_id')->constrained('users')->onDelete('set null');

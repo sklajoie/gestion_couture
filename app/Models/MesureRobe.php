@@ -34,6 +34,7 @@ class MesureRobe extends Model
         'etape_id',
         'entreprise_id',
          'designation',
+         'nombre',
         
     ];
 

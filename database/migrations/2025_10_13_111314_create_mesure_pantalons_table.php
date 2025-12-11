@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('Reference')->nullable();
             $table->string('designation')->nullable();
+              $table->float('nombre')->nullable();
             $table->string('Tour_taille')->nullable();
             $table->string('Tour_bassin')->nullable();
             $table->string('Tour_cuisse')->nullable();

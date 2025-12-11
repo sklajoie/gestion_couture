@@ -48,6 +48,8 @@ class MesureRobeInfolist
                     ->label('Description'),
                 TextEntry::make('user.name')
                     ->label('Utilisateur'),
+                TextEntry::make('nombre')
+                    ->label('Nombre'),
                 ImageEntry::make('Model_mesure') 
                     ->disk('public')
                     ->imageWidth(200)

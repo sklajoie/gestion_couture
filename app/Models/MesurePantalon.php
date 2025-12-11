@@ -32,6 +32,7 @@ class MesurePantalon extends Model
         'etape_id',
         'entreprise_id',
          'designation',
+         'nombre',
     ];
 
         protected $casts = [

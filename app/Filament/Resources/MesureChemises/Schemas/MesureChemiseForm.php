@@ -84,7 +84,7 @@ return $schema
                                 ->panelLayout('grid'),
                                             ////////////choix produit
                             Repeater::make('produitCouture')
-                                ->label('Produits commandés')
+                                ->label('Matieres / Consomables')
                                 ->relationship('produitCouture') // Assure-toi que la relation existe dans le modèle BonCommande
                                 ->schema([
                                     Select::make('produit_id')
@@ -138,7 +138,7 @@ return $schema
                                         
                                 ])
                                 ->columns(4) // Affiche les 4 champs sur une seule ligne
-                                ->createItemButtonLabel('Ajouter un produit')
+                                ->createItemButtonLabel('Matieres / Consomables')
                                 ->columnSpanFull()
                                 ->reactive()
                                 ->default([]) // ← important pour éviter les erreurs si vide
@@ -152,7 +152,7 @@ return $schema
                                  self::calcTotals($state, $set, $get);
                                 }),
                                 TextInput::make('total_produit')
-                                        ->label('TOTAL PRODUIT')
+                                        ->label("Total Matieres & Consomables")
                                         ->numeric()
                                          ->live()
                                          ->reactive()
@@ -173,6 +173,7 @@ return $schema
                                         ->nullable()
                                          ->reactive()
                                          ->live(),
+                               
                                 TextInput::make('prix_vente')
                                         ->label('Prix Vente')
                                         ->numeric()
@@ -185,6 +186,10 @@ return $schema
                                         ->options(Taille::query()->pluck('nom', 'id'))
                                         ->searchable()
                                         ->label('Taille'),
+                                TextInput::make('nombre')
+                                        ->label('Nombre')
+                                        ->numeric()
+                                        ->required(),
                                 
                         ]),
                 ]),
